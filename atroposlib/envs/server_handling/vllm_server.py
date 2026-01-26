@@ -182,7 +182,8 @@ class VLLMServer(APIServer):
         if "model" in kwargs:
             kwargs.pop("model")
         # Prepare request for VLLM native API
-        request_data = {"prompt": {"prompt_token_ids": prompt_tokens}, "logprobs": 0}
+        # vLLM 0.14.x expects prompt_token_ids at top level, not nested in prompt
+        request_data = {"prompt_token_ids": prompt_tokens, "logprobs": 0}
         request_data.update(kwargs)
 
         # Make async request to VLLM /generate endpoint
