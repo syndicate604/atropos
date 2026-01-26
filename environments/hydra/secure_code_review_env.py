@@ -54,15 +54,12 @@ EXAMPLE - SQL Injection Fix:
 ```diff
 --- a/workspace/app.py
 +++ b/workspace/app.py
-@@ -15,7 +15,8 @@ def get_user(user_id):
-     """Fetch user by ID."""
+@@ -15,5 +15,5 @@ def get_user(user_id):
      conn = get_db()
--    # VULNERABLE: String concatenation allows SQL injection
 -    sql = f"SELECT * FROM users WHERE id = '{user_id}'"
-+    # FIXED: Parameterized query prevents SQL injection
+-    cursor = conn.execute(sql)
 +    sql = "SELECT * FROM users WHERE id = ?"
 +    cursor = conn.execute(sql, (user_id,))
--    cursor = conn.execute(sql)
      return cursor.fetchone()
 ```
 
@@ -457,9 +454,6 @@ Generate a unified diff patch to fix this vulnerability:"""
                 self.pass_rate_buffer.append(0.0)
                 self.failure_reasons[failure_reason] = self.failure_reasons.get(failure_reason, 0) + 1
 
-        # Debug: log group scores
-        print(f"[SCR] Group scores: {group_scores}")
-
             # Filter out very short completions
             masks = item["masks"]
             if len([m for m in masks if m != -100]) < 10:
@@ -469,6 +463,9 @@ Generate a unified diff patch to fix this vulnerability:"""
             scores["masks"].append(masks)
             scores["inference_logprobs"].append(item["logprobs"])
             scores["scores"].append(score_value)
+
+        # Debug: log group scores
+        print(f"[SCR] Group scores: {group_scores}")
 
         # Need at least 2 items with different scores for GRPO
         if len(scores["tokens"]) < 2:
