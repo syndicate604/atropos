@@ -41,22 +41,32 @@ Your task is to analyze vulnerable code and produce a unified diff patch that:
 3. Passes regression tests
 4. Produces clean static analysis results
 
-IMPORTANT OUTPUT FORMAT:
-- Output ONLY a unified diff patch
-- The patch should apply with `patch -p1`
-- Use standard diff format with --- a/path and +++ b/path headers
-- Do not include any explanation, just the diff
+CRITICAL OUTPUT FORMAT REQUIREMENTS:
+- Output ONLY a unified diff patch, nothing else
+- The patch MUST apply with `patch -p1`
+- File paths MUST start with a/ and b/ prefixes: `--- a/workspace/app.py` and `+++ b/workspace/app.py`
+- Include proper @@ hunk headers with line numbers
+- Context lines (unchanged) must start with a single space
+- Removed lines start with -
+- Added lines start with +
 
-Example output format:
+EXAMPLE - SQL Injection Fix:
 ```diff
 --- a/workspace/app.py
 +++ b/workspace/app.py
-@@ -10,5 +10,5 @@ def vulnerable_function():
--    # vulnerable code
-+    # fixed code
+@@ -15,7 +15,8 @@ def get_user(user_id):
+     """Fetch user by ID."""
+     conn = get_db()
+-    # VULNERABLE: String concatenation allows SQL injection
+-    sql = f"SELECT * FROM users WHERE id = '{user_id}'"
++    # FIXED: Parameterized query prevents SQL injection
++    sql = "SELECT * FROM users WHERE id = ?"
++    cursor = conn.execute(sql, (user_id,))
+-    cursor = conn.execute(sql)
+     return cursor.fetchone()
 ```
 
-Think carefully about the vulnerability and how to fix it properly before generating the patch."""
+Generate ONLY the diff, no explanations before or after."""
 
 
 class SCRTask(TypedDict):
@@ -196,8 +206,44 @@ class SecureCodeReviewEnv(BaseEnv):
 
 Generate a unified diff patch to fix this vulnerability:"""
 
+    def _normalize_diff_headers(self, diff_text: str) -> str:
+        """
+        Normalize diff headers to ensure `patch -p1` compatibility.
+
+        Converts:
+        - `--- workspace/app.py` → `--- a/workspace/app.py`
+        - `+++ workspace/app.py` → `+++ b/workspace/app.py`
+
+        This fixes the most common formatting issue from small models.
+        """
+        lines = diff_text.split('\n')
+        normalized = []
+
+        for line in lines:
+            # Fix --- header (missing a/ prefix)
+            if line.startswith('--- ') and not line.startswith('--- a/'):
+                # Extract path after "--- "
+                path = line[4:].strip()
+                # Skip timestamps if present (e.g., "--- file.py\t2024-01-01")
+                if '\t' in path:
+                    path = path.split('\t')[0]
+                # Add a/ prefix if not present
+                if not path.startswith('a/'):
+                    line = f'--- a/{path}'
+            # Fix +++ header (missing b/ prefix)
+            elif line.startswith('+++ ') and not line.startswith('+++ b/'):
+                path = line[4:].strip()
+                if '\t' in path:
+                    path = path.split('\t')[0]
+                if not path.startswith('b/'):
+                    line = f'+++ b/{path}'
+
+            normalized.append(line)
+
+        return '\n'.join(normalized)
+
     def _extract_diff_from_response(self, response: str) -> Optional[str]:
-        """Extract a unified diff from the model response."""
+        """Extract a unified diff from the model response and normalize headers."""
         # Try to find diff in code block first (most reliable)
         diff_pattern = r'```(?:diff)?\s*\n(.*?)```'
         matches = re.findall(diff_pattern, response, re.DOTALL)
@@ -206,7 +252,7 @@ Generate a unified diff patch to fix this vulnerability:"""
             diff_text = matches[0].strip()
             # Validate it looks like a diff
             if any(line.startswith(('---', '+++', 'diff ')) for line in diff_text.split('\n')[:5]):
-                return diff_text
+                return self._normalize_diff_headers(diff_text)
 
         # Try to find raw diff without code blocks
         lines = response.split('\n')
@@ -244,9 +290,25 @@ Generate a unified diff patch to fix this vulnerability:"""
 
         # Validate we got something that looks like a diff
         if diff_text and any(line.startswith('---') for line in diff_text.split('\n')[:5]):
-            return diff_text
+            return self._normalize_diff_headers(diff_text)
 
         return None
+
+    # Graded scoring by failure reason to create variance even when all patches fail
+    # Higher (less negative) = closer to success
+    FAILURE_SCORES = {
+        # Format/application failures (worst)
+        "invalid_patch_format": -1.0,
+        "patch_apply_failure": -0.9,
+        # Scanner still finds issues (applied but not properly fixed)
+        "scanner_findings": -0.6,
+        # Broke functionality (security fix worked but side effects)
+        "regression_test_failure": -0.4,
+        # Almost there - applied, tests pass, but exploit still works
+        "patch_ineffective": -0.2,
+        # Unknown failure
+        "unknown": -0.8,
+    }
 
     async def _score_single_patch(
         self,
@@ -257,9 +319,17 @@ Generate a unified diff patch to fix this vulnerability:"""
         Score a single patch using the harness.
 
         Returns: (score, failure_reason, patch_error)
+
+        Scoring is graded by failure reason to create variance:
+        - +1.0: passed (all checks pass)
+        - -0.2: patch_ineffective (almost there)
+        - -0.4: regression_test_failure (fix worked but broke tests)
+        - -0.6: scanner_findings (applied but incomplete fix)
+        - -0.9: patch_apply_failure (couldn't apply)
+        - -1.0: invalid_patch_format (no valid diff)
         """
         if diff_text is None:
-            return -1.0, "invalid_patch_format", "Could not extract diff from response"
+            return self.FAILURE_SCORES["invalid_patch_format"], "invalid_patch_format", "Could not extract diff from response"
 
         # Write diff to temp file
         with tempfile.NamedTemporaryFile(
@@ -284,7 +354,9 @@ Generate a unified diff patch to fix this vulnerability:"""
             if result.passed:
                 return 1.0, "", ""
             else:
-                return -1.0, result.failure_reason or "unknown", result.patch_error
+                failure_reason = result.failure_reason or "unknown"
+                score = self.FAILURE_SCORES.get(failure_reason, -0.8)
+                return score, failure_reason, result.patch_error
 
         finally:
             # Cleanup temp file
@@ -370,11 +442,13 @@ Generate a unified diff patch to fix this vulnerability:"""
         }
 
         # Score each patch (could parallelize later with semaphore)
+        group_scores = []  # For debug logging
         for item in rollout_group_data:
             score_value, failure_reason, patch_error = await self._score_single_patch(
                 task_id=item["task_id"],
                 diff_text=item["diff_text"]
             )
+            group_scores.append((score_value, failure_reason))
 
             # Track metrics
             if score_value > 0:
@@ -382,6 +456,9 @@ Generate a unified diff patch to fix this vulnerability:"""
             else:
                 self.pass_rate_buffer.append(0.0)
                 self.failure_reasons[failure_reason] = self.failure_reasons.get(failure_reason, 0) + 1
+
+        # Debug: log group scores
+        print(f"[SCR] Group scores: {group_scores}")
 
             # Filter out very short completions
             masks = item["masks"]
