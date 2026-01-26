@@ -1,0 +1,37 @@
+# harness/semgrep-rules/security.yaml
+# Minimal rule set for Week 1 - SQL injection detection
+rules:
+  - id: python-sql-injection-format-string
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $CURSOR.execute(f"...", ...)
+          - pattern: |
+              $CURSOR.execute("..." % ..., ...)
+          - pattern: |
+              $CURSOR.execute("...".format(...), ...)
+          - pattern: |
+              $CONN.execute(f"...", ...)
+          - pattern: |
+              $CONN.execute("..." % ..., ...)
+          - pattern: |
+              $CONN.execute("...".format(...), ...)
+    message: "Potential SQL injection via string formatting"
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-89"
+      owasp: "A03:2021"
+
+  - id: python-sql-injection-concatenation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $CURSOR.execute($X + ...)
+          - pattern: |
+              $CONN.execute($X + ...)
+    message: "Potential SQL injection via string concatenation"
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-89"

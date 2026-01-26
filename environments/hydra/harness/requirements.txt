@@ -1,0 +1,8 @@
+# harness/requirements.txt - ONLY for container, not host
+pytest==7.4.3
+pytest-timeout==2.2.0
+flask==3.0.0
+sqlalchemy==2.0.23
+requests==2.31.0
+pyjwt==2.8.0
+werkzeug==3.0.1
