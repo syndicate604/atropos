@@ -33,37 +33,47 @@ from harness.runner import HarnessRunner, TaskResult
 
 
 # System prompt for secure code review
-SYSTEM_PROMPT = """You are an expert security engineer specializing in secure code review and vulnerability remediation.
+SYSTEM_PROMPT = """You are an expert security engineer. Your task is to fix security vulnerabilities by generating unified diff patches.
 
-Your task is to analyze vulnerable code and produce a unified diff patch that:
-1. Fixes the security vulnerability
-2. Maintains all existing functionality
-3. Passes regression tests
-4. Produces clean static analysis results
+STRICT OUTPUT FORMAT - Follow this EXACTLY:
+1. Output ONLY a diff, no text before or after
+2. Use this EXACT format:
 
-CRITICAL OUTPUT FORMAT REQUIREMENTS:
-- Output ONLY a unified diff patch, nothing else
-- The patch MUST apply with `patch -p1`
-- File paths MUST start with a/ and b/ prefixes: `--- a/workspace/app.py` and `+++ b/workspace/app.py`
-- Include proper @@ hunk headers with line numbers
-- Context lines (unchanged) must start with a single space
-- Removed lines start with -
-- Added lines start with +
-
-EXAMPLE - SQL Injection Fix:
 ```diff
+diff --git a/workspace/app.py b/workspace/app.py
 --- a/workspace/app.py
 +++ b/workspace/app.py
-@@ -15,5 +15,5 @@ def get_user(user_id):
-     conn = get_db()
--    sql = f"SELECT * FROM users WHERE id = '{user_id}'"
--    cursor = conn.execute(sql)
-+    sql = "SELECT * FROM users WHERE id = ?"
-+    cursor = conn.execute(sql, (user_id,))
-     return cursor.fetchone()
+@@ -LINE,COUNT +LINE,COUNT @@ function_name
+ context line (space prefix)
+-removed line (minus prefix)
++added line (plus prefix)
+ context line (space prefix)
 ```
 
-Generate ONLY the diff, no explanations before or after."""
+RULES:
+- File path is ALWAYS: workspace/app.py
+- Headers MUST have a/ and b/ prefixes
+- Each line MUST start with: space, +, -, or @@
+- NO explanations, NO prose, NO comments outside the diff
+
+EXAMPLE - Fixing SQL injection (CWE-89):
+```diff
+diff --git a/workspace/app.py b/workspace/app.py
+--- a/workspace/app.py
++++ b/workspace/app.py
+@@ -38,6 +38,6 @@ def search_users():
+     conn = get_db()
+     init_db(conn)
+
+-    sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"
+-    cursor = conn.execute(sql)
++    sql = "SELECT * FROM users WHERE username LIKE ?"
++    cursor = conn.execute(sql, (f"%{query}%",))
+
+     results = [dict(row) for row in cursor.fetchall()]
+```
+
+Generate the diff now:"""
 
 
 class SCRTask(TypedDict):
@@ -203,41 +213,89 @@ class SecureCodeReviewEnv(BaseEnv):
 
 Generate a unified diff patch to fix this vulnerability:"""
 
+    def _normalize_path(self, path: str) -> str:
+        """Normalize a file path for diff format."""
+        path = path.strip()
+        # Remove timestamps
+        if '\t' in path:
+            path = path.split('\t')[0]
+        # Remove leading ./
+        if path.startswith('./'):
+            path = path[2:]
+        # Ensure workspace/ prefix for app.py
+        if path == 'app.py' or path.endswith('/app.py'):
+            if not path.startswith('workspace/'):
+                path = 'workspace/app.py'
+        return path
+
     def _normalize_diff_headers(self, diff_text: str) -> str:
         """
-        Normalize diff headers to ensure `patch -p1` compatibility.
+        Aggressively normalize diff headers for `patch -p1` compatibility.
 
-        Converts:
-        - `--- workspace/app.py` → `--- a/workspace/app.py`
-        - `+++ workspace/app.py` → `+++ b/workspace/app.py`
-
-        This fixes the most common formatting issue from small models.
+        Handles common model mistakes:
+        - Missing a/b prefixes
+        - Missing workspace/ in path
+        - Leading ./ in paths
+        - Missing diff --git header
+        - Prose between headers (stripped)
         """
         lines = diff_text.split('\n')
         normalized = []
+        has_git_header = False
+        in_diff = False
+        file_path = None
 
         for line in lines:
-            # Fix --- header (missing a/ prefix)
-            if line.startswith('--- ') and not line.startswith('--- a/'):
-                # Extract path after "--- "
-                path = line[4:].strip()
-                # Skip timestamps if present (e.g., "--- file.py\t2024-01-01")
-                if '\t' in path:
-                    path = path.split('\t')[0]
-                # Add a/ prefix if not present
-                if not path.startswith('a/'):
-                    line = f'--- a/{path}'
-            # Fix +++ header (missing b/ prefix)
-            elif line.startswith('+++ ') and not line.startswith('+++ b/'):
-                path = line[4:].strip()
-                if '\t' in path:
-                    path = path.split('\t')[0]
-                if not path.startswith('b/'):
-                    line = f'+++ b/{path}'
+            # Track if we have a git header
+            if line.startswith('diff --git'):
+                has_git_header = True
+                in_diff = True
+                normalized.append(line)
+                continue
 
+            # Fix --- header
+            if line.startswith('--- '):
+                in_diff = True
+                path = self._normalize_path(line[4:])
+                # Remove any existing a/ prefix before re-adding
+                if path.startswith('a/'):
+                    path = path[2:]
+                file_path = path
+                line = f'--- a/{path}'
+                normalized.append(line)
+                continue
+
+            # Fix +++ header
+            if line.startswith('+++ '):
+                path = self._normalize_path(line[4:])
+                if path.startswith('b/'):
+                    path = path[2:]
+                line = f'+++ b/{path}'
+                normalized.append(line)
+                continue
+
+            # Keep hunk headers and diff content
+            if line.startswith('@@') or line.startswith('+') or line.startswith('-') or line.startswith(' '):
+                in_diff = True
+                normalized.append(line)
+                continue
+
+            # If we're in diff mode and see non-diff content, might be prose - skip it
+            if in_diff and line.strip() and not line.startswith(('#', 'diff', '---', '+++', '@@', '+', '-', ' ', '\\')):
+                # Skip prose lines within diff
+                continue
+
+            # Keep empty lines and other valid content
             normalized.append(line)
 
-        return '\n'.join(normalized)
+        result = '\n'.join(normalized)
+
+        # Add diff --git header if missing but we have file path
+        if not has_git_header and file_path:
+            git_header = f'diff --git a/{file_path} b/{file_path}\n'
+            result = git_header + result
+
+        return result
 
     def _extract_diff_from_response(self, response: str) -> Optional[str]:
         """Extract a unified diff from the model response and normalize headers."""
@@ -293,19 +351,34 @@ Generate a unified diff patch to fix this vulnerability:"""
 
     # Graded scoring by failure reason to create variance even when all patches fail
     # Higher (less negative) = closer to success
+    # Split patch_apply_failure into subreasons for better variance
     FAILURE_SCORES = {
-        # Format/application failures (worst)
+        # Format failures (worst - no valid diff extracted)
         "invalid_patch_format": -1.0,
-        "patch_apply_failure": -0.9,
-        # Scanner still finds issues (applied but not properly fixed)
+        # Patch apply subreasons (creates variance even when all fail to apply)
+        "patch_apply_malformed": -0.95,      # "malformed patch" / "patch: ****"
+        "patch_apply_path_not_found": -0.9,  # "can't find file to patch"
+        "patch_apply_hunk_failed": -0.85,    # "Hunk #X FAILED"
+        "patch_apply_other": -0.92,          # Other apply errors
+        # Post-apply failures (patch applied successfully)
         "scanner_findings": -0.6,
-        # Broke functionality (security fix worked but side effects)
         "regression_test_failure": -0.4,
-        # Almost there - applied, tests pass, but exploit still works
         "patch_ineffective": -0.2,
         # Unknown failure
         "unknown": -0.8,
     }
+
+    def _classify_patch_error(self, error_text: str) -> str:
+        """Classify patch application error into subreasons for variance."""
+        error_lower = error_text.lower()
+        if "malformed patch" in error_lower or "patch: ****" in error_text:
+            return "patch_apply_malformed"
+        elif "can't find file to patch" in error_lower:
+            return "patch_apply_path_not_found"
+        elif "hunk" in error_lower and "failed" in error_lower:
+            return "patch_apply_hunk_failed"
+        else:
+            return "patch_apply_other"
 
     async def _score_single_patch(
         self,
@@ -352,6 +425,9 @@ Generate a unified diff patch to fix this vulnerability:"""
                 return 1.0, "", ""
             else:
                 failure_reason = result.failure_reason or "unknown"
+                # Split patch_apply_failure into subreasons for variance
+                if failure_reason == "patch_apply_failure" and result.patch_error:
+                    failure_reason = self._classify_patch_error(result.patch_error)
                 score = self.FAILURE_SCORES.get(failure_reason, -0.8)
                 return score, failure_reason, result.patch_error
 
