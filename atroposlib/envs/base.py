@@ -1617,7 +1617,9 @@ class BaseEnv(ABC):
                     env_config_dict_base["data_path_to_save_groups"] = (
                         f"data/{cls.name or 'groups'}.jsonl"
                     )
-                env_config_dict_base["use_wandb"] = True
+                # Process mode runs without rollout server, so disable wandb by default
+                # (no server to get wandb project/group info from)
+                env_config_dict_base["use_wandb"] = False
 
                 env_config_dict = merge_dicts(
                     env_config_dict_base,  # `config_init` defaults with process adjustments
