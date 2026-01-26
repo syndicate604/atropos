@@ -82,7 +82,11 @@ async def generate(request: Request) -> Response:
 
 @with_cancellation
 async def _generate(request_dict: dict, raw_request: Request) -> Response:
-    prompt = request_dict.pop("prompt")
+    # Support both string prompt and token IDs (Atropos sends prompt_token_ids)
+    if "prompt_token_ids" in request_dict:
+        prompt = {"prompt_token_ids": request_dict.pop("prompt_token_ids")}
+    else:
+        prompt = request_dict.pop("prompt")
     stream = request_dict.pop("stream", False)
     request_dict["output_kind"] = RequestOutputKind.FINAL_ONLY
     sampling_params = SamplingParams(**request_dict)
