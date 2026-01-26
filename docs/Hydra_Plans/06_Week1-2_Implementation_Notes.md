@@ -235,11 +235,89 @@ python3 harness/runner.py <task_id> [patch_name] [--patch-file PATH] [--tasks-di
 
 ---
 
+## Week 3 Progress (January 26, 2026)
+
+### Achievements
+
+1. **7B Model Running** - Qwen2.5-7B-Instruct downloaded and serving via custom vLLM server
+2. **Training Variance Unblocked** - Groups now save reliably with score variance
+3. **Graded Scoring with Subreasons** - Patch failures classified for better learning signal
+
+### Graded Scoring System
+
+```python
+FAILURE_SCORES = {
+    # Format failures (worst)
+    "invalid_patch_format": -1.0,
+    # Patch apply subreasons (creates variance)
+    "patch_apply_malformed": -0.95,      # "malformed patch"
+    "patch_apply_path_not_found": -0.9,  # "can't find file"
+    "patch_apply_hunk_failed": -0.85,    # "Hunk #X FAILED"
+    "patch_apply_other": -0.92,
+    # Post-apply failures
+    "scanner_findings": -0.6,
+    "regression_test_failure": -0.4,
+    "patch_ineffective": -0.2,
+    # Success
+    "passed": +1.0,
+}
+```
+
+### Inference Server Configuration
+
+**Use the custom `/generate` server** (not OpenAI-compatible):
+
+```bash
+# Start custom vLLM server with 7B model
+python3 example_trainer/vllm_api_server.py \
+  --model ~/models/Qwen2.5-7B-Instruct \
+  --port 9004 \
+  --gpu-memory-utilization 0.85 \
+  --max-model-len 2048 \
+  --enforce-eager
+
+# Run SecureCodeReviewEnv
+python3 environments/hydra/secure_code_review_env.py process \
+  --openai.base_url http://localhost:9004/v1 \
+  --openai.model_name ~/models/Qwen2.5-7B-Instruct \
+  --openai.server_type vllm \
+  --env.tokenizer_name ~/models/Qwen2.5-7B-Instruct \
+  --env.group_size 4 \
+  --env.total_steps 100 \
+  --env.max_token_length 512 \
+  --env.data_path_to_save_groups /tmp/scr_rollouts.jsonl
+```
+
+### Key Fixes Applied
+
+1. **`example_trainer/vllm_api_server.py`** - Added `prompt_token_ids` support (Atropos sends token IDs, not text)
+2. **`secure_code_review_env.py`** - Subreason classification for patch errors
+3. **`secure_code_review_env.py`** - Aggressive diff normalization (adds `diff --git` header, fixes paths)
+4. **`secure_code_review_env.py`** - Improved few-shot example with exact format
+
+### Current Status
+
+| Metric | Value |
+|--------|-------|
+| Groups saving | ✅ Yes |
+| Score variance | ✅ {-0.9, -0.95} |
+| Infinite retry | ✅ Fixed |
+| Patches applying | ❌ Not yet (model still learning format) |
+
+### Next: Longer Run + Learning Curve
+
+Run 100+ steps and measure:
+- Distribution of failure reasons over time
+- First 10 groups vs last 10 groups
+- Any shift toward "patch applies" categories
+
+---
+
 ## Next Steps
 
-### Immediate (Week 3)
-1. **Try 7B model** for better diff generation
-2. **Add few-shot examples** to system prompt
+### Immediate (Week 3 continued)
+1. **Run 100-step process** - Measure learning curve
+2. **Add stronger few-shot examples** - Reduce malformed diffs
 3. **Expand to 10 tasks** (different vuln categories)
 
 ### Near-term (Week 4-5)
