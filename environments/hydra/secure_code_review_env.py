@@ -40,9 +40,9 @@ STRICT OUTPUT FORMAT - Follow this EXACTLY:
 2. Use this EXACT format:
 
 ```diff
-diff --git a/workspace/app.py b/workspace/app.py
---- a/workspace/app.py
-+++ b/workspace/app.py
+diff --git a/app.py b/app.py
+--- a/app.py
++++ b/app.py
 @@ -LINE,COUNT +LINE,COUNT @@ function_name
  context line (space prefix)
 -removed line (minus prefix)
@@ -51,16 +51,16 @@ diff --git a/workspace/app.py b/workspace/app.py
 ```
 
 RULES:
-- File path is ALWAYS: workspace/app.py
+- File path is ALWAYS: app.py (NOT workspace/app.py)
 - Headers MUST have a/ and b/ prefixes
 - Each line MUST start with: space, +, -, or @@
 - NO explanations, NO prose, NO comments outside the diff
 
 EXAMPLE - Fixing SQL injection (CWE-89):
 ```diff
-diff --git a/workspace/app.py b/workspace/app.py
---- a/workspace/app.py
-+++ b/workspace/app.py
+diff --git a/app.py b/app.py
+--- a/app.py
++++ b/app.py
 @@ -38,6 +38,6 @@ def search_users():
      conn = get_db()
      init_db(conn)
@@ -214,7 +214,12 @@ class SecureCodeReviewEnv(BaseEnv):
 Generate a unified diff patch to fix this vulnerability:"""
 
     def _normalize_path(self, path: str) -> str:
-        """Normalize a file path for diff format."""
+        """
+        Normalize a file path for diff format.
+
+        Patches are applied with `-d /workspace`, so paths should be
+        relative to the workspace directory (e.g., 'app.py' not 'workspace/app.py').
+        """
         path = path.strip()
         # Remove timestamps
         if '\t' in path:
@@ -222,10 +227,15 @@ Generate a unified diff patch to fix this vulnerability:"""
         # Remove leading ./
         if path.startswith('./'):
             path = path[2:]
-        # Ensure workspace/ prefix for app.py
-        if path == 'app.py' or path.endswith('/app.py'):
-            if not path.startswith('workspace/'):
-                path = 'workspace/app.py'
+        # Remove workspace/ prefix - paths should be relative to workspace dir
+        if path.startswith('workspace/'):
+            path = path[len('workspace/'):]
+        # Remove a/ or b/ prefix (will be re-added)
+        if path.startswith('a/') or path.startswith('b/'):
+            path = path[2:]
+        # Remove another workspace/ in case it was doubled (a/workspace/app.py)
+        if path.startswith('workspace/'):
+            path = path[len('workspace/'):]
         return path
 
     def _normalize_diff_headers(self, diff_text: str) -> str:
