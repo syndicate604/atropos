@@ -37,12 +37,12 @@ SYSTEM_PROMPT = """You are an expert security engineer. Your task is to fix secu
 
 STRICT OUTPUT FORMAT - Follow this EXACTLY:
 1. Output ONLY a diff, no text before or after
-2. Use this EXACT format:
+2. Use this EXACT format (replace FILENAME with the actual target file):
 
 ```diff
-diff --git a/app.py b/app.py
---- a/app.py
-+++ b/app.py
+diff --git a/FILENAME b/FILENAME
+--- a/FILENAME
++++ b/FILENAME
 @@ -LINE,COUNT +LINE,COUNT @@ function_name
  context line (space prefix)
 -removed line (minus prefix)
@@ -51,12 +51,12 @@ diff --git a/app.py b/app.py
 ```
 
 RULES:
-- File path is ALWAYS: app.py (NOT workspace/app.py)
+- Use the target file specified in the task (e.g., app.py, NOT workspace/app.py)
 - Headers MUST have a/ and b/ prefixes
 - Each line MUST start with: space, +, -, or @@
 - NO explanations, NO prose, NO comments outside the diff
 
-EXAMPLE - Fixing SQL injection (CWE-89):
+EXAMPLE - Fixing SQL injection (CWE-89) in app.py:
 ```diff
 diff --git a/app.py b/app.py
 --- a/app.py
@@ -83,6 +83,7 @@ class SCRTask(TypedDict):
     metadata: Dict[str, Any]
     cwe: str
     description: str
+    target_file: str  # Relative path for patch (e.g., "app.py")
 
 
 class SecureCodeReviewEnv(BaseEnv):
@@ -171,12 +172,18 @@ class SecureCodeReviewEnv(BaseEnv):
                 print(f"Warning: No code file found for task {task_dir.name}")
                 continue
 
+            # Extract relative target file for patch (strip workspace/ prefix)
+            target_file = vuln_file
+            if target_file.startswith("workspace/"):
+                target_file = target_file[len("workspace/"):]
+
             task = SCRTask(
                 task_id=task_meta["id"],
                 code=code,
                 metadata=task_meta.get("metadata", {}),
                 cwe=task_meta.get("cwe", "Unknown"),
-                description=task_meta.get("metadata", {}).get("description", "")
+                description=task_meta.get("metadata", {}).get("description", ""),
+                target_file=target_file
             )
             self.tasks.append(task)
 
@@ -194,13 +201,15 @@ class SecureCodeReviewEnv(BaseEnv):
 
     def _build_user_prompt(self, task: SCRTask) -> str:
         """Build the user prompt for a task."""
+        target_file = task.get('target_file', 'app.py')
         return f"""## Vulnerability Information
 - CWE: {task['cwe']}
 - Description: {task['description']}
 - Language: {task['metadata'].get('language', 'python')}
 - Framework: {task['metadata'].get('framework', 'unknown')}
+- Target file: {target_file}
 
-## Vulnerable Code
+## Vulnerable Code ({target_file})
 ```python
 {task['code']}
 ```
@@ -211,7 +220,7 @@ class SecureCodeReviewEnv(BaseEnv):
 3. The patch must pass regression tests
 4. The code must be clean of security scanner findings
 
-Generate a unified diff patch to fix this vulnerability:"""
+Generate a unified diff patch for {target_file} to fix this vulnerability:"""
 
     def _normalize_path(self, path: str) -> str:
         """
@@ -310,11 +319,13 @@ Generate a unified diff patch to fix this vulnerability:"""
     def _extract_diff_from_response(self, response: str) -> Optional[str]:
         """Extract a unified diff from the model response and normalize headers."""
         # Try to find diff in code block first (most reliable)
+        # Check ALL fenced blocks, not just the first one (models often emit
+        # explanation blocks before the actual diff block)
         diff_pattern = r'```(?:diff)?\s*\n(.*?)```'
         matches = re.findall(diff_pattern, response, re.DOTALL)
 
-        if matches:
-            diff_text = matches[0].strip()
+        for match in matches:
+            diff_text = match.strip()
             # Validate it looks like a diff
             if any(line.startswith(('---', '+++', 'diff ')) for line in diff_text.split('\n')[:5]):
                 return self._normalize_diff_headers(diff_text)

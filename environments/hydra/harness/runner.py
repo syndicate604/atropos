@@ -322,12 +322,24 @@ class HarnessRunner:
         except Exception as e:
             return False, "patch_apply_failure", f"Could not read patch file: {e}"
 
-        # Try to apply the patch
-        result = subprocess.run(
-            ["patch", "-p1", "-d", str(workspace), "-i", str(patch_file.absolute())],
-            capture_output=True,
-            text=True
-        )
+        # Try to apply the patch with non-interactive flags to prevent hangs
+        try:
+            result = subprocess.run(
+                [
+                    "patch",
+                    "-p1",
+                    "--batch",      # Non-interactive, assume default answers
+                    "--forward",    # Don't ask about reverse patches
+                    "-d", str(workspace),
+                    "-i", str(patch_file.absolute())
+                ],
+                capture_output=True,
+                text=True,
+                stdin=subprocess.DEVNULL,  # Prevent reading from stdin
+                timeout=30  # 30 second timeout for patch application
+            )
+        except subprocess.TimeoutExpired:
+            return False, "patch_apply_failure", "Patch command timed out after 30s"
 
         if result.returncode != 0:
             error_msg = result.stderr or result.stdout or "Unknown patch error"

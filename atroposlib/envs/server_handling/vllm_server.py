@@ -77,11 +77,9 @@ class VLLMServer(APIServer):
                 *[self.openai.chat.completions.create(**kwargs) for _ in range(n)]
             )
             completions = completion_list[0]
-            if n > 1:
-                for c in completion_list[1:]:
-                    completions.choices.extend(c.choices)
-            else:
-                completions = await self.openai.chat.completions.create(**kwargs)
+            # Merge additional completions when n > 1
+            for c in completion_list[1:]:
+                completions.choices.extend(c.choices)
         else:
             if "n" in kwargs:
                 n = kwargs["n"]
@@ -203,18 +201,37 @@ class VLLMServer(APIServer):
         output_tokens_list = []
         output_logprobs_list = []
         finish_reasons_list = []
-        for output_token_logprobs, finish_reason in zip(
-            results["logprobs"], results["finish_reasons"]
-        ):
-            logprobs = [
-                list(item[0].values())[0] for item in output_token_logprobs
-            ]  # Extract logprob from [{id: logprob}]
-            output_ids = [
-                int(list(item[0].keys())[0]) for item in output_token_logprobs
-            ]  # Extract token ID from [{id: logprob}]
 
-            # Get finish reason
-            finish_reason = finish_reason
+        # Use authoritative token_ids from server response (not reconstructed from logprobs)
+        token_ids_from_server = results.get("token_ids", [])
+
+        for idx, (output_token_logprobs, finish_reason) in enumerate(
+            zip(results["logprobs"], results["finish_reasons"])
+        ):
+            # Get authoritative token IDs if available
+            if token_ids_from_server and idx < len(token_ids_from_server):
+                output_ids = list(token_ids_from_server[idx])
+                # Lookup logprob for each token ID from the per-step dict
+                logprobs = []
+                for step_idx, token_id in enumerate(output_ids):
+                    if step_idx < len(output_token_logprobs):
+                        step_dict = output_token_logprobs[step_idx][0]
+                        # Lookup the logprob for this specific token
+                        logprob = step_dict.get(str(token_id), step_dict.get(token_id))
+                        if logprob is None:
+                            # Fallback: use first value if token not found (shouldn't happen)
+                            logprob = list(step_dict.values())[0]
+                        logprobs.append(logprob)
+                    else:
+                        logprobs.append(0.0)  # Missing logprob
+            else:
+                # Fallback to old behavior if token_ids not in response
+                output_ids = [
+                    int(list(item[0].keys())[0]) for item in output_token_logprobs
+                ]
+                logprobs = [
+                    list(item[0].values())[0] for item in output_token_logprobs
+                ]
 
             output_tokens_list.append(output_ids)
             output_logprobs_list.append(logprobs)
