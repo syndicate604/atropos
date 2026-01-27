@@ -70,6 +70,9 @@ class TrainingConfig(BaseModel):
         3, description="Restart vLLM every N training steps"
     )
     vllm_port: int = Field(9001, description="Port for the vLLM server")
+    launch_vllm: bool = Field(
+        False, description="Whether to launch and manage vLLM server (use False if vLLM is already running externally)"
+    )
 
     # Wandb configuration
     use_wandb: bool = Field(
@@ -293,57 +296,65 @@ def train(config: TrainingConfig):
     print(
         f"Starting training for {config.training_steps} steps on device: {config.device}"
     )
-    print(
-        f"vLLM will be restarted every {config.vllm_restart_interval} steps on port {config.vllm_port}"
-    )
+    if config.launch_vllm:
+        print(
+            f"vLLM will be restarted every {config.vllm_restart_interval} steps on port {config.vllm_port}"
+        )
+    else:
+        print(
+            f"Using external vLLM server on port {config.vllm_port} (launch_vllm=False)"
+        )
 
     os.makedirs(config.save_path, exist_ok=True)  # Ensure base save directory exists
     register_trainer(config)
 
     # Init vllm
-    vllm_command = [
-        "python",
-        "-m",
-        "vllm.entrypoints.openai.api_server",
-        "--model",
-        config.model_name,
-        "--port",
-        str(config.vllm_port),
-        "--dtype",
-        "auto",
-        "--gpu-memory-utilization",
-        "0.45",
-        "--disable-log-requests",
-    ]
-    print(f"  Launching vLLM server: {' '.join(vllm_command)}")
-    try:
-        vllm_process = subprocess.Popen(vllm_command)
-        print(f"  vLLM server launched with PID: {vllm_process.pid}")
-        # Check immediate errors
+    if config.launch_vllm:
+        vllm_command = [
+            "python",
+            "-m",
+            "vllm.entrypoints.openai.api_server",
+            "--model",
+            config.model_name,
+            "--port",
+            str(config.vllm_port),
+            "--dtype",
+            "auto",
+            "--gpu-memory-utilization",
+            "0.45",
+            "--disable-log-requests",
+        ]
+        print(f"  Launching vLLM server: {' '.join(vllm_command)}")
         try:
-            stdout, stderr = vllm_process.communicate(timeout=2)
-            if vllm_process.returncode is not None and vllm_process.returncode != 0:
-                print(f"  Error starting vLLM: {stderr.decode()}")
-                vllm_process = None
-                # Maybe raise error or just warn?
-                print("  WARNING: Failed to start vLLM server after checkpoint.")
-        except subprocess.TimeoutExpired:
-            print("  vLLM process started (check logs for details).")
-    except FileNotFoundError:
-        print(
-            "\n *** ERROR: 'python -m vllm...' command not found. Make sure vLLM is installed and accessible. ***\n"
-        )
-        # Potentially stop training or just disable further vLLM restarts
-        print("  Disabling further vLLM restarts.")
-        config.vllm_restart_interval = (
-            config.training_steps + 1
-        )  # Prevent further restarts
-    except Exception as e:
-        print(f"\n *** ERROR: Failed to launch vLLM: {e} ***\n")
-        print("  Disabling further vLLM restarts.")
-        config.vllm_restart_interval = (
-            config.training_steps + 1
-        )  # Prevent further restarts
+            vllm_process = subprocess.Popen(vllm_command)
+            print(f"  vLLM server launched with PID: {vllm_process.pid}")
+            # Check immediate errors
+            try:
+                stdout, stderr = vllm_process.communicate(timeout=2)
+                if vllm_process.returncode is not None and vllm_process.returncode != 0:
+                    print(f"  Error starting vLLM: {stderr.decode()}")
+                    vllm_process = None
+                    # Maybe raise error or just warn?
+                    print("  WARNING: Failed to start vLLM server after checkpoint.")
+            except subprocess.TimeoutExpired:
+                print("  vLLM process started (check logs for details).")
+        except FileNotFoundError:
+            print(
+                "\n *** ERROR: 'python -m vllm...' command not found. Make sure vLLM is installed and accessible. ***\n"
+            )
+            # Potentially stop training or just disable further vLLM restarts
+            print("  Disabling further vLLM restarts.")
+            config.vllm_restart_interval = (
+                config.training_steps + 1
+            )  # Prevent further restarts
+        except Exception as e:
+            print(f"\n *** ERROR: Failed to launch vLLM: {e} ***\n")
+            print("  Disabling further vLLM restarts.")
+            config.vllm_restart_interval = (
+                config.training_steps + 1
+            )  # Prevent further restarts
+    else:
+        print("  Using external vLLM server (launch_vllm=False)")
 
     batches = list()
     for step in range(config.training_steps):
@@ -360,22 +371,23 @@ def train(config: TrainingConfig):
             batches.pop(0)
         )
         # Terminate existing vLLM process if running
-        if (
-            step + 1
-        ) % config.vllm_restart_interval == 0 or step == config.training_steps - 1:  # Also restart/save on last step
-            # Terminate existing vLLM process if running
-            if vllm_process:
-                print("  Terminating existing vLLM process...")
-                vllm_process.terminate()
-                try:
-                    vllm_process.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    print(
-                        "  Existing vLLM process did not terminate gracefully, killing."
-                    )
-                    vllm_process.kill()
-                    vllm_process.wait()
-                vllm_process = None
+        if config.launch_vllm:
+            if (
+                step + 1
+            ) % config.vllm_restart_interval == 0 or step == config.training_steps - 1:  # Also restart/save on last step
+                # Terminate existing vLLM process if running
+                if vllm_process:
+                    print("  Terminating existing vLLM process...")
+                    vllm_process.terminate()
+                    try:
+                        vllm_process.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        print(
+                            "  Existing vLLM process did not terminate gracefully, killing."
+                        )
+                        vllm_process.kill()
+                        vllm_process.wait()
+                    vllm_process = None
         for tokens, labels, advantages, temperatures in zip(
             token_batches, label_batches, advantage_batches, temperature_batches
         ):
@@ -456,104 +468,106 @@ def train(config: TrainingConfig):
 
         # --- vLLM Restart Logic (Moved AFTER optimizer step) ---
         # Note: There are much better ways of updating the policy, this is just a very simple example
-        if (
-            step + 1
-        ) % config.vllm_restart_interval == 0 or step == config.training_steps - 1:  # Also restart/save on last step
-            checkpoint_path = os.path.join(
-                config.save_path, f"step_{step+1}"
-            )  # Save as step+1 since it's after step completion
-            print(f"  Saving checkpoint to {checkpoint_path}...")
-            # Ensure fresh directory for saving
-            if os.path.exists(checkpoint_path):
-                shutil.rmtree(checkpoint_path)  # Remove old checkpoint if it exists
-            os.makedirs(checkpoint_path, exist_ok=True)
-            model.save_pretrained(checkpoint_path)
-            tokenizer.save_pretrained(checkpoint_path)
-            print("  Checkpoint saved.")
+        if config.launch_vllm:
+            if (
+                step + 1
+            ) % config.vllm_restart_interval == 0 or step == config.training_steps - 1:  # Also restart/save on last step
+                checkpoint_path = os.path.join(
+                    config.save_path, f"step_{step+1}"
+                )  # Save as step+1 since it's after step completion
+                print(f"  Saving checkpoint to {checkpoint_path}...")
+                # Ensure fresh directory for saving
+                if os.path.exists(checkpoint_path):
+                    shutil.rmtree(checkpoint_path)  # Remove old checkpoint if it exists
+                os.makedirs(checkpoint_path, exist_ok=True)
+                model.save_pretrained(checkpoint_path)
+                tokenizer.save_pretrained(checkpoint_path)
+                print("  Checkpoint saved.")
 
-            # Terminate existing vLLM process if running
-            if vllm_process:
-                print("  Terminating existing vLLM process...")
-                vllm_process.terminate()
-                try:
-                    vllm_process.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    print(
-                        "  Existing vLLM process did not terminate gracefully, killing."
-                    )
-                    vllm_process.kill()
-                    vllm_process.wait()
-                vllm_process = None
-
-            # Launch new vLLM process (only if not the very last step, maybe? depends on use case)
-            # Let's still launch it on the last step for consistency, cleanup will handle it.
-            vllm_command = [
-                "python",
-                "-m",
-                "vllm.entrypoints.openai.api_server",
-                "--model",
-                os.path.join(config.save_path, f"step_{step+1}"),
-                "--port",
-                str(config.vllm_port),
-                "--dtype",
-                "auto",
-                "--gpu-memory-utilization",
-                "0.45",
-                "--disable-log-requests",
-                "--served-model-name",
-                config.model_name,
-            ]
-            print(f"  Launching vLLM server: {' '.join(vllm_command)}")
-            torch.cuda.empty_cache()
-            try:
-                vllm_process = subprocess.Popen(vllm_command)
-                print(f"  vLLM server launched with PID: {vllm_process.pid}")
-                # Check immediate errors
-                try:
-                    stdout, stderr = vllm_process.communicate(timeout=2)
-                    if (
-                        vllm_process.returncode is not None
-                        and vllm_process.returncode != 0
-                    ):
-                        print(f"  Error starting vLLM: {stderr.decode()}")
-                        vllm_process = None
-                        # Maybe raise error or just warn?
+                # Terminate existing vLLM process if running
+                if vllm_process:
+                    print("  Terminating existing vLLM process...")
+                    vllm_process.terminate()
+                    try:
+                        vllm_process.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
                         print(
-                            "  WARNING: Failed to start vLLM server after checkpoint."
+                            "  Existing vLLM process did not terminate gracefully, killing."
                         )
-                except subprocess.TimeoutExpired:
-                    print("  vLLM process started (check logs for details).")
-            except FileNotFoundError:
-                print(
-                    "\n *** ERROR: 'python -m vllm...' command not found. ",
-                    "Make sure vLLM is installed and accessible. ***\n",
-                )
-                # Potentially stop training or just disable further vLLM restarts
-                print("  Disabling further vLLM restarts.")
-                config.vllm_restart_interval = (
-                    config.training_steps + 1
-                )  # Prevent further restarts
-            except Exception as e:
-                print(f"\n *** ERROR: Failed to launch vLLM: {e} ***\n")
-                print("  Disabling further vLLM restarts.")
-                config.vllm_restart_interval = (
-                    config.training_steps + 1
-                )  # Prevent further restarts
+                        vllm_process.kill()
+                        vllm_process.wait()
+                    vllm_process = None
+
+                # Launch new vLLM process (only if not the very last step, maybe? depends on use case)
+                # Let's still launch it on the last step for consistency, cleanup will handle it.
+                vllm_command = [
+                    "python",
+                    "-m",
+                    "vllm.entrypoints.openai.api_server",
+                    "--model",
+                    os.path.join(config.save_path, f"step_{step+1}"),
+                    "--port",
+                    str(config.vllm_port),
+                    "--dtype",
+                    "auto",
+                    "--gpu-memory-utilization",
+                    "0.45",
+                    "--disable-log-requests",
+                    "--served-model-name",
+                    config.model_name,
+                ]
+                print(f"  Launching vLLM server: {' '.join(vllm_command)}")
+                torch.cuda.empty_cache()
+                try:
+                    vllm_process = subprocess.Popen(vllm_command)
+                    print(f"  vLLM server launched with PID: {vllm_process.pid}")
+                    # Check immediate errors
+                    try:
+                        stdout, stderr = vllm_process.communicate(timeout=2)
+                        if (
+                            vllm_process.returncode is not None
+                            and vllm_process.returncode != 0
+                        ):
+                            print(f"  Error starting vLLM: {stderr.decode()}")
+                            vllm_process = None
+                            # Maybe raise error or just warn?
+                            print(
+                                "  WARNING: Failed to start vLLM server after checkpoint."
+                            )
+                    except subprocess.TimeoutExpired:
+                        print("  vLLM process started (check logs for details).")
+                except FileNotFoundError:
+                    print(
+                        "\n *** ERROR: 'python -m vllm...' command not found. ",
+                        "Make sure vLLM is installed and accessible. ***\n",
+                    )
+                    # Potentially stop training or just disable further vLLM restarts
+                    print("  Disabling further vLLM restarts.")
+                    config.vllm_restart_interval = (
+                        config.training_steps + 1
+                    )  # Prevent further restarts
+                except Exception as e:
+                    print(f"\n *** ERROR: Failed to launch vLLM: {e} ***\n")
+                    print("  Disabling further vLLM restarts.")
+                    config.vllm_restart_interval = (
+                        config.training_steps + 1
+                    )  # Prevent further restarts
         # --- End vLLM Restart Logic ---
 
         # Basic check if vLLM process terminated unexpectedly (outside interval check)
-        if vllm_process and vllm_process.poll() is not None:
-            print(
-                f"\n *** WARNING: vLLM process terminated unexpectedly (return code: {vllm_process.returncode}). ",
-                "Check vLLM logs. ***\n",
-            )
-            stderr_output = (
-                vllm_process.stderr.read().decode()
-                if vllm_process.stderr
-                else "No stderr"
-            )
-            print(f"vLLM stderr: {stderr_output}")
-            vllm_process = None  # Reset so it relaunches next interval
+        if config.launch_vllm:
+            if vllm_process and vllm_process.poll() is not None:
+                print(
+                    f"\n *** WARNING: vLLM process terminated unexpectedly (return code: {vllm_process.returncode}). ",
+                    "Check vLLM logs. ***\n",
+                )
+                stderr_output = (
+                    vllm_process.stderr.read().decode()
+                    if vllm_process.stderr
+                    else "No stderr"
+                )
+                print(f"vLLM stderr: {stderr_output}")
+                vllm_process = None  # Reset so it relaunches next interval
 
     print("Training finished.")
     # --- Wandb Finish ---
@@ -578,10 +592,14 @@ if __name__ == "__main__":
     # Example: Create a config and run training
     # Replace "gpt2" with your desired model
     training_config = TrainingConfig(
-        model_name="Qwen/Qwen2.5-1.5B-Instruct",
-        training_steps=20,  # Use steps
+        model_name="/root/models/Qwen2.5-7B-Instruct",
+        training_steps=5,  # Use steps (smoke test)
+        batch_size=1,  # Reduced from 2 to avoid OOM
+        seq_len=1024,  # Reduced from 2048 to avoid OOM
         vllm_restart_interval=3,  # Example interval
-        use_wandb=True,  # Set to True to enable logging
+        vllm_port=9004,  # External vLLM server port
+        launch_vllm=False,  # Use external vLLM server
+        use_wandb=False,  # Disabled for now
         wandb_project="grpo-trainer-example",  # Replace with your project name
     )
 

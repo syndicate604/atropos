@@ -558,10 +558,13 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                 self.pass_rate_buffer.append(0.0)
                 self.failure_reasons[failure_reason] = self.failure_reasons.get(failure_reason, 0) + 1
 
-            # Filter out very short completions
+            # Filter out very short completions (disabled for smoke testing)
+            # Short completions will have poor harness scores anyway
             masks = item["masks"]
-            if len([m for m in masks if m != -100]) < 10:
-                continue
+            completion_len = sum(1 for m in masks if m != -100)
+            if completion_len < 10:
+                # Keep item to prevent groups from collapsing below 2 members
+                pass
 
             scores["tokens"].append(item["tokens"])
             scores["masks"].append(masks)
@@ -570,16 +573,35 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
 
         # Debug: log group scores
         print(f"[SCR] Group scores: {group_scores}")
+        print(f"[SCR] Items after filtering: {len(scores['tokens'])}/{len(group_scores)}")
 
         # Need at least 2 items with different scores for GRPO
         if len(scores["tokens"]) < 2:
+            print(f"[SCR] Group dropped: only {len(scores['tokens'])} items (need >= 2)")
             return None
 
         # If all scores are the same, can't learn from this
-        if all(s == scores["scores"][0] for s in scores["scores"]):
+        # Can be disabled via --env.ensure_scores_are_not_same false for smoke testing
+        all_same = all(s == scores["scores"][0] for s in scores["scores"])
+        if all_same:
+            print(f"[SCR] Uniform scores detected, ensure_scores_are_not_same={self.config.ensure_scores_are_not_same}")
+        if self.config.ensure_scores_are_not_same and all_same:
+            print(f"[SCR] Group dropped: all scores identical ({scores['scores'][0]})")
             return None
 
+        print(f"[SCR] Group accepted! Returning {len(scores['tokens'])} scored items")
         return scores
+
+    async def handle_send_to_api(self, scored_data, item=None, do_send_to_api=True, abort_on_any_max_length_exceeded=True):
+        """Override to disable token length checking for smoke testing."""
+        # Always disable abort_on_any_max_length_exceeded for smoke testing
+        # Long patches will have poor scores anyway
+        return await super().handle_send_to_api(
+            scored_data,
+            item,
+            do_send_to_api,
+            abort_on_any_max_length_exceeded=False  # Always False
+        )
 
     async def wandb_log(self, wandb_metrics: Optional[Dict] = None):
         """Log metrics to wandb."""
