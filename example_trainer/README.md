@@ -43,6 +43,7 @@ Key parameters you might want to adjust include:
 *   `training_steps`: The total number of optimization steps to perform.
 *   `batch_size` / `gradient_accumulation_steps`: Control the effective batch size.
 *   `lr`: Learning rate.
+*   `optimizer`: Optimizer to use. For 7B full-parameter training on a single 40GB GPU, `paged_adamw8bit` is strongly recommended to avoid OOM at `optimizer.step()`.
 *   `save_path`: Directory where model checkpoints will be saved.
 *   `vllm_port`: The port used by the vLLM server instance launched by this script.
 *   `vllm_restart_interval`: How often (in steps) to save a checkpoint and restart the vLLM server with the new weights.

@@ -50,6 +50,10 @@ class TrainingConfig(BaseModel):
 
     model_name: str = Field(..., description="Name of the base model to train")
     lr: float = Field(1e-5, description="Learning rate for the optimizer")
+    optimizer: str = Field(
+        "paged_adamw8bit",
+        description="Optimizer to use: adamw | adamw8bit | paged_adamw8bit",
+    )
     training_steps: int = Field(
         10, description="Number of training steps"
     )  # Renamed from epochs
@@ -287,11 +291,37 @@ def train(config: TrainingConfig):
     )
 
     model.to(config.device)
+    # Critical for training: KV cache adds memory and isn't used for gradient updates.
+    if hasattr(model, "config"):
+        model.config.use_cache = False
     model.gradient_checkpointing_enable()
     model.train()
 
     # Setup optimizer
-    optimizer = AdamW(model.parameters(), lr=config.lr)
+    optimizer_name = config.optimizer.lower()
+    if optimizer_name in {"adamw8bit", "paged_adamw8bit"}:
+        try:
+            import bitsandbytes as bnb  # type: ignore
+        except Exception as e:
+            raise RuntimeError(
+                f"Requested optimizer={config.optimizer}, but bitsandbytes is not available ({e}). "
+                "Install it (e.g. `pip install bitsandbytes`) or set optimizer='adamw'."
+            ) from e
+
+        optimizer_cls = (
+            bnb.optim.PagedAdamW8bit
+            if optimizer_name == "paged_adamw8bit"
+            else bnb.optim.AdamW8bit
+        )
+        optimizer = optimizer_cls(model.parameters(), lr=config.lr)
+        print(f"Using optimizer: {optimizer_cls.__name__} (bitsandbytes)")
+    elif optimizer_name == "adamw":
+        optimizer = AdamW(model.parameters(), lr=config.lr)
+        print("Using optimizer: torch.optim.AdamW")
+    else:
+        raise ValueError(
+            f"Unknown optimizer '{config.optimizer}'. Expected: adamw | adamw8bit | paged_adamw8bit"
+        )
 
     print(
         f"Starting training for {config.training_steps} steps on device: {config.device}"
@@ -596,6 +626,7 @@ if __name__ == "__main__":
         training_steps=5,  # Use steps (smoke test)
         batch_size=1,  # Reduced from 2 to avoid OOM
         seq_len=1024,  # Reduced from 2048 to avoid OOM
+        optimizer="paged_adamw8bit",  # Avoid OOM at optimizer.step() for 7B full-parameter training
         vllm_restart_interval=3,  # Example interval
         vllm_port=9004,  # External vLLM server port
         launch_vllm=False,  # Use external vLLM server
