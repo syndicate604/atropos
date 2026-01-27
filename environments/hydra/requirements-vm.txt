@@ -1,0 +1,75 @@
+# HYDRA VM Setup Requirements
+# For A100/L4 training boxes running Deep Learning VM images
+
+# ============================================
+# SYSTEM PACKAGES (apt-get install)
+# ============================================
+# docker.io          - Container runtime for harness sandbox
+# git                - Version control
+# curl               - HTTP client
+# jq                 - JSON processing
+
+# ============================================
+# PYTHON PACKAGES (pip install)
+# ============================================
+# Core ML
+torch
+transformers
+accelerate
+bitsandbytes
+
+# Inference
+vllm
+
+# Atropos/HYDRA
+atroposlib          # pip install -e . from repo root
+aiohttp
+openai
+pydantic
+pydantic-cli
+tenacity
+
+# Utilities
+huggingface_hub
+hf_transfer         # Fast model downloads
+wandb               # Optional: logging
+
+# ============================================
+# DOCKER IMAGES (docker build/pull)
+# ============================================
+# hydra-harness:latest - Built from environments/hydra/harness/Dockerfile
+
+# ============================================
+# MODELS (huggingface-cli download)
+# ============================================
+# Qwen/Qwen2.5-7B-Instruct -> ~/models/Qwen2.5-7B-Instruct
+# Qwen/Qwen2.5-1.5B-Instruct -> ~/models/Qwen2.5-1.5B-Instruct (optional, smaller)
+
+# ============================================
+# SETUP COMMANDS
+# ============================================
+# 1. Install system packages:
+#    apt-get update && apt-get install -y docker.io git curl jq
+#    systemctl start docker && systemctl enable docker
+#
+# 2. Install Python packages:
+#    cd ~/hydra && pip install -e .
+#    pip install vllm aiohttp transformers huggingface_hub hf_transfer
+#
+# 3. Download model:
+#    HF_HUB_ENABLE_HF_TRANSFER=1 huggingface-cli download Qwen/Qwen2.5-7B-Instruct --local-dir ~/models/Qwen2.5-7B-Instruct
+#
+# 4. Build harness Docker image:
+#    cd ~/hydra && docker build -t hydra-harness:latest environments/hydra/harness/
+#
+# 5. Start vLLM server (A100 40GB):
+#    python3 example_trainer/vllm_api_server.py --model ~/models/Qwen2.5-7B-Instruct --port 9004 --gpu-memory-utilization 0.5
+#
+# 6. Start Atropos API:
+#    uvicorn atroposlib.api.server:app --host 0.0.0.0 --port 8000
+#
+# 7. Start SecureCodeReviewEnv:
+#    python3 environments/hydra/secure_code_review_env.py serve --slurm false --openai.base_url http://localhost:9004/v1 --openai.model_name ~/models/Qwen2.5-7B-Instruct --openai.server_type vllm --env.tokenizer_name ~/models/Qwen2.5-7B-Instruct --env.use_wandb false
+#
+# 8. Run GRPO trainer:
+#    python3 example_trainer/grpo.py
