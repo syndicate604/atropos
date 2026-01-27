@@ -32,17 +32,17 @@ sys.path.insert(0, str(HYDRA_DIR))
 from harness.runner import HarnessRunner, TaskResult
 
 
-# System prompt for secure code review
-SYSTEM_PROMPT = """You are an expert security engineer. Your task is to fix security vulnerabilities by generating unified diff patches.
+# System prompt template for secure code review (use _get_system_prompt to format)
+SYSTEM_PROMPT_TEMPLATE = """You are an expert security engineer. Your task is to fix security vulnerabilities by generating unified diff patches.
 
 STRICT OUTPUT FORMAT - Follow this EXACTLY:
 1. Output ONLY a diff, no text before or after
-2. Use this EXACT format (replace FILENAME with the actual target file):
+2. Use this EXACT format for the target file {target_file}:
 
 ```diff
-diff --git a/FILENAME b/FILENAME
---- a/FILENAME
-+++ b/FILENAME
+diff --git a/{target_file} b/{target_file}
+--- a/{target_file}
++++ b/{target_file}
 @@ -LINE,COUNT +LINE,COUNT @@ function_name
  context line (space prefix)
 -removed line (minus prefix)
@@ -51,29 +51,34 @@ diff --git a/FILENAME b/FILENAME
 ```
 
 RULES:
-- Use the target file specified in the task (e.g., app.py, NOT workspace/app.py)
+- File path MUST be: {target_file} (NOT workspace/{target_file})
 - Headers MUST have a/ and b/ prefixes
 - Each line MUST start with: space, +, -, or @@
 - NO explanations, NO prose, NO comments outside the diff
 
-EXAMPLE - Fixing SQL injection (CWE-89) in app.py:
+EXAMPLE - Fixing SQL injection (CWE-89) in {target_file}:
 ```diff
-diff --git a/app.py b/app.py
---- a/app.py
-+++ b/app.py
+diff --git a/{target_file} b/{target_file}
+--- a/{target_file}
++++ b/{target_file}
 @@ -38,6 +38,6 @@ def search_users():
      conn = get_db()
      init_db(conn)
 
--    sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"
+-    sql = f"SELECT * FROM users WHERE username LIKE '%{{query}}%'"
 -    cursor = conn.execute(sql)
 +    sql = "SELECT * FROM users WHERE username LIKE ?"
-+    cursor = conn.execute(sql, (f"%{query}%",))
++    cursor = conn.execute(sql, (f"%{{query}}%",))
 
      results = [dict(row) for row in cursor.fetchall()]
 ```
 
 Generate the diff now:"""
+
+
+def _get_system_prompt(target_file: str = "app.py") -> str:
+    """Format the system prompt with the target filename."""
+    return SYSTEM_PROMPT_TEMPLATE.format(target_file=target_file)
 
 
 class SCRTask(TypedDict):
@@ -468,12 +473,14 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         2. Scores each patch using the verification harness
         3. Returns tokens/masks/scores for GRPO training
         """
+        target_file = item.get('target_file', 'app.py')
+        system_prompt = _get_system_prompt(target_file)
         user_message = {"role": "user", "content": self._build_user_prompt(item)}
 
         async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
             chat_completions = await managed.chat_completion(
                 messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": system_prompt},
                     user_message
                 ],
                 n=self.config.group_size,
@@ -493,7 +500,7 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
             to_score.append({
                 "task_id": item["task_id"],
                 "messages": (
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": system_prompt},
                     user_message,
                     {"role": "assistant", "content": response_content},
                 ),
@@ -605,12 +612,14 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         eval_results = []
 
         for task in self.tasks:
+            target_file = task.get('target_file', 'app.py')
+            system_prompt = _get_system_prompt(target_file)
             user_prompt = self._build_user_prompt(task)
 
             async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
                 completion = await managed.chat_completion(
                     messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_prompt}
                     ],
                     n=1,
