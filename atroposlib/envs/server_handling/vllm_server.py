@@ -214,18 +214,29 @@ class VLLMServer(APIServer):
                 # Lookup logprob for each token ID from the per-step dict
                 logprobs = []
                 for step_idx, token_id in enumerate(output_ids):
-                    if step_idx < len(output_token_logprobs):
-                        step_dict = output_token_logprobs[step_idx][0]
-                        # Lookup the logprob for this specific token
-                        logprob = step_dict.get(str(token_id), step_dict.get(token_id))
-                        if logprob is None:
-                            # Fallback: use first value if token not found (shouldn't happen)
-                            logprob = list(step_dict.values())[0]
-                        logprobs.append(logprob)
-                    else:
-                        logprobs.append(0.0)  # Missing logprob
+                    if step_idx >= len(output_token_logprobs):
+                        # Fail fast: token_ids and logprobs length mismatch
+                        raise ValueError(
+                            f"Token/logprob length mismatch at completion {idx}: "
+                            f"got {len(output_ids)} tokens but only {len(output_token_logprobs)} logprob steps"
+                        )
+                    step_dict = output_token_logprobs[step_idx][0]
+                    # Lookup the logprob for this specific token (JSON keys are strings)
+                    logprob = step_dict.get(str(token_id), step_dict.get(token_id))
+                    if logprob is None:
+                        # Fail fast: token not found in logprobs dict
+                        raise ValueError(
+                            f"Token {token_id} not found in logprobs dict at step {step_idx}. "
+                            f"Available keys: {list(step_dict.keys())}"
+                        )
+                    logprobs.append(logprob)
             else:
                 # Fallback to old behavior if token_ids not in response
+                # (for backwards compatibility with servers that don't return token_ids)
+                warnings.warn(
+                    "Server response missing 'token_ids' - reconstructing from logprobs. "
+                    "This may cause token/logprob misalignment if top-k > 1."
+                )
                 output_ids = [
                     int(list(item[0].keys())[0]) for item in output_token_logprobs
                 ]
