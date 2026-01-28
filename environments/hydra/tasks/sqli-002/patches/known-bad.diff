@@ -1,0 +1,15 @@
+--- a/app.py
++++ b/app.py
+@@ -38,8 +38,10 @@ def search_users():
+     conn = get_db()
+     init_db(conn)
+
+-    # VULNERABLE: String concatenation
+-    sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"
++    # ATTEMPTED FIX: Strip whitespace and limit length (STILL VULNERABLE)
++    # This looks like sanitization but doesn't prevent SQL injection
++    sanitized = query.strip()[:100]
++    sql = f"SELECT * FROM users WHERE username LIKE '%{sanitized}%'"
+     cursor = conn.execute(sql)
+
+     results = [dict(row) for row in cursor.fetchall()]
