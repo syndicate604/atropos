@@ -411,21 +411,26 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         diff_text = diff_text.replace("\r\n", "\n").replace("\r", "\n")
 
         # 2. Strip trailing fences defensively
-        # Remove trailing whitespace lines
-        lines = diff_text.rstrip().split('\n')
-        # If last non-empty line is a fence (``` or ```diff), drop it
-        if lines and lines[-1].strip() in ('```', '```diff'):
-            lines = lines[:-1]
-            diff_text = '\n'.join(lines)
+        had_final_newline = diff_text.endswith("\n")
 
-        # 3. Detect truncation BEFORE normalizing newlines
+        # Drop trailing blank lines, then a trailing fence line if present.
+        lines = diff_text.split("\n")
+        while lines and not lines[-1].strip():
+            lines.pop()
+        if lines and lines[-1].strip() in ("```", "```diff"):
+            lines.pop()
+        while lines and not lines[-1].strip():
+            lines.pop()
+        diff_text = "\n".join(lines)
+
+        # 3. Detect truncation BEFORE ensuring final newline
         # Common signs of truncation:
-        # - Ends without newline and last line doesn't look complete
-        # - Has diff structure but missing closing elements
+        # - Response likely ended due to max_tokens (no final newline + other indicators)
+        # - Incomplete diff structure (missing required headers / hunk content)
         truncation_error = None
 
         # Check for mid-line truncation (no final newline + suspicious ending)
-        if diff_text and not diff_text.endswith('\n'):
+        if not had_final_newline and diff_text:
             last_line = diff_text.split('\n')[-1] if '\n' in diff_text else diff_text
             # If last line is long and doesn't start with diff markers, likely truncated
             if len(last_line) > 50 and not last_line.startswith((' ', '+', '-', '@', 'diff', '---', '+++')):
