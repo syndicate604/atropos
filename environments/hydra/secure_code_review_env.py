@@ -381,6 +381,7 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
     FAILURE_SCORES = {
         # Format failures (worst - no valid diff extracted)
         "invalid_patch_format": -1.0,
+        "patch_apply_truncated": -0.97,      # Output truncated mid-line
         # Patch apply subreasons (creates variance even when all fail to apply)
         "patch_apply_malformed": -0.95,      # "malformed patch" / "patch: ****"
         "patch_apply_path_not_found": -0.9,  # "can't find file to patch"
@@ -394,10 +395,79 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         "unknown": -0.8,
     }
 
+    def _sanitize_diff_text(self, diff_text: str) -> Tuple[str, Optional[str]]:
+        """
+        Sanitize diff text before applying patch.
+
+        Returns: (sanitized_diff, truncation_error_or_none)
+
+        Fixes:
+        1. Normalize CRLF to LF
+        2. Strip trailing markdown fences
+        3. Ensure final newline
+        4. Detect truncation (incomplete diff structure)
+        """
+        # 1. Normalize line endings
+        diff_text = diff_text.replace("\r\n", "\n").replace("\r", "\n")
+
+        # 2. Strip trailing fences defensively
+        # Remove trailing whitespace lines
+        lines = diff_text.rstrip().split('\n')
+        # If last non-empty line is a fence (``` or ```diff), drop it
+        if lines and lines[-1].strip() in ('```', '```diff'):
+            lines = lines[:-1]
+            diff_text = '\n'.join(lines)
+
+        # 3. Detect truncation BEFORE normalizing newlines
+        # Common signs of truncation:
+        # - Ends without newline and last line doesn't look complete
+        # - Has diff structure but missing closing elements
+        truncation_error = None
+
+        # Check for mid-line truncation (no final newline + suspicious ending)
+        if diff_text and not diff_text.endswith('\n'):
+            last_line = diff_text.split('\n')[-1] if '\n' in diff_text else diff_text
+            # If last line is long and doesn't start with diff markers, likely truncated
+            if len(last_line) > 50 and not last_line.startswith((' ', '+', '-', '@', 'diff', '---', '+++')):
+                truncation_error = "Diff truncated mid-line (no final newline)"
+            # If it ends with incomplete word/sentence indicators
+            elif last_line and last_line[-1].isalpha():  # Ends with letter mid-word
+                truncation_error = "Diff appears truncated (ends mid-word)"
+
+        # Check for incomplete diff structure
+        has_git_header = 'diff --git' in diff_text
+        has_file_headers = '---' in diff_text and '+++' in diff_text
+        has_hunk_marker = '@@' in diff_text
+
+        if has_git_header or has_hunk_marker:
+            # If we have diff structure, check completeness
+            if not has_file_headers:
+                truncation_error = "Incomplete diff structure (missing --- or +++)"
+            elif has_hunk_marker:
+                # Check if last hunk looks complete (should have at least one diff line after @@)
+                hunk_lines = [i for i, line in enumerate(diff_text.split('\n')) if line.startswith('@@')]
+                if hunk_lines:
+                    last_hunk_idx = hunk_lines[-1]
+                    lines_after_hunk = diff_text.split('\n')[last_hunk_idx + 1:]
+                    # Filter to lines that are actual diff content (not empty)
+                    content_lines = [l for l in lines_after_hunk if l and not l.isspace()]
+                    # Need at least one line of context/changes after hunk header
+                    if not content_lines:
+                        truncation_error = "Incomplete hunk (no content after @@ marker)"
+
+        # 4. Ensure final newline (after truncation check)
+        if not diff_text.endswith('\n'):
+            diff_text += '\n'
+
+        return diff_text, truncation_error
+
     def _classify_patch_error(self, error_text: str) -> str:
         """Classify patch application error into subreasons for variance."""
         error_lower = error_text.lower()
-        if "malformed patch" in error_lower or "patch: ****" in error_text:
+        # Check for truncation indicators first
+        if "unexpectedly ends" in error_lower or "ends in middle of line" in error_lower:
+            return "patch_apply_truncated"
+        elif "malformed patch" in error_lower or "patch: ****" in error_text:
             return "patch_apply_malformed"
         elif "can't find file to patch" in error_lower:
             return "patch_apply_path_not_found"
@@ -427,7 +497,14 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         if diff_text is None:
             return self.FAILURE_SCORES["invalid_patch_format"], "invalid_patch_format", "Could not extract diff from response"
 
-        # Write diff to temp file
+        # Sanitize diff text (normalize line endings, strip fences, detect truncation)
+        diff_text, truncation_error = self._sanitize_diff_text(diff_text)
+
+        # If we detected truncation, return early with specific failure
+        if truncation_error:
+            return self.FAILURE_SCORES["patch_apply_truncated"], "patch_apply_truncated", truncation_error
+
+        # Write sanitized diff to temp file
         with tempfile.NamedTemporaryFile(
             mode='w',
             suffix='.diff',
