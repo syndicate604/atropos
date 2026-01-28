@@ -623,7 +623,7 @@ if __name__ == "__main__":
     # Replace "gpt2" with your desired model
     training_config = TrainingConfig(
         model_name="/root/models/Qwen2.5-7B-Instruct",
-        training_steps=5,  # Use steps (smoke test)
+        training_steps=11,  # Use steps (smoke test)
         batch_size=1,  # Reduced from 2 to avoid OOM
         seq_len=1024,  # Reduced from 2048 to avoid OOM
         optimizer="paged_adamw8bit",  # Avoid OOM at optimizer.step() for 7B full-parameter training
