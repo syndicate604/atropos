@@ -1,0 +1,2 @@
+root        7387  0.0  0.0   7764  1808 ?        S    03:56   0:00 bash -c cd ~/hydra && nohup uvicorn atroposlib.api.server:app --host 0.0.0.0 --port 8000 > /tmp/atropos_api.log 2>&1 & sleep 3 && curl -s http://localhost:8000/health || echo 'API starting...'
+root        7389  0.2  0.0 159524 50616 ?        Sl   03:56   0:01 /usr/bin/python3 /usr/local/bin/uvicorn atroposlib.api.server:app --host 0.0.0.0 --port 8000

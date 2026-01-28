@@ -1,0 +1,2 @@
+Exit code 127
+bash: line 1: nvidia-smi: command not found

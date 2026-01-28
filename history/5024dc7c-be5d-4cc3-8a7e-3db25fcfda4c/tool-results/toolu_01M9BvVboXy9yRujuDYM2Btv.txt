@@ -1,0 +1,24 @@
+   291→                continue
+   292→
+   293→            # If we're in diff mode and see non-diff content, might be prose - skip it
+   294→            if in_diff and line.strip() and not line.startswith(('#', 'diff', '---', '+++', '@@', '+', '-', ' ', '\\')):
+   295→                # Skip prose lines within diff
+   296→                continue
+   297→
+   298→            # Keep empty lines and other valid content
+   299→            normalized.append(line)
+   300→
+   301→        result = '\n'.join(normalized)
+   302→
+   303→        # Add diff --git header if missing but we have file path
+   304→        if not has_git_header and file_path:
+   305→            git_header = f'diff --git a/{file_path} b/{file_path}\n'
+   306→            result = git_header + result
+   307→
+   308→        return result
+   309→
+   310→    def _extract_diff_from_response(self, response: str) -> Optional[str]:
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

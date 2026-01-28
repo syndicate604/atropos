@@ -1,0 +1,75 @@
+4-
+5-STDLIB ONLY - No external dependencies on host.
+6-
+7-Week 2 additions:
+8-- --patch-file to accept arbitrary diff files (for model-generated patches)
+9:- Graceful handling of patch apply failures (structured JSON output)
+10:- New failure reasons: patch_apply_failure, invalid_patch_format
+11-
+12-Original fixes from v2 review:
+13-1. PYTHONPATH set for pytest imports
+14-2. Environment vars prevent cache writes in read-only container
+15-3. No PyYAML - uses JSON for task config
+--
+144-            print(f"  [1/5] Running exploit on original code...")
+145-            exploit_original = self._run_exploit(workspace_dst, exploit_dst)
+146-
+147-            # Step 2: Apply patch (with graceful failure handling)
+148-            print(f"  [2/5] Applying patch: {display_name}...")
+149:            patch_success, patch_error_code, patch_error_msg = self._apply_patch_safe(
+150-                workspace_dst, actual_patch_file
+151-            )
+152-
+153-            if not patch_success:
+154-                # Patch failed to apply - return early with structured result
+--
+159-                    passed=False,
+160-                    exploit_original_succeeded=exploit_original.returncode == 0,
+161-                    exploit_patched_succeeded=False,
+162-                    tests_passed=False,
+163-                    scanner_clean=False,
+164:                    failure_reason=patch_error_code,  # "invalid_patch_format" or "patch_apply_failure"
+165-                    exploit_original_output=exploit_original.stdout + exploit_original.stderr,
+166-                    exploit_patched_output="",
+167-                    tests_output="",
+168-                    scanner_output="",
+169-                    scanner_findings=[],
+--
+302-        """
+303-        Apply a diff patch to the workspace with graceful error handling.
+304-
+305-        Returns:
+306-            (success, error_code, error_message) tuple
+307:            error_code is one of: "", "invalid_patch_format", "patch_apply_failure"
+308-        """
+309-        # Check if patch file exists
+310-        if not patch_file.exists():
+311:            return False, "patch_apply_failure", f"Patch file not found: {patch_file}"
+312-
+313-        # Check if patch file is empty or invalid
+314-        try:
+315-            patch_content = patch_file.read_text()
+316-            if not patch_content.strip():
+--
+318-            # Basic sanity check for diff format
+319-            if not any(line.startswith(('---', '+++', 'diff '))
+320-                       for line in patch_content.split('\n')[:10]):
+321-                return False, "invalid_patch_format", "Missing diff headers (---, +++, or diff)"
+322-        except Exception as e:
+323:            return False, "patch_apply_failure", f"Could not read patch file: {e}"
+324-
+325-        # Try to apply the patch
+326-        result = subprocess.run(
+327-            ["patch", "-p1", "-d", str(workspace), "-i", str(patch_file.absolute())],
+328-            capture_output=True,
+329-            text=True
+330-        )
+331-
+332-        if result.returncode != 0:
+333-            error_msg = result.stderr or result.stdout or "Unknown patch error"
+334:            return False, "patch_apply_failure", error_msg.strip()
+335-
+336-        return True, "", ""
+337-
+338-    def _apply_patch(self, workspace: Path, patch_file: Path) -> None:
+339-        """Apply a diff patch to the workspace (legacy, raises on failure)."""

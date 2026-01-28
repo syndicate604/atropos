@@ -1,0 +1,4 @@
+WARNING: Some requests did not succeed.
+ - Required 'compute.instances.list' permission for 'projects/voice-ai-435704'
+
+WARNING: The following filter keys were not present in any resource : name

@@ -1,0 +1,21 @@
+   575→
+   576→# Example usage (optional, can be run from another script)
+   577→if __name__ == "__main__":
+   578→    # Example: Create a config and run training
+   579→    # Replace "gpt2" with your desired model
+   580→    training_config = TrainingConfig(
+   581→        model_name="Qwen/Qwen2.5-1.5B-Instruct",
+   582→        training_steps=20,  # Use steps
+   583→        vllm_restart_interval=3,  # Example interval
+   584→        use_wandb=True,  # Set to True to enable logging
+   585→        wandb_project="grpo-trainer-example",  # Replace with your project name
+   586→    )
+   587→
+   588→    # --- End Mock ---
+   589→
+   590→    train(training_config)
+   591→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

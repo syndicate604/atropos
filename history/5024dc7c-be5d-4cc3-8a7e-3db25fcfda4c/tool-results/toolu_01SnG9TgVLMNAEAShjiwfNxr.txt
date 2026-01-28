@@ -1,0 +1,11 @@
+./atroposlib/api/server.py
+total 68
+drwxr-xr-x 2 root root  4096 Jan 26 00:28 .
+drwxr-xr-x 9 root root  4096 Jan 26 00:40 ..
+-rw-r--r-- 1 root root 14204 Jan 26 00:28 README.md
+-rw-r--r-- 1 root root    43 Jan 26 00:28 __init__.py
+-rw-r--r-- 1 root root  3148 Jan 26 00:28 env_interaction.md
+-rw-r--r-- 1 root root 18675 Jan 26 00:28 server.py
+-rw-r--r-- 1 root root  2248 Jan 26 00:28 trainer_interaction.md
+-rw-r--r-- 1 root root 11084 Jan 26 00:28 utils.py
+/root/hydra/atroposlib/__init__.py

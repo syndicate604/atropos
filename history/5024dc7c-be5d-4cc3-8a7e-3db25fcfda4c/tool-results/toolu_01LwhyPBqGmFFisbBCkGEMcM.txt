@@ -1,0 +1,30 @@
+NAME                     ZONE           DESCRIPTION
+ct3                      us-central1-a  ct3
+ct3p                     us-central1-a  ct3p
+ct5l                     us-central1-a  ct5l
+ct5lp                    us-central1-a  ct5lp
+ct5p                     us-central1-a  ct5p
+ct6e                     us-central1-a  ct6e
+nvidia-a100-80gb         us-central1-a  NVIDIA A100 80GB
+nvidia-h100-80gb         us-central1-a  NVIDIA H100 80GB
+nvidia-h100-mega-80gb    us-central1-a  NVIDIA H100 80GB MEGA
+nvidia-l4                us-central1-a  NVIDIA L4
+nvidia-l4-vws            us-central1-a  NVIDIA L4 Virtual Workstation
+nvidia-tesla-a100        us-central1-a  NVIDIA A100 40GB
+nvidia-tesla-p4          us-central1-a  NVIDIA Tesla P4
+nvidia-tesla-p4-vws      us-central1-a  NVIDIA Tesla P4 Virtual Workstation
+nvidia-tesla-t4          us-central1-a  NVIDIA T4
+nvidia-tesla-t4-vws      us-central1-a  NVIDIA Tesla T4 Virtual Workstation
+nvidia-tesla-v100        us-central1-a  NVIDIA V100
+ct3                      us-central1-b  ct3
+ct3p                     us-central1-b  ct3p
+ct6e                     us-central1-b  ct6e
+nvidia-b200              us-central1-b  NVIDIA B200 180GB
+nvidia-h100-80gb         us-central1-b  NVIDIA H100 80GB
+nvidia-h100-mega-80gb    us-central1-b  NVIDIA H100 80GB MEGA
+nvidia-h200-141gb        us-central1-b  NVIDIA H200 141GB
+nvidia-l4                us-central1-b  NVIDIA L4
+nvidia-l4-vws            us-central1-b  NVIDIA L4 Virtual Workstation
+nvidia-rtx-pro-6000      us-central1-b  NVIDIA RTX PRO 6000
+nvidia-rtx-pro-6000-vws  us-central1-b  NVIDIA_RTX_PRO_6000
+nvidia-tesla-a100        us-central1-b  NVIDIA A100 40GB

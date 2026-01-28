@@ -1,0 +1,54 @@
+   106→
+   107→    async def _completion_wrapper(self, **kwargs) -> Completion:
+   108→        """
+   109→        Wrapper for the completion using the openai client.
+   110→        """
+   111→        assert (
+   112→            kwargs.get("model", None) is not None
+   113→        ), "Model is required for completion!"
+   114→        assert (
+   115→            kwargs.get("prompt", None) is not None
+   116→        ), "Prompt is required for completion!"
+   117→        if self.config.n_kwarg_is_ignored:
+   118→            n = kwargs.pop("n", 1)
+   119→            completion_list = await asyncio.gather(
+   120→                *[self.openai.completions.create(**kwargs) for _ in range(n)]
+   121→            )
+   122→            completions = completion_list[0]
+   123→            if n > 1:
+   124→                for c in completion_list[1:]:
+   125→                    completions.choices.extend(c.choices)
+   126→        else:
+   127→            if "n" in kwargs:
+   128→                n = kwargs["n"]
+   129→            else:
+   130→                n = 1
+   131→            completions = await self.openai.completions.create(**kwargs)
+   132→            if len(completions.choices) != n:
+   133→                if len(completions.choices) != 1:
+   134→                    raise ValueError(
+   135→                        f"Expected 1 or {n} completions, got {len(completions.choices)}!"
+   136→                    )
+   137→                else:
+   138→                    warnings.warn("n kwarg is ignored by the API, setting to True")
+   139→                    self.config.n_kwarg_is_ignored = True
+   140→                    completion_list = await asyncio.gather(
+   141→                        *[self.openai.completions.create(**kwargs) for _ in range(1, n)]
+   142→                    )
+   143→                    for c in completion_list:
+   144→                        completions.choices.extend(c.choices)
+   145→        return completions
+   146→
+   147→    async def _tokens_and_logprobs_completion_wrapper(
+   148→        self, **kwargs
+   149→    ) -> tuple[list, list, list, list]:
+   150→        """
+   151→        Wrapper for tokens and logprobs completion using VLLM's native API.
+   152→        Returns a tuple of (prompt_tokens, output_tokens, output_logprobs, finish_reasons).
+   153→        Each element is a list of lists (one per completion in the batch).
+   154→        """
+   155→        assert (
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

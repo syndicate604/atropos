@@ -1,0 +1,18 @@
+[hydra a529e67] Reorganize docs: move plans to Hydra_Plans
+ Date: Wed Jan 21 10:07:51 2026 -0800
+ 16 files changed, 1 insertion(+), 1741 deletions(-)
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs.html
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/blazy.js
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/blazy_init.js
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/example-1.png
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/example-2.png
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/index.css
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/js
+ delete mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/sakana_ai_text.svg
+ rename docs/{Plans => Hydra_Plans}/01_HYDRA_Vision_and_Architecture.md (100%)
+ rename docs/{Plans => Hydra_Plans}/02_Security_Governance_Framework.md (100%)
+ rename docs/{Plans => Hydra_Plans}/03_MVP_Path_to_90.md (100%)
+ rename docs/{Plans => Hydra_Plans}/04_BUILD_THIS_Week1_Harness.md (100%)
+ rename docs/{Plans => Hydra_Plans}/05_DRQ_Atropos_Integration.md (100%)
+ rename docs/{Plans => Hydra_Plans}/Ref_Critique_Response_Archive.md (100%)
+ rename docs/{Plans => Hydra_Plans}/Ref_Full_30_Task_Benchmark.md (100%)

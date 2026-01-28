@@ -1,0 +1,24 @@
+   583→        shutil.rmtree(final_save_path)
+   584→    os.makedirs(final_save_path, exist_ok=True)
+   585→    model.save_pretrained(final_save_path)
+   586→    tokenizer.save_pretrained(final_save_path)
+   587→    print("Final model saved.")
+   588→
+   589→
+   590→# Example usage (optional, can be run from another script)
+   591→if __name__ == "__main__":
+   592→    # Example: Create a config and run training
+   593→    # Replace "gpt2" with your desired model
+   594→    training_config = TrainingConfig(
+   595→        model_name="/root/models/Qwen2.5-7B-Instruct",
+   596→        training_steps=5,  # Use steps (smoke test)
+   597→        vllm_restart_interval=3,  # Example interval
+   598→        use_wandb=False,  # Disabled for now
+   599→        wandb_project="grpo-trainer-example",  # Replace with your project name
+   600→    )
+   601→
+   602→    # --- End Mock ---
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

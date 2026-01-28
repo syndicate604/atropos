@@ -1,0 +1,50 @@
+Created symlink '/etc/systemd/user/lomiri-indicators.target.wants/ayatana-indicator-sound.service' → '/usr/lib/systemd/user/ayatana-indicator-sound.service'.
+Unit /usr/lib/systemd/user/ayatana-indicator-sound.service is added as a dependency to a non-existent unit lomiri-indicators.target.
+Setting up evolution-ews (3.56.2-1) ...
+Setting up evolution-plugin-pstimport (3.56.2-4) ...
+Setting up ubuntu-mate-desktop (1.304) ...
+Processing triggers for initramfs-tools (0.150ubuntu3.1) ...
+update-initramfs: Generating /boot/initrd.img-6.17.0-1005-gcp
+Processing triggers for dictionaries-common (1.30.10) ...
+aspell-autobuildhash: processing: en [en-common].
+aspell-autobuildhash: processing: en [en-variant_0].
+aspell-autobuildhash: processing: en [en-variant_1].
+aspell-autobuildhash: processing: en [en-variant_2].
+aspell-autobuildhash: processing: en [en-w_accents-only].
+aspell-autobuildhash: processing: en [en-wo_accents-only].
+aspell-autobuildhash: processing: en [en_AU-variant_0].
+aspell-autobuildhash: processing: en [en_AU-variant_1].
+aspell-autobuildhash: processing: en [en_AU-w_accents-only].
+aspell-autobuildhash: processing: en [en_AU-wo_accents-only].
+aspell-autobuildhash: processing: en [en_CA-variant_0].
+aspell-autobuildhash: processing: en [en_CA-variant_1].
+aspell-autobuildhash: processing: en [en_CA-w_accents-only].
+aspell-autobuildhash: processing: en [en_CA-wo_accents-only].
+aspell-autobuildhash: processing: en [en_GB-ise-w_accents-only].
+aspell-autobuildhash: processing: en [en_GB-ise-wo_accents-only].
+aspell-autobuildhash: processing: en [en_GB-ize-w_accents-only].
+aspell-autobuildhash: processing: en [en_GB-ize-wo_accents-only].
+aspell-autobuildhash: processing: en [en_GB-variant_0].
+aspell-autobuildhash: processing: en [en_GB-variant_1].
+aspell-autobuildhash: processing: en [en_US-w_accents-only].
+aspell-autobuildhash: processing: en [en_US-wo_accents-only].
+Processing triggers for libvlc-bin:amd64 (3.0.21-11) ...
+Processing triggers for sgml-base (1.31+nmu1) ...
+Processing triggers for libc-bin (2.42-0ubuntu3) ...
+Processing triggers for libgdk-pixbuf-2.0-0:amd64 (2.42.12+dfsg-5) ...
+Processing triggers for ufw (0.36.2-9) ...
+Processing triggers for dbus (1.16.2-2ubuntu2) ...
+
+Running kernel seems to be up-to-date.
+
+Restarting services...
+
+Service restarts being deferred:
+ systemctl restart networkd-dispatcher.service
+ systemctl restart unattended-upgrades.service
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.

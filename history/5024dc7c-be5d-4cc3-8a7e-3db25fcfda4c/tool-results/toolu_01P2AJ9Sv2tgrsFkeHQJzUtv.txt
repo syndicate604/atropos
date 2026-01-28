@@ -1,0 +1,15 @@
+249-        self.backlog = []
+250-        self.rollouts_for_wandb = []
+251-        self.running_items: dict[UUID, Item] = dict()
+252:        self.wandb_project = None
+253-        self.wandb_group = None
+254-        self.curr_step = 0
+255-        self.max_token_len = -1
+--
+471-                    ) as resp:
+472-                        data = await parse_http_response(resp, logger)
+473-                        self.wandb_group = data["group"]
+474:                        self.wandb_project = data["project"]
+475-
+476-                if self.wandb_project is None:
+477-                    await asyncio.sleep(1)

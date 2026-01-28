@@ -1,0 +1,23 @@
+507988
+507989
+509101
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+  [1/5] Running exploit on original code...
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+  [2/5] Applying patch: external:tmpq6wecj0w.diff...
+  [3/5] Running exploit on patched code...
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+  [2/5] Applying patch: external:tmpzxropmpf.diff...
+  [3/5] Running exploit on patched code...
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1

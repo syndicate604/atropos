@@ -1,0 +1,4 @@
+[hydra 92e5240] Harden token/logprob alignment: fail fast instead of silent fallbacks
+ 1 file changed, 21 insertions(+), 10 deletions(-)
+To github.com:RelayOne/hydra.git
+   305adf7..92e5240  hydra -> hydra

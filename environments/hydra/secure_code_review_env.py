@@ -127,7 +127,7 @@ class SecureCodeReviewEnv(BaseEnv):
             total_steps=100,
             batch_size=4,
             steps_per_eval=25,
-            max_token_length=2048,
+            max_token_length=3072,
             wandb_name="secure_code_review",
         )
         server_configs = [
@@ -429,15 +429,16 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         # - Incomplete diff structure (missing required headers / hunk content)
         truncation_error = None
 
-        # Check for mid-line truncation (no final newline + suspicious ending)
+        # Heuristic: lack of final newline alone isn't enough (diffs may contain
+        # "\ No newline at end of file"). Only treat it as truncation if the last
+        # line also looks suspicious.
         if not had_final_newline and diff_text:
-            last_line = diff_text.split('\n')[-1] if '\n' in diff_text else diff_text
-            # If last line is long and doesn't start with diff markers, likely truncated
-            if len(last_line) > 50 and not last_line.startswith((' ', '+', '-', '@', 'diff', '---', '+++')):
-                truncation_error = "Diff truncated mid-line (no final newline)"
-            # If it ends with incomplete word/sentence indicators
-            elif last_line and last_line[-1].isalpha():  # Ends with letter mid-word
-                truncation_error = "Diff appears truncated (ends mid-word)"
+            last_line = diff_text.split("\n")[-1]
+            diff_prefixes = (" ", "+", "-", "@", "\\", "diff", "---", "+++")
+            if len(last_line) > 200 and not last_line.startswith(diff_prefixes):
+                truncation_error = (
+                    "Diff truncated mid-line (suspicious last line, no final newline)"
+                )
 
         # Check for incomplete diff structure
         has_git_header = 'diff --git' in diff_text
@@ -461,8 +462,8 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                         truncation_error = "Incomplete hunk (no content after @@ marker)"
 
         # 4. Ensure final newline (after truncation check)
-        if not diff_text.endswith('\n'):
-            diff_text += '\n'
+        if diff_text and not diff_text.endswith("\n"):
+            diff_text += "\n"
 
         return diff_text, truncation_error
 

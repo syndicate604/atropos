@@ -1,0 +1,11 @@
+572-    tokenizer.save_pretrained(final_save_path)
+573-    print("Final model saved.")
+574-
+575-
+576-# Example usage (optional, can be run from another script)
+577:if __name__ == "__main__":
+578-    # Example: Create a config and run training
+579-    # Replace "gpt2" with your desired model
+580-    training_config = TrainingConfig(
+581-        model_name="Qwen/Qwen2.5-1.5B-Instruct",
+582-        training_steps=20,  # Use steps

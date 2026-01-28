@@ -1,0 +1,4 @@
+Connected
+NVIDIA L4, 18802 MiB, 23034 MiB
+root        3787  0.0  0.0   7764  1808 ?        S    00:38   0:00 bash -c cd ~/hydra && nohup python3 example_trainer/vllm_api_server.py --model Qwen/Qwen2.5-1.5B-Instruct --port 9004 --gpu-memory-utilization 0.8 > /tmp/vllm.log 2>&1 &
+root        3788  1.4  1.4 9755572 926912 ?      Sl   00:38   1:04 python3 example_trainer/vllm_api_server.py --model Qwen/Qwen2.5-1.5B-Instruct --port 9004 --gpu-memory-utilization 0.8

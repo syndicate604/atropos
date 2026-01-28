@@ -1,0 +1,3 @@
+Exit code 1
+ERROR: (gcloud.compute.instances.set-machine-type) Could not fetch resource:
+ - Instances with guest accelerators do not support live migration.

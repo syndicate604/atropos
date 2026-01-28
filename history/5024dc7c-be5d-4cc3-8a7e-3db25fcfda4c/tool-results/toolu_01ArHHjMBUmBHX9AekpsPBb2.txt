@@ -1,0 +1,18 @@
+     1→{
+     2→  "type": "service_account",
+     3→  "project_id": "balmy-ocean-449223-v9",
+     4→  "private_key_id": "df4fdbca4d9f08586315a06b35cd3bcb48276940",
+     5→  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCx16HDVH8mZq3q\nHVZv6EaYGUmd42SbG1mAef2DR5un1BPi9SNnsYHclDAhMCC+wfhKAQQeJ8283Il+\nHxZ7Ffeg8vqKXm56Uzev6/bNtNTVyri6DXccinjN6PCuGH5w1SL3yVW7wkTNDEJf\nPhtPAqTt8byWDiMvUredOh5r6e5zHwRNkHtkNQP8pwSZ0lbVLRPjTLhQ6OBvF1Px\ntt4kkRVoHzqq8wzuysOFo+DdChG+9/ZBXIk0Hyd2Z1mTHNnBwMlXqQtS2St3xMmc\nUh4GUav5co2/0ioJF9AD230aJ46Fme07JBf+SkqFTgm+bM5Irgcx6yVn3EFYOEZr\n8V4xl+UTAgMBAAECggEAHZO6tAU0BltyVird6surHfWqsCcW3tL8Hilrt68rnIxh\naFATvNWhPuGoZYSfFYql9AzaNfexuFTHSyH5d6wOHIb8kxGkdxSrAMeSKuEFuq61\n7T97DVScRcaVbKbnNHXGFIa4CvuCvMVqrnNiUFAkxOv8zMn6IQ81OWFmmNT1ktCQ\nqIKu/YQopp6aOEDkCXSWcHCN1t/LdXXM5wXBoKJ3xs9TEgZBTWfgmM7OQgXbISQn\n1krXLYDa7tEHJC6hOR8u/7Qltv32LHCVAo5BWI0xG9mlBD/ZGqJW925jxHXj5GjH\nnTBCmltEleJiYMVYhqOP2AeGPn+2p+1a485/6pi3sQKBgQDzx+/Bmer3vAo8Cvnh\nMJkU7jelaEtGq67++8MfwuIn36/0SSXaovqAcbX/Yh1mNKqJLxwfCh2glqvp+h0s\n1iUZX9WaekHlYSR9Rf0TWzDhhQ9tQZ9hj8YhMBPNpvqC2lSpjFZ2MbHjfqteCmf0\nr68Mn2V3dxyL4Z42Ytww9nyP0QKBgQC6wZs9zsWWU+m+TyU1kraMWbC9wc+5+18p\nzpVqQ6oOa6AGkg9yTpqy+pOzHsf0sQm/dEuVaGw4L/o988hXcbAMTKKc0qH66GWp\nzUEFY2uhILIqNRvo7wzx5pLAhFdrj4os9afbij8m6elBdGX2i85KPTso1lafedG+\nXcTSQyLjowKBgQCLBKBf+iM5ZR09AlFfLrSNcA+BnwkWYv9nXzD1otAPRwtzNmeE\n194cczwDR/NV/oClvJy/wqgElQeyZTRQBkqfvrvz3PZJFW2WltvsNtuYL6YNexel\nrjShZmZUp31CM7mF+oav3kUAY5LcDPkdWzZq71cQmndH+cCcaSICNf3wkQKBgAfh\nz/mF1pUHqZ/cm0dtj8LQrkL0AR5qW5PaIjg/7td492IPnBNI+gJ/zOgMbogHSNAJ\nyn7dz2N3suoWdegq5jE+ssZHpYp/cHsALLRbg9ljFeHuJ+Vm4Xb8MklpzH6/qidH\nnvQHG686xBt9HCiRsf00JGEO2s0USSPttTbimoBdAoGBAKLb8pTqK6ULy+WeNYyZ\noIPKJdi0yvA0fvCU8rCf/h3Uz5uHxmyvWn4xGXqMMFjlQRaSWQdnIu6IDjkX3X66\noF9Yrqa3z2SEUuEsdc2AsZsjc5Jn7zH1gnLm4K7eSwrIHsK9R4arRePqy2Ipb9NN\nwYIs/CvX89tNV9w2GPTKBKFN\n-----END PRIVATE KEY-----\n",
+     6→  "client_email": "todal-277@balmy-ocean-449223-v9.iam.gserviceaccount.com",
+     7→  "client_id": "102391602668647311343",
+     8→  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+     9→  "token_uri": "https://oauth2.googleapis.com/token",
+    10→  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    11→  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/todal-277%40balmy-ocean-449223-v9.iam.gserviceaccount.com",
+    12→  "universe_domain": "googleapis.com"
+    13→}
+    14→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

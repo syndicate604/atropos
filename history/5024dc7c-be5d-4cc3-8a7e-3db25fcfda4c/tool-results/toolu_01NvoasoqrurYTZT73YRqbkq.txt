@@ -1,0 +1,2 @@
+root       30251  0.0  0.0   7764  1808 ?        S    04:14   0:00 bash -c cd ~/hydra && rm -f /tmp/grpo.log && nohup python3 example_trainer/grpo.py > /tmp/grpo.log 2>&1 & sleep 2 && tail -5 /tmp/grpo.log
+root       30254  9.2  1.0 27950992 900408 ?     Sl   04:14   0:11 python3 example_trainer/grpo.py

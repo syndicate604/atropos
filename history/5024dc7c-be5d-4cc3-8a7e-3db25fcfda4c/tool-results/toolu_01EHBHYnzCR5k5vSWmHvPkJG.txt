@@ -1,0 +1,54 @@
+   308→        return result
+   309→
+   310→    def _extract_diff_from_response(self, response: str) -> Optional[str]:
+   311→        """Extract a unified diff from the model response and normalize headers."""
+   312→        # Try to find diff in code block first (most reliable)
+   313→        diff_pattern = r'```(?:diff)?\s*\n(.*?)```'
+   314→        matches = re.findall(diff_pattern, response, re.DOTALL)
+   315→
+   316→        if matches:
+   317→            diff_text = matches[0].strip()
+   318→            # Validate it looks like a diff
+   319→            if any(line.startswith(('---', '+++', 'diff ')) for line in diff_text.split('\n')[:5]):
+   320→                return self._normalize_diff_headers(diff_text)
+   321→
+   322→        # Try to find raw diff without code blocks
+   323→        lines = response.split('\n')
+   324→        diff_start = None
+   325→        for i, line in enumerate(lines):
+   326→            if line.startswith(('--- ', 'diff --git')):
+   327→                diff_start = i
+   328→                break
+   329→
+   330→        if diff_start is None:
+   331→            return None
+   332→
+   333→        # Extract diff lines starting from diff_start
+   334→        diff_lines = []
+   335→        collecting = True
+   336→
+   337→        for line in lines[diff_start:]:
+   338→            # Always include lines that look like diff content
+   339→            if line.startswith(('+', '-', '@', ' ', '\\', 'diff', '---', '+++')):
+   340→                diff_lines.append(line)
+   341→                collecting = True
+   342→            elif not line.strip():
+   343→                # Allow blank lines within the diff
+   344→                if collecting:
+   345→                    diff_lines.append(line)
+   346→            else:
+   347→                # Non-diff, non-blank line - stop collecting
+   348→                # But only if we've collected something meaningful
+   349→                if len(diff_lines) > 2:  # At least --- and +++ lines
+   350→                    break
+   351→                # Otherwise keep going in case we haven't found the real diff yet
+   352→                collecting = False
+   353→
+   354→        diff_text = '\n'.join(diff_lines).strip()
+   355→
+   356→        # Validate we got something that looks like a diff
+   357→        if diff_text and any(line.startswith('---') for line in diff_text.split('\n')[:5]):
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

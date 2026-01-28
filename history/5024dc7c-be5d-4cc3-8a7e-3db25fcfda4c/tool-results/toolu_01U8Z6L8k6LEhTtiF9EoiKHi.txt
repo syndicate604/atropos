@@ -1,0 +1,49 @@
+   300→        patch_file: Path
+   301→    ) -> Tuple[bool, str, str]:
+   302→        """
+   303→        Apply a diff patch to the workspace with graceful error handling.
+   304→
+   305→        Returns:
+   306→            (success, error_code, error_message) tuple
+   307→            error_code is one of: "", "invalid_patch_format", "patch_apply_failure"
+   308→        """
+   309→        # Check if patch file exists
+   310→        if not patch_file.exists():
+   311→            return False, "patch_apply_failure", f"Patch file not found: {patch_file}"
+   312→
+   313→        # Check if patch file is empty or invalid
+   314→        try:
+   315→            patch_content = patch_file.read_text()
+   316→            if not patch_content.strip():
+   317→                return False, "invalid_patch_format", "Patch file is empty"
+   318→            # Basic sanity check for diff format
+   319→            if not any(line.startswith(('---', '+++', 'diff '))
+   320→                       for line in patch_content.split('\n')[:10]):
+   321→                return False, "invalid_patch_format", "Missing diff headers (---, +++, or diff)"
+   322→        except Exception as e:
+   323→            return False, "patch_apply_failure", f"Could not read patch file: {e}"
+   324→
+   325→        # Try to apply the patch
+   326→        result = subprocess.run(
+   327→            ["patch", "-p1", "-d", str(workspace), "-i", str(patch_file.absolute())],
+   328→            capture_output=True,
+   329→            text=True
+   330→        )
+   331→
+   332→        if result.returncode != 0:
+   333→            error_msg = result.stderr or result.stdout or "Unknown patch error"
+   334→            return False, "patch_apply_failure", error_msg.strip()
+   335→
+   336→        return True, "", ""
+   337→
+   338→    def _apply_patch(self, workspace: Path, patch_file: Path) -> None:
+   339→        """Apply a diff patch to the workspace (legacy, raises on failure)."""
+   340→        success, error_code, error_msg = self._apply_patch_safe(workspace, patch_file)
+   341→        if not success:
+   342→            raise RuntimeError(f"Failed to apply patch ({error_code}): {error_msg}")
+   343→
+   344→    def _parse_scanner_result(self, stdout: str) -> Tuple[bool, List[dict]]:
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

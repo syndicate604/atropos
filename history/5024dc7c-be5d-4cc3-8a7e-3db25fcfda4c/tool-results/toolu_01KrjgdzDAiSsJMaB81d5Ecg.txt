@@ -1,0 +1,12 @@
+ROLE                                  MEMBERS
+roles/aiplatform.admin                user:ericmacdougall@nitrograph.com
+roles/aiplatform.user                 user:ericmacdougall@nitrograph.com
+roles/aiplatform.user                 user:ken@nitrograph.com
+roles/editor                          user:ken@nitrograph.com
+roles/iam.serviceAccountAdmin         user:ericmacdougall@nitrograph.com
+roles/iam.serviceAccountTokenCreator  user:casey@nitrograph.com
+roles/owner                           user:casey@nitrograph.com
+roles/owner                           user:eric@nitrograph.com
+roles/owner                           user:ericmacdougall@nitrograph.com
+roles/owner                           user:laura@nitrograph.com
+roles/serviceusage.apiKeysAdmin       user:ericmacdougall@nitrograph.com

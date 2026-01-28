@@ -1,0 +1,46 @@
+1f814a5 Merge pull request #289 from GHOryy5/patch-1
+faf84d2 Merge branch 'main' into patch-1
+84a8bbb Merge pull request #317 from Savage890/fix/issue-308-jsonl2html
+9047f03 Merge pull request #297 from NousResearch/add_reasoning_handling_draft
+42db3b1 Merge pull request #318 from crStiv/typos
+7e12fa0 Update README.md
+b624cbd Update plot.py
+14b82ae Update configs.py
+941fadd Update run.py
+20992ed Update hpo.py
+d2fbe43 Update lcb_modal_endpoint.py
+351403d Merge branch 'main' into add_reasoning_handling_draft
+31a8cdc update test to reflect the change in reasoning effort mapping
+b46d7ef Merge branch 'add_reasoning_handling_draft' of https://github.com/NousResearch/atropos into add_reasoning_handling_draft
+6816168 linter....
+6c827d9 [pre-commit.ci] auto fixes from pre-commit.com hooks
+45d47fb Refactor reasoning configuration check in APIServer class
+f3ea354 [pre-commit.ci] auto fixes from pre-commit.com hooks
+c2e7b37 Merge branch 'add_reasoning_handling_draft' of https://github.com/NousResearch/atropos into add_reasoning_handling_draft
+b2d17a4 Add README for server handling module and refine ReasoningConfig logic
+0e187d7 Update completion handler documentation to clarify that reasoning config is not injected for completions, as it is only supported in chat completions.
+b6e2426 [pre-commit.ci] auto fixes from pre-commit.com hooks
+0316cac Rename `is_active` method to `is_reasoning_kwargs_active` in `ReasoningConfig` for clarity. Update references in the class and corresponding tests to reflect this change.
+39e9a23 [pre-commit.ci] auto fixes from pre-commit.com hooks
+39f05d1 fix: handle nested message format in jsonl2html.py (#308)
+9f6681b Merge pull request #315 from NousResearch/pre-commit-ci-update-config
+00a0f53 Merge branch 'add_reasoning_handling_draft' of https://github.com/NousResearch/atropos into add_reasoning_handling_draft
+3a854cc fix linter
+79a55ff [pre-commit.ci] auto fixes from pre-commit.com hooks
+2a7dd49 Merge branch 'add_reasoning_handling_draft' of https://github.com/NousResearch/atropos into add_reasoning_handling_draft
+b33cb7f A bit more updates for robustness
+837fc23 Merge branch 'main' into add_reasoning_handling_draft
+6aba524 ReasoningConfig documentation to clarify dependency on effort and max_tokens settings. This update specifies that enabling either of these parameters requires reasoning in OpenRouter to be set to Enabled.
+2150453 revive _get_server_base_url
+38d0283 [pre-commit.ci] pre-commit autoupdate
+6cfcbdf [pre-commit.ci] auto fixes from pre-commit.com hooks
+e1ece3e Add reasoning configuration support across server implementations
+6763649 Merge branch 'add_reasoning_handling_draft' of https://github.com/NousResearch/atropos into add_reasoning_handling_draft
+89c9697 fix test
+a23be15 [pre-commit.ci] auto fixes from pre-commit.com hooks
+127a925 Merge branch 'add_reasoning_handling_draft' of https://github.com/NousResearch/atropos into add_reasoning_handling_draft
+747fbc9 fix linting
+97047ee [pre-commit.ci] auto fixes from pre-commit.com hooks
+62fa512 Add support for reasoning models and their variety of providers/endpoints
+d8c83dd [pre-commit.ci] auto fixes from pre-commit.com hooks
+4c4aba1 Prevent hangs in kernel evaluation by bounding worker waits

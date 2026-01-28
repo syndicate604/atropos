@@ -1,0 +1,2 @@
+NAME                   ZONE           NAT_IP        ITEMS
+training-controller-1  us-central1-c  35.222.9.121  ['http-server', 'https-server']

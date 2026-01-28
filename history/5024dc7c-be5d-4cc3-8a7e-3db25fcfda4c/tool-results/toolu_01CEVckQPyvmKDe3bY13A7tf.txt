@@ -1,0 +1,3 @@
+[Tue Jan 27 03:54:04 2026] audit: type=1400 audit(1769486044.748:53): apparmor="DENIED" operation="open" class="file" profile="ubuntu_pro_apt_news" name="/root/hydra/" pid=4025 comm="python3" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+[Tue Jan 27 03:54:04 2026] audit: type=1400 audit(1769486044.750:54): apparmor="DENIED" operation="open" class="file" profile="ubuntu_pro_esm_cache" name="/root/hydra/" pid=4026 comm="python3" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+[Tue Jan 27 03:54:31 2026] audit: type=1400 audit(1769486072.181:56): apparmor="DENIED" operation="open" class="file" profile="ubuntu_pro_esm_cache" name="/root/hydra/" pid=5639 comm="python3" requested_mask="r" denied_mask="r" fsuid=0 ouid=0

@@ -1,0 +1,13 @@
+-rw-r--r-- 1 bron bron 748 Sep 17  2024 /home/bron/.ssh/git_rsa.pub
+-rw-r--r-- 1 bron bron 104 May 15  2025 /home/bron/.ssh/id_ed25519.pub
+-rw-r--r-- 1 bron bron 751 Apr 20  2024 /home/bron/.ssh/id_rsa.pub
+Host github.com
+    HostName github.com
+    User syndicate604
+    IdentityFile ~/.ssh/git_rsa
+
+# HYDRA GCP Training Controller
+Host hydra-controller
+    HostName 35.222.9.121
+    User root
+    IdentityFile ~/.ssh/gcp/ngcp_root_key

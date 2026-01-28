@@ -1,0 +1,21 @@
+226:def get_data(
+227-    batch_size: int, seq_len: int
+228-) -> List[
+229-    Tuple[
+230-        List[torch.Tensor], List[torch.Tensor], List[torch.Tensor], List[torch.Tensor]
+231-    ]
+232-]:
+233-    """
+234-    getting data from the api
+235-    """
+236-    batches = []
+237-    while True:
+238-        data = get_batch()
+239-        if data["batch"] is not None:
+240-            # Save the batch
+241-            with open("temp.json", "w", encoding="utf-8") as f:
+242-                json.dump(data, f)
+243-            # In case the inference runs ahead of the training, we loop until we don't have any more data
+244-            batches.append(pad_data_to_good_offset(data, batch_size))
+245-        elif len(batches) > 0:
+246-            # Return the batches

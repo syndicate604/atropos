@@ -1,0 +1,51 @@
+preview_lines 5
+
+=== item 0 ===
+keys: ['group_overrides', 'inference_logprobs', 'masks', 'messages', 'overrides', 'ref_logprobs', 'scores', 'tokens']
+group_size: 4
+scores: [-1.0, 1.0, 1.0, -1.0]
+lens(tokens): [375, 402, 466, 353]
+lens(masks): [375, 402, 466, 353]
+mask_prompt_tokens: 209 completion_tokens: 166
+mask_has_completion: True
+lens(logprobs): [375, 402, 466, 353]
+
+=== item 1 ===
+keys: ['group_overrides', 'inference_logprobs', 'masks', 'messages', 'overrides', 'ref_logprobs', 'scores', 'tokens']
+group_size: 4
+scores: [-1.0, 1.0, -1.0, -1.0]
+lens(tokens): [593, 651, 674, 944]
+lens(masks): [593, 651, 674, 944]
+mask_prompt_tokens: 209 completion_tokens: 384
+mask_has_completion: True
+lens(logprobs): [593, 651, 674, 944]
+
+=== item 2 ===
+keys: ['group_overrides', 'inference_logprobs', 'masks', 'messages', 'overrides', 'ref_logprobs', 'scores', 'tokens']
+group_size: 4
+scores: [1.0, 1.0, 1.0, -1.0]
+lens(tokens): [481, 605, 590, 698]
+lens(masks): [481, 605, 590, 698]
+mask_prompt_tokens: 223 completion_tokens: 258
+mask_has_completion: True
+lens(logprobs): [481, 605, 590, 698]
+
+=== item 3 ===
+keys: ['group_overrides', 'inference_logprobs', 'masks', 'messages', 'overrides', 'ref_logprobs', 'scores', 'tokens']
+group_size: 4
+scores: [1.0, -1.0, 1.0, 1.0]
+lens(tokens): [505, 508, 456, 440]
+lens(masks): [505, 508, 456, 440]
+mask_prompt_tokens: 234 completion_tokens: 271
+mask_has_completion: True
+lens(logprobs): [505, 508, 456, 440]
+
+=== item 4 ===
+keys: ['group_overrides', 'inference_logprobs', 'masks', 'messages', 'overrides', 'ref_logprobs', 'scores', 'tokens']
+group_size: 4
+scores: [-1.0, 1.0, 1.0, -1.0]
+lens(tokens): [417, 582, 545, 557]
+lens(masks): [417, 582, 545, 557]
+mask_prompt_tokens: 262 completion_tokens: 155
+mask_has_completion: True
+lens(logprobs): [417, 582, 545, 557]

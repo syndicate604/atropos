@@ -1,0 +1,39 @@
+   480→                messages=[
+   481→                    {"role": "system", "content": SYSTEM_PROMPT},
+   482→                    user_message
+   483→                ],
+   484→                n=self.config.group_size,
+   485→                max_tokens=self.config.max_token_length,
+   486→                temperature=1.0,
+   487→            )
+   488→
+   489→            state = managed.get_state()
+   490→            nodes = state["nodes"]
+   491→
+   492→        # Build items to score
+   493→        to_score = []
+   494→        for i, choice in enumerate(chat_completions.choices):
+   495→            response_content = choice.message.content
+   496→            diff_text = self._extract_diff_from_response(response_content)
+   497→
+   498→            to_score.append({
+   499→                "task_id": item["task_id"],
+   500→                "messages": (
+   501→                    {"role": "system", "content": SYSTEM_PROMPT},
+   502→                    user_message,
+   503→                    {"role": "assistant", "content": response_content},
+   504→                ),
+   505→                "diff_text": diff_text,
+   506→                "tokens": nodes[i].tokens,
+   507→                "masks": nodes[i].masked_tokens,
+   508→                "logprobs": nodes[i].logprobs,
+   509→                "finish_reason": choice.finish_reason,
+   510→            })
+   511→
+   512→        # Score all patches
+   513→        scored_data = await self.score(to_score)
+   514→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

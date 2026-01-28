@@ -1,0 +1,6 @@
+     1→root       14603 25.5  0.0 158172 48592 ?        Sl   02:12   0:00 /usr/bin/python3 /usr/local/bin/uvicorn atroposlib.api.server:app --host 0.0.0.0 --port 8000
+     2→{"current_step":0,"queue_size":0}
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

@@ -1,0 +1,2 @@
+Exit code 255
+root@35.202.149.44: Permission denied (publickey).

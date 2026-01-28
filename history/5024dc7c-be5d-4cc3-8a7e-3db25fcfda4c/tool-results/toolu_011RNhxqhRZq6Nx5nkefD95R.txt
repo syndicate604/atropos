@@ -1,0 +1,20 @@
+        health_check=True
+    )
+]
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start
+WARNING:root:Waiting to register the env due to status wait for trainer to start

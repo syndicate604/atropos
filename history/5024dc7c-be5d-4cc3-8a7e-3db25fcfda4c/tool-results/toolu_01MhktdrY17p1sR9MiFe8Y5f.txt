@@ -1,0 +1,3 @@
+NAME                                                FAMILY
+pytorch-2-7-cu128-ubuntu-2204-nvidia-570-v20260120  pytorch-2-7-cu128-ubuntu-2204-nvidia-570
+pytorch-2-7-cu128-ubuntu-2404-nvidia-570-v20260120  pytorch-2-7-cu128-ubuntu-2404-nvidia-570

@@ -1,0 +1,41 @@
+[hydra c51a10d] Add HYDRA planning docs and architecture
+ 40 files changed, 22554 insertions(+)
+ create mode 100644 Initial_Ideas.md
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs.html
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/blazy.js
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/blazy_init.js
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/example-1.png
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/example-2.png
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/index.css
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/js
+ create mode 100644 docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/sakana_ai_text.svg
+ create mode 100644 docs/Plans/01_HYDRA_Vision_and_Architecture.md
+ create mode 100644 docs/Plans/02_Security_Governance_Framework.md
+ create mode 100644 docs/Plans/03_MVP_Path_to_90.md
+ create mode 100644 docs/Plans/04_BUILD_THIS_Week1_Harness.md
+ create mode 100644 docs/Plans/05_DRQ_Atropos_Integration.md
+ create mode 100644 docs/Plans/Ref_Critique_Response_Archive.md
+ create mode 100644 docs/Plans/Ref_Full_30_Task_Benchmark.md
+ create mode 100644 docs/RelayOne/ARCHITECTURE.md
+ create mode 100644 docs/RelayOne/BILLING_LEDGER_TESTS_SUMMARY.md
+ create mode 100644 docs/RelayOne/BLOG_IMPLEMENTATION_SUMMARY.md
+ create mode 100644 docs/RelayOne/CASE_STUDIES_IMPLEMENTATION_LOG.md
+ create mode 100644 docs/RelayOne/CASE_STUDIES_ROUTES.md
+ create mode 100644 docs/RelayOne/CHANGELOG.md
+ create mode 100644 docs/RelayOne/CHANGELOG_model_provider_tests.md
+ create mode 100644 docs/RelayOne/CONTACT_FORM_IMPLEMENTATION.md
+ create mode 100644 docs/RelayOne/CONTRIBUTING.md
+ create mode 100644 docs/RelayOne/DEPLOYMENT_GUIDE.md
+ create mode 100644 docs/RelayOne/DOCUMENTATION_VERIFICATION_REPORT.md
+ create mode 100644 docs/RelayOne/ENVIRONMENT.md
+ create mode 100644 docs/RelayOne/IMPLEMENTATION_PLAN.md
+ create mode 100644 docs/RelayOne/IMPLEMENTATION_PROGRESS.md
+ create mode 100644 docs/RelayOne/INVESTOR_QUICKSTART.md
+ create mode 100644 docs/RelayOne/PROGRESS.md
+ create mode 100644 docs/RelayOne/README.md
+ create mode 100644 docs/RelayOne/SECURITY.md
+ create mode 100644 docs/RelayOne/SENTRY_INTEGRATION_LOG.md
+ create mode 100644 docs/RelayOne/TEST_COVERAGE_REPORT.md
+ create mode 100644 docs/RelayOne/UNDOCUMENTED_SYSTEMS_AUDIT.md
+ create mode 100644 docs/RelayOne/VERIFICATION_LOG.md
+ create mode 100644 docs/RelayOne/WORKFLOW_BUILDER_IMPLEMENTATION.md

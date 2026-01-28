@@ -1,0 +1,13 @@
+mate-session
+● xrdp.service - xrdp daemon
+     Loaded: loaded (/usr/lib/systemd/system/xrdp.service; enabled; preset: enabled)
+     Active: active (running) since Sun 2026-01-25 20:08:27 UTC; 42min ago
+ Invocation: 99e79b843381432fb04224e026e76891
+       Docs: man:xrdp(8)
+             man:xrdp.ini(5)
+   Main PID: 55842 (xrdp)
+      Tasks: 1 (limit: 77074)
+     Memory: 1.3M (peak: 3.3M)
+        CPU: 52ms
+Synchronizing state of xrdp.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable xrdp

@@ -1,0 +1,61 @@
+107-        self.harness: Optional[HarnessRunner] = None
+108-
+109-        # Metrics for wandb
+110-        self.pass_rate_buffer: List[float] = []
+111-        self.failure_reasons: Dict[str, int] = {}
+112-
+113-    @classmethod
+114-    def config_init(cls) -> Tuple[BaseEnvConfig, List[APIServerConfig]]:
+115-        """Default configuration for the environment."""
+116-        env_config = BaseEnvConfig(
+117-            tokenizer_name="Qwen/Qwen2.5-7B-Instruct",
+118-            group_size=4,
+119-            use_wandb=True,
+120-            rollout_server_url="http://localhost:8000",
+121-            total_steps=100,
+122-            batch_size=4,
+123-            steps_per_eval=25,
+124-            max_token_length=2048,
+125-            wandb_name="secure_code_review",
+126-        )
+127-        server_configs = [
+128-            APIServerConfig(
+129-                model_name="Qwen/Qwen2.5-7B-Instruct",
+130-                base_url="http://localhost:9001/v1",
+131-                api_key="x",
+132-                num_requests_for_eval=32,
+133-            ),
+134-        ]
+135-        return env_config, server_configs
+136-
+137:    async def setup(self):
+138-        """Load tasks from the tasks directory."""
+139-        tasks_dir = HYDRA_DIR / "tasks"
+140-
+141-        if not tasks_dir.exists():
+142-            raise FileNotFoundError(f"Tasks directory not found: {tasks_dir}")
+143-
+144-        # Initialize harness runner
+145-        self.harness = HarnessRunner(
+146-            tasks_dir=tasks_dir,
+147-            image="hydra-harness:latest"
+148-        )
+149-
+150-        # Load all tasks
+151-        self.tasks = []
+152-        for task_dir in sorted(tasks_dir.iterdir()):
+153-            if not task_dir.is_dir():
+154-                continue
+155-
+156-            task_json = task_dir / "task.json"
+157-            if not task_json.exists():
+158-                continue
+159-
+160-            # Load task metadata
+161-            with open(task_json) as f:
+162-                task_meta = json.load(f)
+163-
+164-            # Load vulnerable code from metadata or default to workspace/app.py
+165-            vuln_file = task_meta.get("files", {}).get("vulnerable", "workspace/app.py")
+166-            code_file = task_dir / vuln_file
+167-

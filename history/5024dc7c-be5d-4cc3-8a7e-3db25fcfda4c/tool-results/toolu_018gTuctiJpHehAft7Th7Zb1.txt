@@ -1,0 +1,30 @@
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+  [4/5] Running regression tests...
+max_num_workers: 3, queue size: 3, workers: 3, self_queue_size: 1
+  [2/5] Applying patch: external:tmpg1a3p_ma.diff...
+  [!] Patch failed: patching file app.py
+patch unexpectedly ends in middle of line
+Hunk #1 FAILED at 38.
+1 out of 1 hunk...
+[SCR] Group scores: [(-0.85, 'patch_apply_hunk_failed'), (-0.4, 'regression_test_failure'), (-0.85, 'patch_apply_hunk_failed'), (-0.85, 'patch_apply_hunk_failed')]
+{"status":"received"}
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2
+max_num_workers: 2, queue size: 4, workers: 2, self_queue_size: 2

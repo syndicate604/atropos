@@ -1,0 +1,30 @@
+[0;36m(EngineCore_DP0 pid=8348)[0;0m Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:04<00:00,  1.10s/it]
+[0;36m(EngineCore_DP0 pid=8348)[0;0m Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:04<00:00,  1.09s/it]
+[0;36m(EngineCore_DP0 pid=8348)[0;0m 
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:27 [default_loader.py:291] Loading weights took 4.47 seconds
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:27 [gpu_model_runner.py:3905] Model loading took 14.25 GiB memory and 4.848245 seconds
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:35 [backends.py:644] Using cache directory: /root/.cache/vllm/torch_compile_cache/2c77039e1d/rank_0_0/backbone for vLLM's torch.compile
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:35 [backends.py:704] Dynamo bytecode transform time: 7.49 s
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:39 [backends.py:261] Cache the graph of compile range (1, 2048) for later use
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:43 [backends.py:278] Compiling a graph for compile range (1, 2048) takes 4.28 s
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:43 [monitor.py:34] torch.compile takes 11.77 s in total
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:44 [gpu_worker.py:358] Available KV cache memory: 4.75 GiB
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:44 [kv_cache_utils.py:1305] GPU KV cache size: 88,896 tokens
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:44 [kv_cache_utils.py:1310] Maximum concurrency for 32,768 tokens per request: 2.71x
+[0;36m(EngineCore_DP0 pid=8348)[0;0m Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):   0%|          | 0/35 [00:00<?, ?it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):   6%|▌         | 2/35 [00:00<00:01, 19.56it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  11%|█▏        | 4/35 [00:00<00:01, 19.74it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  17%|█▋        | 6/35 [00:00<00:01, 19.84it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  26%|██▌       | 9/35 [00:00<00:01, 19.45it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  34%|███▍      | 12/35 [00:00<00:01, 20.09it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  43%|████▎     | 15/35 [00:00<00:00, 20.21it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  51%|█████▏    | 18/35 [00:00<00:00, 20.37it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  60%|██████    | 21/35 [00:01<00:00, 20.53it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  69%|██████▊   | 24/35 [00:01<00:00, 20.69it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  77%|███████▋  | 27/35 [00:01<00:00, 20.81it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  86%|████████▌ | 30/35 [00:01<00:00, 20.91it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  94%|█████████▍| 33/35 [00:01<00:00, 19.56it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE): 100%|██████████| 35/35 [00:01<00:00, 18.95it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE): 100%|██████████| 35/35 [00:01<00:00, 19.91it/s]
+[0;36m(EngineCore_DP0 pid=8348)[0;0m Capturing CUDA graphs (decode, FULL):   0%|          | 0/19 [00:00<?, ?it/s]Capturing CUDA graphs (decode, FULL):  11%|█         | 2/19 [00:00<00:01, 16.47it/s]Capturing CUDA graphs (decode, FULL):  26%|██▋       | 5/19 [00:00<00:00, 19.34it/s]Capturing CUDA graphs (decode, FULL):  42%|████▏     | 8/19 [00:00<00:00, 20.36it/s]Capturing CUDA graphs (decode, FULL):  58%|█████▊    | 11/19 [00:00<00:00, 20.67it/s]Capturing CUDA graphs (decode, FULL):  74%|███████▎  | 14/19 [00:00<00:00, 20.95it/s]Capturing CUDA graphs (decode, FULL):  89%|████████▉ | 17/19 [00:00<00:00, 21.02it/s]Capturing CUDA graphs (decode, FULL): 100%|██████████| 19/19 [00:00<00:00, 20.68it/s]
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:48 [gpu_model_runner.py:4856] Graph capturing finished in 3 secs, took 0.35 GiB
+[0;36m(EngineCore_DP0 pid=8348)[0;0m INFO 01-27 04:07:48 [core.py:273] init engine (profile, create kv cache, warmup model) took 20.66 seconds
+INFO 01-27 04:07:48 [launcher.py:38] Available routes are:
+INFO 01-27 04:07:48 [launcher.py:46] Route: /openapi.json, Methods: GET, HEAD
+INFO 01-27 04:07:48 [launcher.py:46] Route: /docs, Methods: GET, HEAD
+INFO 01-27 04:07:48 [launcher.py:46] Route: /docs/oauth2-redirect, Methods: GET, HEAD
+INFO 01-27 04:07:48 [launcher.py:46] Route: /redoc, Methods: GET, HEAD
+INFO 01-27 04:07:48 [launcher.py:46] Route: /health, Methods: GET
+INFO 01-27 04:07:48 [launcher.py:46] Route: /health_generate, Methods: GET
+INFO 01-27 04:07:48 [launcher.py:46] Route: /generate, Methods: POST
+INFO:     Started server process [8317]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:9004 (Press CTRL+C to quit)
+INFO:     127.0.0.1:43642 - "GET /health HTTP/1.1" 200 OK

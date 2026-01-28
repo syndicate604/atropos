@@ -1,0 +1,19 @@
+    78→
+    79→class SCRTask(TypedDict):
+    80→    """Type for a secure code review task."""
+    81→    task_id: str
+    82→    code: str
+    83→    metadata: Dict[str, Any]
+    84→    cwe: str
+    85→    description: str
+    86→
+    87→
+    88→class SecureCodeReviewEnv(BaseEnv):
+    89→    """
+    90→    HYDRA Secure Code Review Environment for Atropos.
+    91→
+    92→    Generates patch candidates and scores them using the verification harness.
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

@@ -1,0 +1,2 @@
+Exit code 1
+mv: cannot move '/home/bron/projects/atropos/mvp' to '/home/bron/projects/mvp/mvp': Permission denied

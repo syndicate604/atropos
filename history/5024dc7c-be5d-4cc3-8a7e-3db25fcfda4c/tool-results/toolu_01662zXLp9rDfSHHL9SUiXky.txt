@@ -1,0 +1,74 @@
+   150→        # Load all tasks
+   151→        self.tasks = []
+   152→        for task_dir in sorted(tasks_dir.iterdir()):
+   153→            if not task_dir.is_dir():
+   154→                continue
+   155→
+   156→            task_json = task_dir / "task.json"
+   157→            if not task_json.exists():
+   158→                continue
+   159→
+   160→            # Load task metadata
+   161→            with open(task_json) as f:
+   162→                task_meta = json.load(f)
+   163→
+   164→            # Load vulnerable code from metadata or default to workspace/app.py
+   165→            vuln_file = task_meta.get("files", {}).get("vulnerable", "workspace/app.py")
+   166→            code_file = task_dir / vuln_file
+   167→
+   168→            if code_file.exists():
+   169→                code = code_file.read_text()
+   170→            else:
+   171→                print(f"Warning: No code file found for task {task_dir.name}")
+   172→                continue
+   173→
+   174→            task = SCRTask(
+   175→                task_id=task_meta["id"],
+   176→                code=code,
+   177→                metadata=task_meta.get("metadata", {}),
+   178→                cwe=task_meta.get("cwe", "Unknown"),
+   179→                description=task_meta.get("metadata", {}).get("description", "")
+   180→            )
+   181→            self.tasks.append(task)
+   182→
+   183→        if not self.tasks:
+   184→            raise ValueError("No valid tasks found in tasks directory")
+   185→
+   186→        print(f"Loaded {len(self.tasks)} tasks: {[t['task_id'] for t in self.tasks]}")
+   187→        self.task_iter = 0
+   188→
+   189→    async def get_next_item(self) -> SCRTask:
+   190→        """Get the next task for training."""
+   191→        task = self.tasks[self.task_iter % len(self.tasks)]
+   192→        self.task_iter += 1
+   193→        return task
+   194→
+   195→    def _build_user_prompt(self, task: SCRTask) -> str:
+   196→        """Build the user prompt for a task."""
+   197→        return f"""## Vulnerability Information
+   198→- CWE: {task['cwe']}
+   199→- Description: {task['description']}
+   200→- Language: {task['metadata'].get('language', 'python')}
+   201→- Framework: {task['metadata'].get('framework', 'unknown')}
+   202→
+   203→## Vulnerable Code
+   204→```python
+   205→{task['code']}
+   206→```
+   207→
+   208→## Requirements
+   209→1. Fix the security vulnerability described above
+   210→2. Maintain all existing functionality
+   211→3. The patch must pass regression tests
+   212→4. The code must be clean of security scanner findings
+   213→
+   214→Generate a unified diff patch to fix this vulnerability:"""
+   215→
+   216→    def _normalize_path(self, path: str) -> str:
+   217→        """
+   218→        Normalize a file path for diff format.
+   219→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

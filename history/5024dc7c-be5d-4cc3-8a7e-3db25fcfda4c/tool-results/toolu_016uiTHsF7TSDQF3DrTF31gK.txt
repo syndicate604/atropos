@@ -1,0 +1,3 @@
+NAME                               TITLE
+aiplatform.googleapis.com          Vertex AI API
+generativelanguage.googleapis.com  Generative Language API

@@ -1,0 +1,16 @@
+Total groups: 100
+
+FIRST 10 GROUPS:
+  Total samples: 40
+   -0.90:   29 ( 72.5%) (path_not_found)
+   -0.95:   11 ( 27.5%) (malformed)
+
+LAST 10 GROUPS:
+  Total samples: 40
+   -0.90:   26 ( 65.0%) (path_not_found)
+   -0.95:   14 ( 35.0%) (malformed)
+
+ALL 100 GROUPS:
+  Total samples: 400
+   -0.90:  280 ( 70.0%) (path_not_found)
+   -0.95:  120 ( 30.0%) (malformed)

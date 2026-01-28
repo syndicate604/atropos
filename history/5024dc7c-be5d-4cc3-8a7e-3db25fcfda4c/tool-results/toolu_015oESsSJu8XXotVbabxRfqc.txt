@@ -1,0 +1,340 @@
+/home/bron/projects/atropos/atroposlib/envs/README.md-48-            max_tokens=4096,
+/home/bron/projects/atropos/atroposlib/envs/README.md-49-            temperature=1.0,
+/home/bron/projects/atropos/atroposlib/envs/README.md-50-        )
+/home/bron/projects/atropos/atroposlib/envs/README.md-51-
+/home/bron/projects/atropos/atroposlib/envs/README.md-52-        # Get tracked sequences with aligned tokens and logprobs
+atroposlib/envs/README.md:53:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/README.md-54-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/README.md-55-
+/home/bron/projects/atropos/atroposlib/envs/README.md-56-    # Extract pre-computed, guaranteed-aligned data
+atroposlib/envs/README.md-57-    for choice, node in zip(completion.choices, nodes):
+/home/bron/projects/atropos/atroposlib/envs/README.md-58-        tokens = node.tokens                # ✅ Automatically computed
+--
+/home/bron/projects/atropos/atroposlib/envs/README.md-79-            messages=messages,
+/home/bron/projects/atropos/atroposlib/envs/README.md-80-            n=self.config.group_size,
+/home/bron/projects/atropos/atroposlib/envs/README.md-81-            max_tokens=4096,
+/home/bron/projects/atropos/atroposlib/envs/README.md-82-        )
+/home/bron/projects/atropos/atroposlib/envs/README.md-83-
+atroposlib/envs/README.md:84:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/README.md-85-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/README.md-86-
+/home/bron/projects/atropos/atroposlib/envs/README.md-87-    # Process nodes...
+/home/bron/projects/atropos/atroposlib/envs/README.md-88-```
+/home/bron/projects/atropos/atroposlib/envs/README.md-89-
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-81-    # Check response
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-82-    assert result.choices[0].text == " World"
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-83-    assert result.choices[0].finish_reason == "stop"
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-84-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-85-    # Check tracked state (default mode uses nodes list)
+atroposlib/tests/test_managed_server.py:86:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-87-    assert len(state["nodes"]) == 1
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-88-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-89-    # Get the sequence node
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-90-    node = state["nodes"][0]
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-91-    full_text = prompt + output_text
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-131-    # Check response
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-132-    assert result.choices[0].message.content == output_text
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-133-    assert result.choices[0].message.role == "assistant"
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-134-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-135-    # Check tracked state
+atroposlib/tests/test_managed_server.py:136:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-137-    assert len(state["nodes"]) == 1
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-138-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-139-    # Verify tokens are properly tracked
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-140-    node = state["nodes"][0]
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-141-    prompt_len = len(prompt_tokens)
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-181-    )
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-182-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-183-    await managed.completion(prompt=prompt_2)
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-184-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-185-    # Check state - turn 2 extended turn 1, so it should replace that node
+atroposlib/tests/test_managed_server.py:186:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-187-    assert len(state["nodes"]) == 1
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-188-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-189-    # Check the extended node
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-190-    node = state["nodes"][0]
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-191-    assert node.full_text == "Hello World!"
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-220-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-221-    # Check we got 3 completions
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-222-    assert len(result.choices) == 3
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-223-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-224-    # Check state has 3 nodes (one per branch)
+atroposlib/tests/test_managed_server.py:225:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-226-    assert len(state["nodes"]) == 3
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-227-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-228-    # Verify each node has different text
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-229-    full_texts = {node.full_text for node in state["nodes"]}
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-230-    assert full_texts == {"Hello World", "Hello There", "Hello Friend"}
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-253-    )
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-254-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-255-    await managed.completion(prompt=prompt)
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-256-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-257-    # Check sequence
+atroposlib/tests/test_managed_server.py:258:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-259-    assert len(state["nodes"]) == 1
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-260-    node = state["nodes"][0]
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-261-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-262-    # Should have exactly one BOS at the start
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-263-    assert node.tokens[0] == mock_server.tokenizer.bos_token_id
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-284-    )
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-285-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-286-    await managed.completion(prompt=prompt)
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-287-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-288-    # Verify nodes exist
+atroposlib/tests/test_managed_server.py:289:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-290-    assert len(state["nodes"]) > 0
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-291-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-292-    # Reset
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-293-    managed.reset()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-294-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-295-    # Verify nodes are cleared
+atroposlib/tests/test_managed_server.py:296:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-297-    assert len(state["nodes"]) == 0
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-298-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-299-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-300-@pytest.mark.asyncio
+atroposlib/tests/test_managed_server.py-301-async def test_tokenizer_initialization_from_server(mock_server):
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-356-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-357-    # Verify the response
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-358-    assert result.choices[0].text == " Yay"
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-359-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-360-    # Verify we have 1 node (turn 2 replaced turn 1 since it extended)
+atroposlib/tests/test_managed_server.py:361:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-362-    assert len(state["nodes"]) == 1
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-363-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-364-    # Verify the node has the correct combined tokens
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-365-    node = state["nodes"][0]
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-366-    assert node.tokens == expected_input_ids + output_tokens_2
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-396-    )
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-397-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-398-    await managed.chat_completion(messages=messages_1, n=8)
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-399-
+atroposlib/tests/test_managed_server.py-400-    # After turn 1: should have 8 nodes
+atroposlib/tests/test_managed_server.py:401:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-402-    assert len(state["nodes"]) == 8
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-403-
+atroposlib/tests/test_managed_server.py-404-    # Turn 2: For each of the 8 nodes, extend with another user+assistant turn
+atroposlib/tests/test_managed_server.py-405-    for i in range(8):
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-406-        messages_2 = [
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-431-        )
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-432-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-433-        await managed.chat_completion(messages=messages_2, n=1)
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-434-
+atroposlib/tests/test_managed_server.py-435-    # After turn 2: still 8 nodes (they were extended/replaced, not added)
+atroposlib/tests/test_managed_server.py:436:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-437-    assert len(state["nodes"]) == 8
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-438-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-439-    # Verify turn 2 nodes have 2 assistant turns each
+atroposlib/tests/test_managed_server.py-440-    for i in range(8):
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-441-        node = state["nodes"][i]
+--
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-469-        )
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-470-
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-471-        await managed.chat_completion(messages=messages_3, n=1)
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-472-
+atroposlib/tests/test_managed_server.py-473-    # After turn 3: 8 (turn 2 nodes) + 8 (turn 3 new context) = 16 nodes total!
+atroposlib/tests/test_managed_server.py:474:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-475-    assert len(state["nodes"]) == 16
+/home/bron/projects/atropos/atroposlib/tests/test_managed_server.py-476-
+atroposlib/tests/test_managed_server.py-477-    # Verify structure:
+atroposlib/tests/test_managed_server.py-478-    # First 8 nodes: 2 assistant turns (no system prompt)
+atroposlib/tests/test_managed_server.py-479-    for i in range(8):
+--
+atroposlib/envs/server_handling/server_manager.py-379-            async with server_manager.managed_server() as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-380-                response = await managed.chat_completion(
+atroposlib/envs/server_handling/server_manager.py-381-                    messages=[{"role": "user", "content": "Hello"}],
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-382-                    n=2
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-383-                )
+atroposlib/envs/server_handling/server_manager.py:384:                state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-385-                # Process state...
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-386-                # State is automatically cleared when exiting context
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-387-        """
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-388-        most_available_server = 0
+/home/bron/projects/atropos/atroposlib/envs/server_handling/server_manager.py-389-        most_available_server_num_slots = -1
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-23-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-24-**With ManagedServer** (automatic):
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-25-```python
+atroposlib/envs/server_handling/MANAGED_SERVER.md-26-async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-27-    response = await managed.completion(prompt=prompt, n=8)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:28:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-29-    nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-30-    # tokens, masked_tokens, and logprobs are already aligned and ready!
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-31-```
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-32-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-33-### Key Benefits
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-96-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-97-```python
+atroposlib/envs/server_handling/MANAGED_SERVER.md-98-async with server.managed_server(tokenizer=tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-99-    # First completion
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-100-    await managed.completion(prompt="Hello", n=1)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:101:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-102-    len(state["nodes"])  # → 1
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-103-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-104-    # Extension (prompt starts with previous full_text)
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-105-    await managed.completion(prompt="Hello World", n=1)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:106:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-107-    len(state["nodes"])  # → 1 (replaced, not added)
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-108-```
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-109-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-110-#### 2. Tree Mode (track_tree=True)
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-111-- Maintains a dictionary of nodes keyed by `full_text`
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-136-            temperature=1.0,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-137-            top_p=1.0,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-138-        )
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-139-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-140-        # Get tracked sequences
+atroposlib/envs/server_handling/MANAGED_SERVER.md:141:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-142-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-143-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-144-    # Process nodes for training
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-145-    to_score = []
+atroposlib/envs/server_handling/MANAGED_SERVER.md-146-    for choice, node in zip(completion.choices, nodes):
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-175-            temperature=1.0,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-176-            top_p=0.95,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-177-        )
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-178-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-179-        # Get tracked sequences
+atroposlib/envs/server_handling/MANAGED_SERVER.md:180:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-181-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-182-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-183-    # Process nodes
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-184-    to_score = []
+atroposlib/envs/server_handling/MANAGED_SERVER.md-185-    for choice, node in zip(chat_completion.choices, nodes):
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-200-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-201-```python
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-202-# Turn 1
+atroposlib/envs/server_handling/MANAGED_SERVER.md-203-async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-204-    await managed.completion(prompt="Hello", n=1)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:205:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-206-    # nodes[0].full_text = "Hello World"
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-207-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-208-    # Turn 2: Extends turn 1
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-209-    # This prompt starts with "Hello World" (turn 1's full_text)
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-210-    await managed.completion(prompt="Hello World! How are you?", n=1)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:211:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-212-    # nodes[0].full_text = "Hello World! How are you? I'm great!"
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-213-    # The node from turn 1 has been replaced with the extended version
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-214-```
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-215-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-216-**How Extension Detection Works:**
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-229-        completions_fwd = await managed.chat_completion(
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-230-            messages=messages_fwd,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-231-            n=3,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-232-            temperature=1.0,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-233-        )
+atroposlib/envs/server_handling/MANAGED_SERVER.md:234:        state_fwd = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-235-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-236-    # Second set of completions (independent context)
+atroposlib/envs/server_handling/MANAGED_SERVER.md-237-    async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-238-        completions_bwd = await managed.chat_completion(
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-239-            messages=messages_bwd,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-240-            n=3,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-241-            temperature=1.0,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-242-        )
+atroposlib/envs/server_handling/MANAGED_SERVER.md:243:        state_bwd = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-244-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-245-    # Process both sets
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-246-    nodes_fwd = state_fwd["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-247-    nodes_bwd = state_bwd["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-248-```
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-254-```python
+atroposlib/envs/server_handling/MANAGED_SERVER.md-255-async def collect_trajectories_normal(self, item):
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-256-    # Generate initial completions
+atroposlib/envs/server_handling/MANAGED_SERVER.md-257-    async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-258-        response = await managed.chat_completion(messages=chat, n=16)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:259:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-260-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-261-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-262-    # Find interesting pairs for RLAIF
+atroposlib/envs/server_handling/MANAGED_SERVER.md-263-    if should_do_rlaif:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-264-        # Pass tokens/masks/logprobs to next stage
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-323-            top_p=1.0,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-324-            stop=stop_list,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-325-        )
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-326-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-327-        # Get tracked sequences with aligned tokens and logprobs
+atroposlib/envs/server_handling/MANAGED_SERVER.md:328:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-329-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-330-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-331-    # Extract data from SequenceNodes for scoring
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-332-    to_score = []
+atroposlib/envs/server_handling/MANAGED_SERVER.md-333-    for choice, node in zip(completion.choices, nodes):
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-370-            temperature=1.0,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-371-            top_p=0.95,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-372-        )
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-373-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-374-        # Get tracked sequences with aligned tokens and logprobs
+atroposlib/envs/server_handling/MANAGED_SERVER.md:375:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-376-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-377-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-378-    # Extract data from SequenceNodes for scoring
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-379-    to_score = []
+atroposlib/envs/server_handling/MANAGED_SERVER.md-380-    for chat_completion, node in zip(chat_completions.choices, nodes):
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-527-            prompt=prompt,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-528-            n=8,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-529-            max_tokens=4096,
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-530-        )
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-531-
+atroposlib/envs/server_handling/MANAGED_SERVER.md:532:        state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-533-        nodes = state["nodes"]
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-534-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-535-    # Extract pre-computed, guaranteed-aligned data
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-536-    to_score = []
+atroposlib/envs/server_handling/MANAGED_SERVER.md-537-    for node in nodes:
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-633-```python
+atroposlib/envs/server_handling/MANAGED_SERVER.md-634-async with server_manager.managed_server(tokenizer=tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-635-    # Use managed.completion() or managed.chat_completion()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-636-    ...
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-637-    # Get state before context exits
+atroposlib/envs/server_handling/MANAGED_SERVER.md:638:    state = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-639-```
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-640-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-641-The context manager:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-642-- Creates a `ManagedServer` instance
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-643-- Returns it for use within the block
+--
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-653-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-654-2. **Get state before exiting the context**:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-655-   ```python
+atroposlib/envs/server_handling/MANAGED_SERVER.md-656-   async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-657-       completion = await managed.completion(...)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:658:       state = managed.get_state()  # ✅ Do this inside the context
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-659-   # ❌ Don't try to access state here - context has exited
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-660-   ```
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-661-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-662-3. **Use separate contexts for independent completions**:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-663-   ```python
+atroposlib/envs/server_handling/MANAGED_SERVER.md-664-   # Context 1: Generate candidates
+atroposlib/envs/server_handling/MANAGED_SERVER.md-665-   async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-666-       candidates = await managed.completion(...)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:667:       state1 = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-668-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-669-   # Context 2: Judge candidates (independent)
+atroposlib/envs/server_handling/MANAGED_SERVER.md-670-   async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-671-       judgments = await managed.completion(...)
+atroposlib/envs/server_handling/MANAGED_SERVER.md:672:       state2 = managed.get_state()
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-673-   ```
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-674-
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-675-## Troubleshooting
+/home/bron/projects/atropos/atroposlib/envs/server_handling/MANAGED_SERVER.md-676-
+atroposlib/envs/server_handling/MANAGED_SERVER.md-677-### Issue: "Extension detection not working"

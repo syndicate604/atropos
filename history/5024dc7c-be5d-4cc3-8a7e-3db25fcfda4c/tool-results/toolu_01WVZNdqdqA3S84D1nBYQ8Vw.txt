@@ -1,0 +1,4 @@
+36:SYSTEM_PROMPT = """You are an expert security engineer. Your task is to fix security vulnerabilities by generating unified diff patches.
+476:                    {"role": "system", "content": SYSTEM_PROMPT},
+496:                    {"role": "system", "content": SYSTEM_PROMPT},
+613:                        {"role": "system", "content": SYSTEM_PROMPT},

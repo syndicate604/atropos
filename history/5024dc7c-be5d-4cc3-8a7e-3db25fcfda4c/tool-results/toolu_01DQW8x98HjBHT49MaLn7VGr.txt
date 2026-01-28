@@ -1,0 +1,54 @@
+   200→                results = await response.json()
+   201→        output_tokens_list = []
+   202→        output_logprobs_list = []
+   203→        finish_reasons_list = []
+   204→
+   205→        # Use authoritative token_ids from server response (not reconstructed from logprobs)
+   206→        token_ids_from_server = results.get("token_ids", [])
+   207→
+   208→        for idx, (output_token_logprobs, finish_reason) in enumerate(
+   209→            zip(results["logprobs"], results["finish_reasons"])
+   210→        ):
+   211→            # Get authoritative token IDs if available
+   212→            if token_ids_from_server and idx < len(token_ids_from_server):
+   213→                output_ids = list(token_ids_from_server[idx])
+   214→                # Lookup logprob for each token ID from the per-step dict
+   215→                logprobs = []
+   216→                for step_idx, token_id in enumerate(output_ids):
+   217→                    if step_idx < len(output_token_logprobs):
+   218→                        step_dict = output_token_logprobs[step_idx][0]
+   219→                        # Lookup the logprob for this specific token
+   220→                        logprob = step_dict.get(str(token_id), step_dict.get(token_id))
+   221→                        if logprob is None:
+   222→                            # Fallback: use first value if token not found (shouldn't happen)
+   223→                            logprob = list(step_dict.values())[0]
+   224→                        logprobs.append(logprob)
+   225→                    else:
+   226→                        logprobs.append(0.0)  # Missing logprob
+   227→            else:
+   228→                # Fallback to old behavior if token_ids not in response
+   229→                output_ids = [
+   230→                    int(list(item[0].keys())[0]) for item in output_token_logprobs
+   231→                ]
+   232→                logprobs = [
+   233→                    list(item[0].values())[0] for item in output_token_logprobs
+   234→                ]
+   235→
+   236→            output_tokens_list.append(output_ids)
+   237→            output_logprobs_list.append(logprobs)
+   238→            finish_reasons_list.append(finish_reason)
+   239→
+   240→        return (
+   241→            prompt_tokens,
+   242→            output_tokens_list,
+   243→            output_logprobs_list,
+   244→            finish_reasons_list,
+   245→        )
+   246→
+   247→
+   248→def resolve_openai_configs(
+   249→    default_server_configs,
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

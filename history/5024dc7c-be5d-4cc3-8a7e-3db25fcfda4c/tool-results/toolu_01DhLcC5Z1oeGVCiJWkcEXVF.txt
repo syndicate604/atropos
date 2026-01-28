@@ -1,0 +1,4 @@
+root        8609  0.0  0.0   7764  1808 ?        S    04:08   0:00 bash -c cd ~/hydra && nohup python3 environments/hydra/secure_code_review_env.py serve --slurm false --openai.base_url http://localhost:9004/v1 --openai.model_name ~/models/Qwen2.5-7B-Instruct --openai.server_type vllm --env.tokenizer_name ~/models/Qwen2.5-7B-Instruct --env.use_wandb false > /tmp/scr_env.log 2>&1 &
+root        8610 10.9  0.9 6591276 809044 ?      Sl   04:08   0:07 python3 environments/hydra/secure_code_review_env.py serve --slurm false --openai.base_url http://localhost:9004/v1 --openai.model_name /root/models/Qwen2.5-7B-Instruct --openai.server_type vllm --env.tokenizer_name /root/models/Qwen2.5-7B-Instruct --env.use_wandb false
+root        8723  0.0  0.0   7764  1552 ?        S    04:08   0:00 bash -c cd ~/hydra && nohup python3 example_trainer/grpo.py > /tmp/grpo.log 2>&1 &
+root        8724 93.5  1.6 20715216 1445352 ?    Sl   04:08   0:32 python3 example_trainer/grpo.py

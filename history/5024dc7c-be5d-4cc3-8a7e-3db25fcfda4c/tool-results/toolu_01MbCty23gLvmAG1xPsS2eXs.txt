@@ -1,0 +1,4 @@
+Using endpoint [https://us-central1-aiplatform.googleapis.com/]
+MODEL_ID             DISPLAY_NAME
+4884777218976251904  todal-api_selection-09ace65c
+4420343507403669504  todal-api_selection-8c9c54e8

@@ -1,0 +1,3 @@
+36:SYSTEM_PROMPT_TEMPLATE = """You are an expert security engineer. Your task is to fix security vulnerabilities by generating unified diff patches.
+81:    return SYSTEM_PROMPT_TEMPLATE.format(target_file=target_file)
+620:                        {"role": "system", "content": SYSTEM_PROMPT},

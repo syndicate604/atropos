@@ -1,0 +1,86 @@
+BaseEnvConfig(
+    group_size=4,
+    max_num_workers=-1,
+    max_eval_workers=16,
+    max_num_workers_per_node=8,
+    steps_per_eval=25,
+    max_token_length=512,
+    eval_handling=<EvalHandlingEnum.STOP_TRAIN: 'STOP_TRAIN'>,
+    eval_limit_ratio=0.5,
+    inference_weight=1.0,
+    batch_size=4,
+    max_batches_offpolicy=3,
+    tokenizer_name='/root/models/Qwen2.5-7B-Instruct',
+    use_wandb=True,
+    rollout_server_url='http://localhost:8000',
+    total_steps=100,
+    wandb_name='secure_code_review',
+    num_rollouts_to_keep=32,
+    num_rollouts_per_group_for_logging=1,
+    ensure_scores_are_not_same=True,
+    data_path_to_save_groups=None,
+    data_dir_to_save_evals=None,
+    min_items_sent_before_logging=2,
+    include_messages=False,
+    min_batch_allocation=None,
+    worker_timeout=600.0,
+    thinking_mode=False,
+    reasoning_effort=None,
+    max_reasoning_tokens=None,
+    custom_thinking_prompt=None
+)
+[
+    APIServerConfig(
+        timeout=1200,
+        num_max_requests_at_once=512,
+        num_requests_for_eval=32,
+        model_name='/root/models/Qwen2.5-7B-Instruct',
+        rolling_buffer_length=1000,
+        server_type='vllm',
+        api_key='x',
+        base_url='http://localhost:9004/v1',
+        n_kwarg_is_ignored=False,
+        health_check=True
+    )
+]
+Loaded 1 tasks: ['sqli-001']
+Traceback (most recent call last):
+  File "/root/hydra/environments/hydra/secure_code_review_env.py", line 670, in <module>
+    SecureCodeReviewEnv.cli()
+  File "/root/hydra/atroposlib/envs/base.py", line 1349, in cli
+    run_and_exit(
+  File "/usr/local/lib/python3.10/dist-packages/pydantic_cli/__init__.py", line 683, in run_and_exit
+    sys.exit(f(_args))
+  File "/usr/local/lib/python3.10/dist-packages/pydantic_cli/__init__.py", line 562, in f
+    return _runner(
+  File "/usr/local/lib/python3.10/dist-packages/pydantic_cli/__init__.py", line 372, in _runner
+    exit_code = exception_handler(e)
+  File "/root/hydra/atroposlib/envs/base.py", line 1347, in custom_error_handler
+    raise ex
+  File "/usr/local/lib/python3.10/dist-packages/pydantic_cli/__init__.py", line 364, in _runner
+    out = cmd.run()
+  File "/root/hydra/atroposlib/envs/base.py", line 1514, in run
+    asyncio.run(env.env_manager())
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/root/hydra/atroposlib/envs/base.py", line 1169, in env_manager
+    await self.setup_wandb()
+  File "/root/hydra/atroposlib/envs/base.py", line 488, in setup_wandb
+    wandb.init(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_init.py", line 1597, in init
+    get_sentry().reraise(e)
+  File "/usr/local/lib/python3.10/dist-packages/wandb/analytics/sentry.py", line 190, in reraise
+    raise exc.with_traceback(tb)
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_init.py", line 1518, in init
+    wi.maybe_login(init_settings)
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_init.py", line 196, in maybe_login
+    wandb_login._login(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_login.py", line 190, in _login
+    auth = _find_or_prompt_for_key(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_login.py", line 266, in _find_or_prompt_for_key
+    auth = wbauth.authenticate_session(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/lib/wbauth/authenticate.py", line 138, in authenticate_session
+    raise UsageError(
+wandb.errors.errors.UsageError: No API key configured. Use `wandb login` to log in.

@@ -1,0 +1,5 @@
+Exit code 127
+bash: line 1: nvidia-smi: command not found
+
+Connected\!
+training-box-01.us-central1-f.c.balmy-ocean-449223-v9.internal

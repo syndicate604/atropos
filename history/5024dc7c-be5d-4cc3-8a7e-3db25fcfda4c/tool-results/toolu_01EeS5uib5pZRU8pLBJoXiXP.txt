@@ -1,0 +1,27 @@
+Updating a7a87a3..1f814a5
+Fast-forward (no commit created; -m option ignored)
+ .pre-commit-config.yaml                            |   2 +-
+ atroposlib/envs/base.py                            |  40 +-
+ atroposlib/envs/server_handling/README.md          |  69 ++
+ atroposlib/envs/server_handling/openai_server.py   |  14 +-
+ atroposlib/envs/server_handling/server_baseline.py | 208 ++++-
+ atroposlib/envs/server_handling/server_manager.py  |  52 +-
+ atroposlib/envs/server_handling/sglang_server.py   |  14 +-
+ atroposlib/envs/server_handling/trl_vllm_server.py |  14 +-
+ atroposlib/envs/server_handling/vllm_server.py     |  14 +-
+ atroposlib/frontend/jsonl2html.py                  |  24 +-
+ atroposlib/tests/test_jsonl2html.py                | 133 +++
+ atroposlib/tests/test_reasoning_models.py          | 914 +++++++++++++++++++++
+ .../code_execution_server/lcb_modal_endpoint.py    |   4 +-
+ .../FOB/examples/neps/hpo.py                       |   4 +-
+ .../FOB/pytorch_fob/engine/configs.py              |   2 +-
+ .../FOB/pytorch_fob/engine/run.py                  |   4 +-
+ .../FOB/pytorch_fob/evaluation/plot.py             |   2 +-
+ .../FOB/pytorch_fob/tasks/README.md                |   2 +-
+ environments/eval_environments/eval_helpers.py     | 479 ++++++++++-
+ environments/eval_environments/ifeval_eval.py      | 119 ++-
+ environments/kernelbench_env/kernelbench_env.py    |  45 +-
+ 21 files changed, 2039 insertions(+), 120 deletions(-)
+ create mode 100644 atroposlib/envs/server_handling/README.md
+ create mode 100644 atroposlib/tests/test_jsonl2html.py
+ create mode 100644 atroposlib/tests/test_reasoning_models.py

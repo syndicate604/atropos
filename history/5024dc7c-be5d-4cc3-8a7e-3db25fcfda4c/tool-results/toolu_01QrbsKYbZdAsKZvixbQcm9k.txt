@@ -1,0 +1,19 @@
+  1615→                env_config_dict_base["include_messages"] = True
+  1616→                if env_config_dict_base.get("data_path_to_save_groups") is None:
+  1617→                    env_config_dict_base["data_path_to_save_groups"] = (
+  1618→                        f"data/{cls.name or 'groups'}.jsonl"
+  1619→                    )
+  1620→                env_config_dict_base["use_wandb"] = True
+  1621→
+  1622→                env_config_dict = merge_dicts(
+  1623→                    env_config_dict_base,  # `config_init` defaults with process adjustments
+  1624→                    yaml_config.get(ENV_NAMESPACE, {}),  # YAML config
+  1625→                    extract_namespace(cli_passed_flags, env_full_prefix),  # CLI args
+  1626→                )
+  1627→
+  1628→                # 2. OpenAI Configuration
+  1629→                oai_cli_passed_args = extract_namespace(
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

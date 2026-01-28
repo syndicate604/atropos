@@ -1,0 +1,2 @@
+root        8723  0.0  0.0   7764  1552 ?        S    04:08   0:00 bash -c cd ~/hydra && nohup python3 example_trainer/grpo.py > /tmp/grpo.log 2>&1 &
+root        8724 48.9  1.6 20715216 1445352 ?    Sl   04:08   0:32 python3 example_trainer/grpo.py

@@ -1,0 +1,3 @@
+NAME           ZONE           DESCRIPTION
+nvidia-l4      us-central1-c  NVIDIA L4
+nvidia-l4-vws  us-central1-c  NVIDIA L4 Virtual Workstation

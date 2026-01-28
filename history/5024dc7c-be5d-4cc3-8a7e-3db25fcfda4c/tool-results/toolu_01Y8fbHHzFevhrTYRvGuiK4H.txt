@@ -1,0 +1,10 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:00<00:00, 77.64it/s]
+Starting training for 5 steps on device: cuda
+vLLM will be restarted every 3 steps on port 9001
+  Launching vLLM server: python -m vllm.entrypoints.openai.api_server --model /root/models/Qwen2.5-7B-Instruct --port 9001 --dtype auto --gpu-memory-utilization 0.45 --disable-log-requests
+
+ *** ERROR: 'python -m vllm...' command not found. Make sure vLLM is installed and accessible. ***
+
+  Disabling further vLLM restarts.
+Step 1/5

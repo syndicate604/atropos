@@ -1,0 +1,10 @@
+The file /home/bron/projects/atropos/README.md has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    39→```
+    40→
+    41→**The moat isn't smarter weights—it's better verifiers + domain-specific data + faster iteration.**
+    42→
+    43→See [HYDRA Vision & Architecture](docs/Hydra_Plans/01_HYDRA_Vision_and_Architecture.md) for full details.
+    44→
+    45→---
+    46→
+    47→## Training Platform: Atropos

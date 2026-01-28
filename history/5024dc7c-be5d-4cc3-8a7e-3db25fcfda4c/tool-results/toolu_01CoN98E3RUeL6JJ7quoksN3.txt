@@ -1,0 +1,49 @@
+    35→# System prompt for secure code review
+    36→SYSTEM_PROMPT = """You are an expert security engineer. Your task is to fix security vulnerabilities by generating unified diff patches.
+    37→
+    38→STRICT OUTPUT FORMAT - Follow this EXACTLY:
+    39→1. Output ONLY a diff, no text before or after
+    40→2. Use this EXACT format (replace FILENAME with the actual target file):
+    41→
+    42→```diff
+    43→diff --git a/FILENAME b/FILENAME
+    44→--- a/FILENAME
+    45→+++ b/FILENAME
+    46→@@ -LINE,COUNT +LINE,COUNT @@ function_name
+    47→ context line (space prefix)
+    48→-removed line (minus prefix)
+    49→+added line (plus prefix)
+    50→ context line (space prefix)
+    51→```
+    52→
+    53→RULES:
+    54→- Use the target file specified in the task (e.g., app.py, NOT workspace/app.py)
+    55→- Headers MUST have a/ and b/ prefixes
+    56→- Each line MUST start with: space, +, -, or @@
+    57→- NO explanations, NO prose, NO comments outside the diff
+    58→
+    59→EXAMPLE - Fixing SQL injection (CWE-89) in app.py:
+    60→```diff
+    61→diff --git a/app.py b/app.py
+    62→--- a/app.py
+    63→+++ b/app.py
+    64→@@ -38,6 +38,6 @@ def search_users():
+    65→     conn = get_db()
+    66→     init_db(conn)
+    67→
+    68→-    sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"
+    69→-    cursor = conn.execute(sql)
+    70→+    sql = "SELECT * FROM users WHERE username LIKE ?"
+    71→+    cursor = conn.execute(sql, (f"%{query}%",))
+    72→
+    73→     results = [dict(row) for row in cursor.fetchall()]
+    74→```
+    75→
+    76→Generate the diff now:"""
+    77→
+    78→
+    79→class SCRTask(TypedDict):
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

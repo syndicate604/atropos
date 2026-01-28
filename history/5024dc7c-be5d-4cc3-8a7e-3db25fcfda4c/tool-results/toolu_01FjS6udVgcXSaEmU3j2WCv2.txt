@@ -1,0 +1,2 @@
+NAME     IS_ACTIVE  ACCOUNT                 PROJECT          COMPUTE_DEFAULT_ZONE  COMPUTE_DEFAULT_REGION
+default  True       syndicate604@gmail.com  voice-ai-435704

@@ -1,0 +1,6 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:00<00:00, 71.69it/s]
+Starting training for 5 steps on device: cuda
+Using external vLLM server on port 9004 (launch_vllm=False)
+  Using external vLLM server (launch_vllm=False)
+Step 1/5

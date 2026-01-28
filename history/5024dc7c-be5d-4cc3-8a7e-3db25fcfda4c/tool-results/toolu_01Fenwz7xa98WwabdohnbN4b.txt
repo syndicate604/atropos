@@ -1,0 +1,31 @@
+Total groups: 100
+
+FIRST 10 GROUPS:
+  Total samples: 40
+  Patches applied: 0/40 (0.0%)
+     -0.85:  27 ( 67.5%) (hunk_failed)
+     -0.95:  13 ( 32.5%) (malformed)
+
+LAST 10 GROUPS:
+  Total samples: 40
+  Patches applied: 7/40 (17.5%)
+     -0.20:   5 ( 12.5%) (ineffective - APPLIED)
+     -0.40:   2 (  5.0%) (regression - APPLIED)
+     -0.85:  25 ( 62.5%) (hunk_failed)
+     -0.92:   1 (  2.5%)
+     -0.95:   7 ( 17.5%) (malformed)
+
+ALL 100 GROUPS:
+  Total samples: 400
+  Patches applied: 38/400 (9.5%)
+      1.00:   2 (  0.5%) (PASSED!)
+     -0.20:  22 (  5.5%) (ineffective - APPLIED)
+     -0.40:  14 (  3.5%) (regression - APPLIED)
+     -0.85: 279 ( 69.8%) (hunk_failed)
+     -0.92:   1 (  0.2%)
+     -0.95:  82 ( 20.5%) (malformed)
+
+--- LEARNING CURVE ---
+First 10: 0/40 patches applied (0.0%)
+Last 10:  7/40 patches applied (17.5%)
+Change:   +17.5%

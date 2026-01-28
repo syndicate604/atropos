@@ -1,0 +1,6 @@
+origin	git@github.com:syndicate604/atropos.git (fetch)
+origin	git@github.com:syndicate604/atropos.git (push)
+relayone	git@github.com:RelayOne/atropos.git (fetch)
+relayone	git@github.com:RelayOne/atropos.git (push)
+upstream	git@github.com:NousResearch/atropos.git (fetch)
+upstream	git@github.com:NousResearch/atropos.git (push)

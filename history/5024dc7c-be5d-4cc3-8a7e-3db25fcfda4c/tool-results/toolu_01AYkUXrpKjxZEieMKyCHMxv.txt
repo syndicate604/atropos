@@ -1,0 +1,10 @@
+INFO:     127.0.0.1:38366 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38378 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38386 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38356 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38388 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38396 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38404 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55776 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55780 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55786 - "GET /health HTTP/1.1" 200 OK

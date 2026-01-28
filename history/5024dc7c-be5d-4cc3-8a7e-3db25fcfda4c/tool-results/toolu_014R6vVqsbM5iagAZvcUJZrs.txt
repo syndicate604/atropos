@@ -1,0 +1,20 @@
+INFO:     127.0.0.1:53444 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53446 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53462 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53428 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53500 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53504 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53476 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53520 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33910 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33924 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33928 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33960 - "GET /health HTTP/1.1" 200 OK
+INFO 01-27 04:18:43 [launcher.py:110] Shutting down FastAPI HTTP server.
+INFO:     Shutting down
+INFO:     Waiting for connections to close. (CTRL+C to force quit)
+INFO:     127.0.0.1:33944 - "POST /generate HTTP/1.1" 200 OK
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+ERROR 01-27 04:18:44 [core_client.py:610] Engine core proc EngineCore_DP0 died unexpectedly, shutting down client.

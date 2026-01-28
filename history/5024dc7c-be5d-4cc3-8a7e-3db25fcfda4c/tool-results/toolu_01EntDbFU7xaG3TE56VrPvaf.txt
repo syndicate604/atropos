@@ -1,0 +1,7 @@
+Cloning into 'hydra'...
+Host key verification failed.
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+Need to set up SSH key for GitHub

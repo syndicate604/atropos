@@ -1,0 +1,14 @@
+diff --git a/workspace/app.py b/workspace/app.py
+--- a/workspace/app.py
++++ b/workspace/app.py
+@@ -43,6 +43,6 @@ @app.route("/search")
+     conn = get_db()
+     init_db(conn)
+
+-    sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"
+-    cursor = conn.execute(sql)
++    sql = "SELECT * FROM users WHERE username LIKE ?"
++    cursor = conn.execute(sql, (f"%{query}%",))
+
+     results = [dict(row) for row in cursor.fetchall()]
+     return jsonify({"results": results, "count": len(results)})

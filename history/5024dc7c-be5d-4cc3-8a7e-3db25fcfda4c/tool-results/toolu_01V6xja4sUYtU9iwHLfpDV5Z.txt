@@ -1,0 +1,6 @@
+Download complete. Moving file to /root/models/Qwen2.5-7B-Instruct/tokenizer_config.json
+Downloading 'vocab.json' to '/root/models/Qwen2.5-7B-Instruct/.cache/huggingface/download/j3m-Hy6QvBddw8RXA1uSWl1AJ0c=.4783fe10ac3adce15ac8f358ef5462739852c569.incomplete'
+Download complete. Moving file to /root/models/Qwen2.5-7B-Instruct/vocab.json
+[33m⚠️  Warning: 'huggingface-cli download' is deprecated. Use 'hf download' instead.[0m
+/root/models/Qwen2.5-7B-Instruct
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv

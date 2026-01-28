@@ -1,0 +1,15 @@
+# Host 35.202.149.44 found: line 59
+# Host 35.202.149.44 found: line 60
+# Host 35.202.149.44 found: line 61
+/home/bron/.ssh/known_hosts updated.
+Original contents retained as /home/bron/.ssh/known_hosts.old
+=== GPU ===
+NVIDIA A100-SXM4-40GB, 40960 MiB
+
+=== Python/PyTorch ===
+Python 3.10.12
+PyTorch 2.7.1+cu128, CUDA available: True
+
+=== Disk ===
+/dev/root       485G   26G  459G   6% /
+Warning: Permanently added '35.202.149.44' (ED25519) to the list of known hosts.

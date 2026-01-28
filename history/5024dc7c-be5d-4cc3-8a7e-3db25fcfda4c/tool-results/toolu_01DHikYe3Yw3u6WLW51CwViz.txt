@@ -1,0 +1,39 @@
+    46→class TrainingConfig(BaseModel):
+    47→    """
+    48→    Training details, model, etc
+    49→    """
+    50→
+    51→    model_name: str = Field(..., description="Name of the base model to train")
+    52→    lr: float = Field(1e-5, description="Learning rate for the optimizer")
+    53→    training_steps: int = Field(
+    54→        10, description="Number of training steps"
+    55→    )  # Renamed from epochs
+    56→    batch_size: int = Field(
+    57→        2, description="Batch size for training (will be handled by get_data)"
+    58→    )
+    59→    seq_len: int = Field(2048, description="Sequence length for training")
+    60→    gradient_accumulation_steps: int = Field(
+    61→        32, description="Number of gradient accumulation steps"
+    62→    )
+    63→    device: str = Field(
+    64→        "cuda" if torch.cuda.is_available() else "cpu", description="Device to train on"
+    65→    )
+    66→    save_path: str = Field(
+    67→        "trained_model_checkpoints", description="Base path to save model checkpoints"
+    68→    )
+    69→    vllm_restart_interval: int = Field(
+    70→        3, description="Restart vLLM every N training steps"
+    71→    )
+    72→    vllm_port: int = Field(9001, description="Port for the vLLM server")
+    73→
+    74→    # Wandb configuration
+    75→    use_wandb: bool = Field(
+    76→        False, description="Whether to use Weights & Biases for logging"
+    77→    )
+    78→    wandb_project: Optional[str] = Field(None, description="Wandb project name")
+    79→    wandb_group: Optional[str] = Field(None, description="Wandb group name")
+    80→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

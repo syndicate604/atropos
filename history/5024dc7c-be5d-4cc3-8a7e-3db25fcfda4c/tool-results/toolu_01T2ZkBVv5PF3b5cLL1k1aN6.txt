@@ -1,0 +1,104 @@
+     1→import atexit
+     2→import json
+     3→import math
+     4→import os
+     5→import random
+     6→import shutil
+     7→import string
+     8→import subprocess
+     9→import time
+    10→from typing import List, Optional, Tuple
+    11→
+    12→import numpy as np
+    13→import requests
+    14→import torch
+    15→import torch.nn.functional as F
+    16→import wandb  # Added for logging
+    17→from pydantic import BaseModel, Field
+    18→from tenacity import retry, stop_after_attempt, wait_exponential
+    19→from torch.optim import AdamW
+    20→from transformers import AutoModelForCausalLM, AutoTokenizer
+    21→
+    22→# Global variable to keep track of the vLLM process
+    23→vllm_process = None
+    24→
+    25→
+    26→def cleanup_vllm():
+    27→    global vllm_process
+    28→    if vllm_process:
+    29→        print("\nTerminating vLLM process...")
+    30→        vllm_process.terminate()
+    31→        try:
+    32→            vllm_process.wait(timeout=5)  # Wait a bit for graceful shutdown
+    33→            print("vLLM process terminated.")
+    34→        except subprocess.TimeoutExpired:
+    35→            print("vLLM process did not terminate gracefully, killing.")
+    36→            vllm_process.kill()
+    37→            vllm_process.wait()
+    38→            print("vLLM process killed.")
+    39→        vllm_process = None
+    40→
+    41→
+    42→# Register the cleanup function to be called on script exit
+    43→atexit.register(cleanup_vllm)
+    44→
+    45→
+    46→class TrainingConfig(BaseModel):
+    47→    """
+    48→    Training details, model, etc
+    49→    """
+    50→
+    51→    model_name: str = Field(..., description="Name of the base model to train")
+    52→    lr: float = Field(1e-5, description="Learning rate for the optimizer")
+    53→    training_steps: int = Field(
+    54→        10, description="Number of training steps"
+    55→    )  # Renamed from epochs
+    56→    batch_size: int = Field(
+    57→        2, description="Batch size for training (will be handled by get_data)"
+    58→    )
+    59→    seq_len: int = Field(2048, description="Sequence length for training")
+    60→    gradient_accumulation_steps: int = Field(
+    61→        32, description="Number of gradient accumulation steps"
+    62→    )
+    63→    device: str = Field(
+    64→        "cuda" if torch.cuda.is_available() else "cpu", description="Device to train on"
+    65→    )
+    66→    save_path: str = Field(
+    67→        "trained_model_checkpoints", description="Base path to save model checkpoints"
+    68→    )
+    69→    vllm_restart_interval: int = Field(
+    70→        3, description="Restart vLLM every N training steps"
+    71→    )
+    72→    vllm_port: int = Field(9001, description="Port for the vLLM server")
+    73→
+    74→    # Wandb configuration
+    75→    use_wandb: bool = Field(
+    76→        False, description="Whether to use Weights & Biases for logging"
+    77→    )
+    78→    wandb_project: Optional[str] = Field(None, description="Wandb project name")
+    79→    wandb_group: Optional[str] = Field(None, description="Wandb group name")
+    80→
+    81→
+    82→@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=15))
+    83→def register_trainer(config: TrainingConfig):
+    84→    """
+    85→    Register the trainer with the Atropos API
+    86→    """
+    87→    requests.post(
+    88→        "http://localhost:8000/register",
+    89→        json={
+    90→            "wandb_group": config.wandb_group,
+    91→            "wandb_project": config.wandb_project,
+    92→            "batch_size": config.batch_size * config.gradient_accumulation_steps,
+    93→            "max_token_len": config.seq_len,
+    94→            "starting_step": 0,
+    95→            "checkpoint_dir": config.save_path,
+    96→            "save_checkpoint_interval": config.training_steps,
+    97→            "num_steps": config.training_steps,
+    98→        },
+    99→        timeout=10,
+   100→    )
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

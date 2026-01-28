@@ -1,0 +1,104 @@
+   460→
+   461→        print(f"  Step Loss: {grpo_loss.item():.4f}")
+   462→
+   463→        # --- vLLM Restart Logic (Moved AFTER optimizer step) ---
+   464→        # Note: There are much better ways of updating the policy, this is just a very simple example
+   465→        if (
+   466→            step + 1
+   467→        ) % config.vllm_restart_interval == 0 or step == config.training_steps - 1:  # Also restart/save on last step
+   468→            checkpoint_path = os.path.join(
+   469→                config.save_path, f"step_{step+1}"
+   470→            )  # Save as step+1 since it's after step completion
+   471→            print(f"  Saving checkpoint to {checkpoint_path}...")
+   472→            # Ensure fresh directory for saving
+   473→            if os.path.exists(checkpoint_path):
+   474→                shutil.rmtree(checkpoint_path)  # Remove old checkpoint if it exists
+   475→            os.makedirs(checkpoint_path, exist_ok=True)
+   476→            model.save_pretrained(checkpoint_path)
+   477→            tokenizer.save_pretrained(checkpoint_path)
+   478→            print("  Checkpoint saved.")
+   479→
+   480→            # Terminate existing vLLM process if running
+   481→            if vllm_process:
+   482→                print("  Terminating existing vLLM process...")
+   483→                vllm_process.terminate()
+   484→                try:
+   485→                    vllm_process.wait(timeout=5)
+   486→                except subprocess.TimeoutExpired:
+   487→                    print(
+   488→                        "  Existing vLLM process did not terminate gracefully, killing."
+   489→                    )
+   490→                    vllm_process.kill()
+   491→                    vllm_process.wait()
+   492→                vllm_process = None
+   493→
+   494→            # Launch new vLLM process (only if not the very last step, maybe? depends on use case)
+   495→            # Let's still launch it on the last step for consistency, cleanup will handle it.
+   496→            vllm_command = [
+   497→                "python",
+   498→                "-m",
+   499→                "vllm.entrypoints.openai.api_server",
+   500→                "--model",
+   501→                os.path.join(config.save_path, f"step_{step+1}"),
+   502→                "--port",
+   503→                str(config.vllm_port),
+   504→                "--dtype",
+   505→                "auto",
+   506→                "--gpu-memory-utilization",
+   507→                "0.45",
+   508→                "--disable-log-requests",
+   509→                "--served-model-name",
+   510→                config.model_name,
+   511→            ]
+   512→            print(f"  Launching vLLM server: {' '.join(vllm_command)}")
+   513→            torch.cuda.empty_cache()
+   514→            try:
+   515→                vllm_process = subprocess.Popen(vllm_command)
+   516→                print(f"  vLLM server launched with PID: {vllm_process.pid}")
+   517→                # Check immediate errors
+   518→                try:
+   519→                    stdout, stderr = vllm_process.communicate(timeout=2)
+   520→                    if (
+   521→                        vllm_process.returncode is not None
+   522→                        and vllm_process.returncode != 0
+   523→                    ):
+   524→                        print(f"  Error starting vLLM: {stderr.decode()}")
+   525→                        vllm_process = None
+   526→                        # Maybe raise error or just warn?
+   527→                        print(
+   528→                            "  WARNING: Failed to start vLLM server after checkpoint."
+   529→                        )
+   530→                except subprocess.TimeoutExpired:
+   531→                    print("  vLLM process started (check logs for details).")
+   532→            except FileNotFoundError:
+   533→                print(
+   534→                    "\n *** ERROR: 'python -m vllm...' command not found. ",
+   535→                    "Make sure vLLM is installed and accessible. ***\n",
+   536→                )
+   537→                # Potentially stop training or just disable further vLLM restarts
+   538→                print("  Disabling further vLLM restarts.")
+   539→                config.vllm_restart_interval = (
+   540→                    config.training_steps + 1
+   541→                )  # Prevent further restarts
+   542→            except Exception as e:
+   543→                print(f"\n *** ERROR: Failed to launch vLLM: {e} ***\n")
+   544→                print("  Disabling further vLLM restarts.")
+   545→                config.vllm_restart_interval = (
+   546→                    config.training_steps + 1
+   547→                )  # Prevent further restarts
+   548→        # --- End vLLM Restart Logic ---
+   549→
+   550→        # Basic check if vLLM process terminated unexpectedly (outside interval check)
+   551→        if vllm_process and vllm_process.poll() is not None:
+   552→            print(
+   553→                f"\n *** WARNING: vLLM process terminated unexpectedly (return code: {vllm_process.returncode}). ",
+   554→                "Check vLLM logs. ***\n",
+   555→            )
+   556→            stderr_output = (
+   557→                vllm_process.stderr.read().decode()
+   558→                if vllm_process.stderr
+   559→                else "No stderr"
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

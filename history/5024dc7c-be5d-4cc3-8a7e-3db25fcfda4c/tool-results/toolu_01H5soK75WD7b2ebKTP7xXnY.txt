@@ -1,0 +1,31 @@
+33-
+34-
+35-# System prompt for secure code review
+36:SYSTEM_PROMPT = """You are an expert security engineer. Your task is to fix security vulnerabilities by generating unified diff patches.
+37-
+38-STRICT OUTPUT FORMAT - Follow this EXACTLY:
+39-1. Output ONLY a diff, no text before or after
+--
+462-        async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+463-            chat_completions = await managed.chat_completion(
+464-                messages=[
+465:                    {"role": "system", "content": SYSTEM_PROMPT},
+466-                    user_message
+467-                ],
+468-                n=self.config.group_size,
+--
+482-            to_score.append({
+483-                "task_id": item["task_id"],
+484-                "messages": (
+485:                    {"role": "system", "content": SYSTEM_PROMPT},
+486-                    user_message,
+487-                    {"role": "assistant", "content": response_content},
+488-                ),
+--
+599-            async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+600-                completion = await managed.chat_completion(
+601-                    messages=[
+602:                        {"role": "system", "content": SYSTEM_PROMPT},
+603-                        {"role": "user", "content": user_prompt}
+604-                    ],
+605-                    n=1,

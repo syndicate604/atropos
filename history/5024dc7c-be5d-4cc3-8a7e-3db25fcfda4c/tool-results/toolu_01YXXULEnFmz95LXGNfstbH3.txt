@@ -1,0 +1,4 @@
+/snap/bin/gcloud
+Google Cloud SDK 552.0.0
+alpha 2026.01.09
+beta 2026.01.09

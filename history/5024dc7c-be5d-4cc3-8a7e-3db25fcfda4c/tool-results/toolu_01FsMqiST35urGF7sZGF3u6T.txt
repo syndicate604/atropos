@@ -1,0 +1,16 @@
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs.html"
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/blazy.js"
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/blazy_init.js"
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/example-1.png"
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/example-2.png"
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/index.css"
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/js"
+ D "docs/Digital Red Queen_ Adversarial Program Evolution in Core War with LLMs_files/sakana_ai_text.svg"
+ D docs/Plans/01_HYDRA_Vision_and_Architecture.md
+ D docs/Plans/02_Security_Governance_Framework.md
+ D docs/Plans/03_MVP_Path_to_90.md
+ D docs/Plans/04_BUILD_THIS_Week1_Harness.md
+ D docs/Plans/05_DRQ_Atropos_Integration.md
+ D docs/Plans/Ref_Critique_Response_Archive.md
+ D docs/Plans/Ref_Full_30_Task_Benchmark.md
+?? docs/Hydra_Plans/

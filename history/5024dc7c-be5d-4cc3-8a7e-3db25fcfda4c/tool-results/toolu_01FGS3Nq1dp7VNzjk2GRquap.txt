@@ -1,0 +1,3 @@
+81 /tmp/gsm8k_rollouts.jsonl
+keys: ['tokens', 'masks', 'scores', 'inference_logprobs', 'ref_logprobs', 'overrides', 'group_overrides', 'messages']
+group_size: 4

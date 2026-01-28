@@ -1,0 +1,12 @@
+=== VM Info ===
+training-controller-1
+
+=== GPU ===
+NVIDIA L4, 23034 MiB
+
+=== CPU/RAM ===
+16
+Mem:            62Gi       1.7Gi        13Gi       1.0Mi        47Gi        60Gi
+
+=== Disk ===
+/dev/root       194G   65G  129G  34% /

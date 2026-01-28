@@ -1,0 +1,44 @@
+   470→        """
+   471→        user_message = {"role": "user", "content": self._build_user_prompt(item)}
+   472→
+   473→        async with self.server.managed_server(tokenizer=self.tokenizer) as managed:
+   474→            chat_completions = await managed.chat_completion(
+   475→                messages=[
+   476→                    {"role": "system", "content": SYSTEM_PROMPT},
+   477→                    user_message
+   478→                ],
+   479→                n=self.config.group_size,
+   480→                max_tokens=self.config.max_token_length,
+   481→                temperature=1.0,
+   482→            )
+   483→
+   484→            state = managed.get_state()
+   485→            nodes = state["nodes"]
+   486→
+   487→        # Build items to score
+   488→        to_score = []
+   489→        for i, choice in enumerate(chat_completions.choices):
+   490→            response_content = choice.message.content
+   491→            diff_text = self._extract_diff_from_response(response_content)
+   492→
+   493→            to_score.append({
+   494→                "task_id": item["task_id"],
+   495→                "messages": (
+   496→                    {"role": "system", "content": SYSTEM_PROMPT},
+   497→                    user_message,
+   498→                    {"role": "assistant", "content": response_content},
+   499→                ),
+   500→                "diff_text": diff_text,
+   501→                "tokens": nodes[i].tokens,
+   502→                "masks": nodes[i].masked_tokens,
+   503→                "logprobs": nodes[i].logprobs,
+   504→                "finish_reason": choice.finish_reason,
+   505→            })
+   506→
+   507→        # Score all patches
+   508→        scored_data = await self.score(to_score)
+   509→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

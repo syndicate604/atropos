@@ -1,0 +1,8 @@
+Total groups: 10
+
+Score distribution (total 40 samples):
+   -0.20:   5 ( 12.5%) (patch_ineffective - APPLIED!)
+   -0.85:  26 ( 65.0%) (hunk_failed)
+   -0.95:   9 ( 22.5%) (malformed)
+
+Patch application rate: 5/40 (12.5%)

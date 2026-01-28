@@ -1,0 +1,925 @@
+     1→# Master LLM Training Plan: Security Specialist Flywheel
+     2→
+     3→## Project Codename: HYDRA (Hybrid Universal Dynamic Reinforcement Adversaries)
+     4→
+     5→**Version:** 2.0
+     6→**Date:** January 2026
+     7→**Authors:** AI Research Team
+     8→
+     9→---
+    10→
+    11→## Executive Summary
+    12→
+    13→This plan outlines a practical approach to building **security-focused LLM specialists** that can reliably beat frontier models on narrow, operational tasks. The key insight: you don't beat frontier models by training once—you build a **continuous specialization flywheel**.
+    14→
+    15→**Core Architecture:** CI/CD for Model Advantage
+    16→1. Use frontier models as **teachers** (selectively)
+    17→2. Generate **verifiable, domain-specific data** that general models don't have
+    18→3. Train/refresh specialist models **regularly**
+    19→4. Route requests to specialist OR frontier with **eval-driven gating**
+    20→
+    21→**Key Innovation:** The moat isn't "smarter weights"—it's **better verifiers + domain-specific data + faster iteration**.
+    22→
+    23→**Products:**
+    24→1. **Detection Engineer Model** - Sigma/YARA rules, alert triage, IR playbooks
+    25→2. **Secure Code Review Model** - Vulnerability patches, security review, CI copilot
+    26→3. **CTF Operator Model** - Authorized red team assistance (sandboxed)
+    27→
+    28→**Expected Outcome:** Specialists that outperform frontier models on specific security tasks through verifiable, continuous improvement—not one-time training.
+    29→
+    30→**Training Platform:** [Atropos](https://github.com/NousResearch/atropos) - the LLM RL Gym framework in this repository. HYDRA environments are Atropos `BaseEnv` subclasses that generate rollouts for GRPO/DPO training.
+    31→
+    32→**Inspiration:** [Digital Red Queen](https://sakana.ai/drq/) - adversarial co-evolution produces more robust strategies than static benchmark optimization, even with smaller models.
+    33→
+    34→---
+    35→
+    36→## Table of Contents
+    37→
+    38→1. [Continuous Specialization Flywheel](#1-continuous-specialization-flywheel)
+    39→2. [Training Platform: Atropos](#2-training-platform-atropos)
+    40→3. [Product Verticals](#3-product-verticals)
+    41→4. [Verifier Harnesses (The Moat)](#4-verifier-harnesses-the-moat)
+    42→5. [DRQ Adversarial Training](#5-drq-adversarial-training)
+    43→6. [Two-Tier Model Architecture](#6-two-tier-model-architecture)
+    44→7. [Judge Reliability & Bias Mitigation](#7-judge-reliability--bias-mitigation)
+    45→8. [Data Evolution Loop](#8-data-evolution-loop)
+    46→9. [Implementation Phases](#9-implementation-phases)
+    47→10. [Infrastructure & Costs](#10-infrastructure--costs)
+    48→11. [Data Specification](#11-data-specification)
+    49→12. [Budget Gates & Stopping Criteria](#12-budget-gates--stopping-criteria)
+    50→13. [Ablation Plan](#13-ablation-plan)
+    51→14. [Risk Analysis](#14-risk-analysis)
+    52→15. [Success Metrics](#15-success-metrics)
+    53→
+    54→---
+    55→
+    56→## 1. Continuous Specialization Flywheel
+    57→
+    58→### 1.1 The "Always Stay Ahead" Principle
+    59→
+    60→**Key Insight:** You don't beat frontier models by training once. You beat them by building a continuous specialization flywheel that:
+    61→
+    62→1. Uses the newest frontier models as **teachers** (selectively)
+    63→2. Generates **verifiable, domain-specific data** that general models don't have
+    64→3. Trains/refreshes specialist models **regularly**
+    65→4. Routes requests to specialist OR frontier, with **eval-driven gating**
+    66→
+    67→**Think: "CI/CD for model advantage."**
+    68→
+    69→### 1.2 The Flywheel Architecture
+    70→
+    71→```
+    72→┌─────────────────────────────────────────────────────────────────────────────┐
+    73→│                    CONTINUOUS SPECIALIZATION FLYWHEEL                        │
+    74→│                                                                             │
+    75→│  ┌─────────────────────────────────────────────────────────────────────┐   │
+    76→│  │                     FRONTIER TEACHER LAYER                           │   │
+    77→│  │  (Claude Opus / GPT-5 / Gemini Pro - via API, NOT trained)          │   │
+    78→│  │                                                                      │   │
+    79→│  │  Used for:                                                           │   │
+    80→│  │  • Generating hard scenarios                                         │   │
+    81→│  │  • Adjudicating disagreements                                        │   │
+    82→│  │  • Producing high-quality rationales                                 │   │
+    83→│  │  • Auditing dataset quality                                          │   │
+    84→│  │  • Teacher refresh when new model drops                              │   │
+    85→│  └─────────────────────────────────────────────────────────────────────┘   │
+    86→│                                    │                                        │
+    87→│                                    ▼                                        │
+    88→│  ┌─────────────────────────────────────────────────────────────────────┐   │
+    89→│  │                     VERIFIER / SIMULATOR LAYER                       │   │
+    90→│  │  ████████████████████ THIS IS THE MOAT ████████████████████████      │   │
+    91→│  │                                                                      │   │
+    92→│  │  • Sandboxed code execution                                          │   │
+    93→│  │  • Unit tests / fuzzing                                              │   │
+    94→│  │  • Static analyzers (Semgrep, linters, taint checkers)              │   │
+    95→│  │  • Containerized vulnerable labs                                     │   │
+    96→│  │  • IDS rule tests, log replay, alert matching                       │   │
+    97→│  │  • Policy checkers (blue-team constraints)                          │   │
+    98→│  │  • Exploit verification in sandboxes                                │   │
+    99→│  └─────────────────────────────────────────────────────────────────────┘   │
+   100→│                                    │                                        │
+   101→│                                    ▼                                        │
+   102→│  ┌─────────────────────────────────────────────────────────────────────┐   │
+   103→│  │                     SPECIALIST MODEL LAYER                           │   │
+   104→│  │  (Your products - trained via LoRA, refreshed regularly)            │   │
+   105→│  │                                                                      │   │
+   106→│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                  │   │
+   107→│  │  │ Detection   │  │ Secure Code │  │ CTF/Lab     │                  │   │
+   108→│  │  │ Engineer    │  │ Reviewer    │  │ Operator    │                  │   │
+   109→│  │  │ Model       │  │ Model       │  │ Model       │                  │   │
+   110→│  │  └─────────────┘  └─────────────┘  └─────────────┘                  │   │
+   111→│  └─────────────────────────────────────────────────────────────────────┘   │
+   112→│                                    │                                        │
+   113→│                                    ▼                                        │
+   114→│  ┌─────────────────────────────────────────────────────────────────────┐   │
+   115→│  │                     ROUTER / ORCHESTRATOR                            │   │
+   116→│  │                                                                      │   │
+   117→│  │  • Picks specialist vs frontier based on task type + confidence     │   │
+   118→│  │  • Falls back to frontier when specialist is uncertain              │   │
+   119→│  │  • Logs all interactions for future training                        │   │
+   120→│  │  • Collects failure cases for next refresh cycle                    │   │
+   121→│  └─────────────────────────────────────────────────────────────────────┘   │
+   122→│                                    │                                        │
+   123→│                                    ▼                                        │
+   124→│  ┌─────────────────────────────────────────────────────────────────────┐   │
+   125→│  │                     FEEDBACK LOOP (Weekly/Monthly)                   │   │
+   126→│  │                                                                      │   │
+   127→│  │  1. Mine failures where specialist lost to frontier                 │   │
+   128→│  │  2. Ask frontier for better solutions (or critiques)                │   │
+   129→│  │  3. Add to dataset + verify                                         │   │
+   130→│  │  4. Run preference optimization refresh (DPO/GRPO)                  │   │
+   131→│  │  5. Re-evaluate and ship new "vX.Y" specialist                      │   │
+   132→│  └─────────────────────────────────────────────────────────────────────┘   │
+   133→│                                                                             │
+   134→└─────────────────────────────────────────────────────────────────────────────┘
+   135→```
+   136→
+   137→**Production Implementation:** The Router/Orchestrator layer is implemented via **RelayOne** (`mvp/`). See [RelayOne Integration](05_DRQ_Atropos_Integration.md#relayone-integration-hydra-mvp) for gateway APIs, audit log export, and model routing configuration.
+   138→
+   139→### 1.3 Teacher Refresh Protocol
+   140→
+   141→**When a new frontier model drops (e.g., Claude 5, GPT-6):**
+   142→
+   143→```python
+   144→class TeacherRefresh:
+   145→    """Protocol for refreshing specialists when new frontier drops."""
+   146→
+   147→    async def refresh_cycle(self, new_frontier_model: str):
+   148→        # Step 1: Sample hard cases where specialist loses
+   149→        hard_cases = await self.mine_failures(
+   150→            specialist=self.current_specialist,
+   151→            frontier=new_frontier_model,
+   152→            n_samples=1000
+   153→        )
+   154→
+   155→        # Step 2: Ask new frontier for better solutions
+   156→        improved_solutions = await self.generate_with_teacher(
+   157→            model=new_frontier_model,
+   158→            hard_cases=hard_cases
+   159→        )
+   160→
+   161→        # Step 3: Verify solutions (THE MOAT - no judge needed)
+   162→        verified = []
+   163→        for case, solution in zip(hard_cases, improved_solutions):
+   164→            result = await self.verifier.verify(case, solution)
+   165→            if result.passed:
+   166→                verified.append((case, solution))
+   167→
+   168→        # Step 4: Add to dataset
+   169→        self.dataset.add_preference_pairs(verified)
+   170→
+   171→        # Step 5: Run short preference optimization
+   172→        new_specialist = await self.train_refresh(
+   173→            base=self.current_specialist,
+   174→            new_data=verified,
+   175→            method="dpo",  # Quick refresh, not full retrain
+   176→            epochs=1
+   177→        )
+   178→
+   179→        # Step 6: Evaluate and ship
+   180→        eval_results = await self.evaluate(new_specialist)
+   181→        if eval_results.better_than(self.current_specialist):
+   182→            self.deploy(new_specialist, version=self.next_version())
+   183→```
+   184→
+   185→### 1.4 Why Specialists Beat Frontier
+   186→
+   187→| Factor | Generic Frontier Model | Your Specialist |
+   188→|--------|----------------------|-----------------|
+   189→| **Optimization target** | Broad helpfulness + safety | Your exact task metrics |
+   190→| **Tool chain training** | Generic tool use | Your specific tools + workflows |
+   191→| **Failure modes** | Doesn't know your edge cases | Trained on your failures |
+   192→| **Feedback loop** | Updated every few months | Updated weekly |
+   193→| **Verification** | Relies on RLHF | Deterministic verifiers |
+   194→| **Telemetry formats** | Generic | Your exact log formats |
+   195→| **False positive tuning** | Not a priority | Optimized for low FP |
+   196→
+   197→**The moat isn't "smarter weights." It's:**
+   198→- Better data (domain-specific, continuously generated)
+   199→- Better verifiers (deterministic, no judge bias)
+   200→- Tighter task framing (exactly your workflow)
+   201→- Faster iteration (weekly refresh vs monthly releases)
+   202→
+   203→---
+   204→
+   205→## 2. Training Platform: Atropos
+   206→
+   207→HYDRA runs on the **Atropos** LLM RL Gym framework (this repository). Each HYDRA product is an Atropos environment that generates training rollouts.
+   208→
+   209→### 2.1 Why Atropos (Not Standalone Harness)
+   210→
+   211→| Standalone Harness | Atropos Environment |
+   212→|-------------------|---------------------|
+   213→| Produces pass/fail JSON | Produces `ScoredDataGroup` for GRPO/DPO |
+   214→| Manual offline training | Online training via API server |
+   215→| Human-operated refresh | Continuous automated training |
+   216→| Single task at a time | Parallel multi-environment scaling |
+   217→
+   218→### 2.2 Atropos Architecture
+   219→
+   220→```
+   221→┌─────────────────────────────────────────────────────────────────────────────┐
+   222→│                           HYDRA ON ATROPOS                                   │
+   223→│                                                                             │
+   224→│  HYDRA Environments (BaseEnv subclasses)                                    │
+   225→│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐             │
+   226→│  │ SecureCodeReview│  │ DetectionEngineer│  │ CTFOperator     │            │
+   227→│  │ Env             │  │ Env              │  │ Env             │            │
+   228→│  │                 │  │                  │  │                 │            │
+   229→│  │ • Task pool     │  │ • Log corpus     │  │ • CTF labs      │            │
+   230→│  │ • Exploit verify│  │ • Rule verify    │  │ • Tool traces   │            │
+   231→│  │ • DRQ attacker  │  │ • FP analysis    │  │ • Sandbox       │            │
+   232→│  └────────┬────────┘  └────────┬─────────┘  └────────┬────────┘            │
+   233→│           │                    │                     │                      │
+   234→│           └────────────────────┼─────────────────────┘                      │
+   235→│                                ▼                                            │
+   236→│  ┌─────────────────────────────────────────────────────────────────────┐   │
+   237→│  │                    Atropos API Server                                │   │
+   238→│  │  • Sequesters rollout data from all environments                    │   │
+   239→│  │  • Serves batches to trainer                                        │   │
+   240→│  │  • Manages checkpoints                                              │   │
+   241→│  └─────────────────────────────────────────────────────────────────────┘   │
+   242→│                                │                                            │
+   243→│                                ▼                                            │
+   244→│  ┌─────────────────────────────────────────────────────────────────────┐   │
+   245→│  │                    GRPO/DPO Trainer                                  │   │
+   246→│  │  • Fetches batches from API                                         │   │
+   247→│  │  • Backpropagates                                                   │   │
+   248→│  │  • Produces LoRA checkpoints                                        │   │
+   249→│  └─────────────────────────────────────────────────────────────────────┘   │
+   250→└─────────────────────────────────────────────────────────────────────────────┘
+   251→```
+   252→
+   253→### 2.3 How Training Actually Works
+   254→
+   255→```bash
+   256→# Terminal 1: Start Atropos API server
+   257→python -m atroposlib.cli.run_api --port 8000
+   258→
+   259→# Terminal 2: Start inference server (vLLM/SGLang)
+   260→python -m vllm.entrypoints.openai.api_server \
+   261→    --model Qwen/Qwen2.5-7B-Instruct --port 9004
+   262→
+   263→# Terminal 3: Start HYDRA environment (generates rollouts)
+   264→python environments/hydra/secure_code_review_env.py serve \
+   265→    --rollout-server-url http://localhost:8000
+   266→
+   267→# Terminal 4: Start trainer (consumes rollouts)
+   268→python example_trainer/grpo.py \
+   269→    --api-url http://localhost:8000 \
+   270→    --output-dir checkpoints/hydra_v1
+   271→```
+   272→
+   273→### 2.4 HYDRA Environment Pattern
+   274→
+   275→Each HYDRA product follows this pattern (based on `diplomacy_env_minimal.py`):
+   276→
+   277→```python
+   278→from atroposlib.envs.base import BaseEnv, BaseEnvConfig, ScoredDataGroup
+   279→
+   280→class SecureCodeReviewEnv(BaseEnv):
+   281→    """HYDRA Secure Code Review as Atropos environment."""
+   282→
+   283→    name = "secure_code_review"
+   284→
+   285→    async def get_next_item(self) -> Item:
+   286→        """Sample next task from pool."""
+   287→        return {"task_id": "sqli-001", "vulnerable_code": "..."}
+   288→
+   289→    async def collect_trajectories(self, item: Item) -> Tuple[ScoredDataGroup, List[Item]]:
+   290→        """Generate patches, verify with harness, score."""
+   291→        # 1. Generate patch candidates with training policy
+   292→        patches = await self.generate_patches(item)
+   293→
+   294→        # 2. Verify each patch (exploit, tests, scanner)
+   295→        results = [self.runner.run_task(item["task_id"], p) for p in patches]
+   296→
+   297→        # 3. Score and return ScoredDataGroup for GRPO
+   298→        return self.build_scored_data_group(patches, results)
+   299→```
+   300→
+   301→---
+   302→
+   303→## 3. Product Verticals
+   304→
+   305→### 3.1 Product Strategy
+   306→
+   307→**Focus on narrow, operational security tasks where:**
+   308→1. Success is **machine-verifiable** (tests, scanners, log replay)
+   309→2. Generic models **don't have your data** (internal formats, edge cases)
+   310→3. Tasks are **tool-grounded** (code execution, API calls)
+   311→4. There's **clear ROI** (time saved, incidents prevented)
+   312→
+   313→### 3.2 Product 1: Detection Engineer Model (Blue Team)
+   314→
+   315→**Target users:** SOC analysts, detection engineers, threat hunters
+   316→
+   317→**Core tasks:**
+   318→
+   319→| Task | Input | Output | Verifier |
+   320→|------|-------|--------|----------|
+   321→| Log → Detection Rule | Zeek/Suricata/Sysmon logs | Sigma/YARA/Suricata rules | Replay logs, check triggers |
+   322→| Alert Triage | Alert bundle + context | Prioritized hypotheses + steps | Simulated incident with ground truth |
+   323→| Rule Optimization | Existing rule + FP examples | Refined rule | FP rate on test corpus |
+   324→| IOC Extraction | Threat report | Structured IOCs | Format validation + known-bad matching |
+   325→
+   326→**Dataset generation pipeline:**
+   327→
+   328→```python
+   329→class DetectionEngineerDataset:
+   330→    """Generate verifiable detection engineering data."""
+   331→
+   332→    async def generate_log_to_rule_pairs(self):
+   333→        # 1. Collect logs from diverse sources
+   334→        logs = await self.collect_logs(sources=[
+   335→            "zeek_samples", "sysmon_samples", "windows_security"
+   336→        ])
+   337→
+   338→        # 2. For each attack type, generate rule candidates
+   339→        for log_bundle in logs:
+   340→            attack_type = self.classify_attack(log_bundle)
+   341→
+   342→            # Ask frontier to generate Sigma rule
+   343→            rule_candidate = await self.frontier.generate(
+   344→                f"Write a Sigma rule to detect this attack:\n{log_bundle}"
+   345→            )
+   346→
+   347→            # VERIFY: Replay logs and check rule triggers
+   348→            verification = await self.sigma_verifier.test_rule(
+   349→                rule=rule_candidate,
+   350→                positive_logs=log_bundle.attack_logs,
+   351→                negative_logs=log_bundle.benign_logs
+   352→            )
+   353→
+   354→            if verification.true_positive_rate > 0.95 and verification.false_positive_rate < 0.05:
+   355→                self.dataset.add({
+   356→                    "input": log_bundle,
+   357→                    "output": rule_candidate,
+   358→                    "verification": verification
+   359→                })
+   360→```
+   361→
+   362→**Why it beats frontier:**
+   363→- Trained on **your exact telemetry formats** and tool chain
+   364→- Optimized for **low false positives** (generic models aren't tuned for this)
+   365→- Knows **your environment** (asset inventory, baseline behavior)
+   366→- **Weekly refresh** on new attack patterns
+   367→
+   368→### 3.3 Product 2: Secure Code Review / Patch Engineer
+   369→
+   370→**Target users:** Security engineers, DevSecOps, AppSec teams
+   371→
+   372→**Core tasks:**
+   373→
+   374→| Task | Input | Output | Verifier |
+   375→|------|-------|--------|----------|
+   376→| Vulnerability Patch | Code + scan finding + exploit | Patched code + tests | Scanner clean + tests pass + exploit fails |
+   377→| Security Review | PR diff | Security issues + fixes | Static analyzer + manual spot check |
+   378→| Secure Refactor | Insecure pattern | Secure equivalent | Regression tests + security tests |
+   379→| Dependency Fix | CVE + affected code | Updated deps + migration | Build passes + scanner clean |
+   380→
+   381→**Dataset generation pipeline:**
+   382→
+   383→```python
+   384→class SecureCodeReviewDataset:
+   385→    """Generate verifiable secure code review data."""
+   386→
+   387→    async def generate_patch_pairs(self):
+   388→        # 1. Find vulnerable code samples
+   389→        vuln_samples = await self.collect_vulnerable_code(sources=[
+   390→            "cve_fixes",  # Historical CVE patches
+   391→            "sast_findings",  # Static analysis findings
+   392→            "ctf_challenges"  # CTF web challenges
+   393→        ])
+   394→
+   395→        for sample in vuln_samples:
+   396→            # 2. Ask frontier to generate patch
+   397→            patch = await self.frontier.generate(f"""
+   398→                Vulnerable code: {sample.vulnerable_code}
+   399→                Vulnerability: {sample.vulnerability_description}
+   400→                Generate: Patched code + test cases
+   401→            """)
+   402→
+   403→            # 3. VERIFY: Multi-stage verification
+   404→            verification = await self.verify_patch(
+   405→                original=sample.vulnerable_code,
+   406→                patched=patch.code,
+   407→                tests=patch.tests
+   408→            )
+   409→
+   410→            if verification.all_passed:
+   411→                self.dataset.add({
+   412→                    "input": sample,
+   413→                    "output": patch,
+   414→                    "verification": verification
+   415→                })
+   416→
+   417→    async def verify_patch(self, original, patched, tests):
+   418→        results = {}
+   419→        results["exploit_original"] = await self.sandbox.run_exploit(original)
+   420→        results["exploit_patched"] = await self.sandbox.run_exploit(patched)
+   421→        results["regression"] = await self.sandbox.run_tests(patched, tests.regression)
+   422→        results["scanner"] = await self.semgrep.scan(patched)
+   423→
+   424→        return VerificationResult(
+   425→            all_passed=(
+   426→                results["exploit_original"].succeeded and
+   427→                not results["exploit_patched"].succeeded and
+   428→                results["regression"].all_passed and
+   429→                results["scanner"].findings == 0
+   430→            )
+   431→        )
+   432→```
+   433→
+   434→**Why it beats frontier:**
+   435→- **Deterministic evaluation** - you can grind improvement
+   436→- Trained on **your stack** (frameworks, libraries, patterns)
+   437→- Becomes a **CI security copilot** that's objectively better
+   438→- Very strong ROI (vulnerabilities caught in CI vs production)
+   439→
+   440→### 3.4 Product 3: CTF/Lab Operator Model (Authorized Red Team)
+   441→
+   442→**Target users:** Pentest teams, red team operators, security trainers
+   443→
+   444→**Constraints (critical for safety):**
+   445→- Constrained to **CTF-style labs you own**
+   446→- Requires **tool traces + reproducibility + auditing**
+   447→- Outputs **non-actionable outside sandbox**
+   448→- All executions **logged and reviewable**
+   449→
+   450→**Core tasks:**
+   451→
+   452→| Task | Input | Output | Verifier |
+   453→|------|-------|--------|----------|
+   454→| Attack Chain Planning | Lab description + objective | Step-by-step plan | Successful completion in lab |
+   455→| Exploit Development | Vulnerability description | Working exploit | Exploit succeeds in sandbox |
+   456→| Lateral Movement | Current access + target | Next steps + rationale | Access achieved in lab |
+   457→
+   458→**Safety notes:**
+   459→- This product requires **strong governance**
+   460→- Only viable for authorized testing companies
+   461→- Audit logs are **non-negotiable**
+   462→
+   463→### 3.5 Product Comparison
+   464→
+   465→| Product | Controversy Risk | Sellability | Verification Complexity | ROI |
+   466→|---------|------------------|-------------|------------------------|-----|
+   467→| Detection Engineer | **LOW** | **HIGH** | Medium | Very High |
+   468→| Secure Code Review | **LOW** | **HIGH** | Medium | Very High |
+   469→| CTF Operator | **MEDIUM** | Medium | High | High |
+   470→
+   471→**Recommendation: Start with Detection Engineer or Secure Code Review.**
+   472→
+   473→---
+   474→
+   475→## 4. Verifier Harnesses (The Moat)
+   476→
+   477→### 4.1 The Single Most Important Design Rule
+   478→
+   479→**Make your domain tasks machine-checkable.**
+   480→
+   481→If success depends on a **judge model**, your advantage gets eaten as soon as the next frontier model has better judging.
+   482→
+   483→If success depends on **tests, sandboxes, log replays, scanners**, you can keep compounding improvements cheaply.
+   484→
+   485→### 4.2 Verifier Stack
+   486→
+   487→```
+   488→┌─────────────────────────────────────────────────────────────────────────┐
+   489→│                        VERIFIER HARNESS STACK                            │
+   490→├─────────────────────────────────────────────────────────────────────────┤
+   491→│                                                                         │
+   492→│  LAYER 1: Code Execution Sandbox                                        │
+   493→│  ├── Docker containers with strict isolation                            │
+   494→│  ├── Firecracker microVMs for untrusted code                           │
+   495→│  ├── Resource limits (CPU, memory, time, network)                       │
+   496→│  └── Reproducible environments (pinned dependencies)                    │
+   497→│                                                                         │
+   498→│  LAYER 2: Static Analysis                                               │
+   499→│  ├── Semgrep (custom rules for your patterns)                          │
+   500→│  ├── CodeQL (for complex taint analysis)                               │
+   501→│  ├── Bandit/Pylint/ESLint (language-specific)                          │
+   502→│  └── Custom AST checks                                                  │
+   503→│                                                                         │
+   504→│  LAYER 3: Dynamic Testing                                               │
+   505→│  ├── Unit test execution                                                │
+   506→│  ├── Fuzzing (AFL++, libFuzzer)                                        │
+   507→│  ├── Property-based testing (Hypothesis)                               │
+   508→│  └── Exploit verification in sandbox                                   │
+   509→│                                                                         │
+   510→│  LAYER 4: Security-Specific                                             │
+   511→│  ├── Sigma rule testing (against log corpora)                          │
+   512→│  ├── YARA rule testing (against file corpora)                          │
+   513→│  ├── Suricata/Snort rule testing (against PCAP)                        │
+   514→│  └── IDS alert matching and false positive analysis                    │
+   515→│                                                                         │
+   516→│  LAYER 5: Environment Simulation                                        │
+   517→│  ├── Vulnerable lab environments (VulnHub, HackTheBox-style)           │
+   518→│  ├── Log replay systems                                                 │
+   519→│  ├── Simulated incident environments                                   │
+   520→│  └── Network traffic replay (tcpreplay)                                │
+   521→│                                                                         │
+   522→└─────────────────────────────────────────────────────────────────────────┘
+   523→```
+   524→
+   525→### 4.3 Verifier Coverage by Product
+   526→
+   527→| Product | Primary Verifiers | Secondary Verifiers |
+   528→|---------|------------------|---------------------|
+   529→| Detection Engineer | Sigma/YARA test, log replay | FP rate analysis, format validation |
+   530→| Secure Code Review | Static analysis, exploit sandbox | Unit tests, fuzz testing |
+   531→| CTF Operator | Lab execution, objective check | Audit log, safety bounds |
+   532→
+   533→---
+   534→
+   535→## 5. DRQ Adversarial Training
+   536→
+   537→### 5.1 Digital Red Queen Insight
+   538→
+   539→From [Sakana AI's DRQ paper](https://sakana.ai/drq/):
+   540→
+   541→> "Adversarial self-play produces more robust strategies than optimization against static benchmarks, even with smaller models."
+   542→
+   543→**Why this matters for HYDRA:**
+   544→
+   545→| Static Benchmark Training | DRQ Adversarial Training |
+   546→|--------------------------|-------------------------|
+   547→| Model learns to pass fixed test set | Model learns to beat evolving adversary |
+   548→| Overfits to benchmark | Generalizes to novel attacks |
+   549→| Plateaus when benchmark is "solved" | Arms race drives continuous improvement |
+   550→| Hidden set is only defense against gaming | Gaming becomes the training signal |
+   551→
+   552→### 5.2 DRQ for Security Tasks
+   553→
+   554→HYDRA naturally has **adversarial pairs**:
+   555→
+   556→| Defender | Attacker | Arena |
+   557→|----------|----------|-------|
+   558→| Patch generator | Exploit mutator | Secure Code Review |
+   559→| Detection rule writer | Evasion generator | Detection Engineer |
+   560→| Defender playbook | Attack chain planner | CTF Operator |
+   561→
+   562→**DRQ Form 1 (MVP):** Fixed attacker
+   563→- Train defender only
+   564→- Attacker is heuristic or frontier model
+   565→- Simpler, proves the loop works
+   566→
+   567→**DRQ Form 2 (Advanced):** Full co-training
+   568→- Train both defender and attacker
+   569→- True arms race like Sakana's Core War
+   570→- More complex but potentially stronger
+   571→
+   572→### 5.3 DRQ in Atropos collect_trajectories
+   573→
+   574→```python
+   575→async def collect_trajectories(self, item: Item) -> Tuple[ScoredDataGroup, List[Item]]:
+   576→    """DRQ-style scoring in Atropos environment."""
+   577→
+   578→    # 1. Generate patches (defender)
+   579→    patches = await self.generate_patches(item)
+   580→
+   581→    # 2. Verify with harness (static benchmark component)
+   582→    harness_results = [self.runner.run_task(item["task_id"], p) for p in patches]
+   583→
+   584→    # 3. Run attacker against patches that pass harness (DRQ component)
+   585→    attacker_results = []
+   586→    for patch, result in zip(patches, harness_results):
+   587→        if result.passed:
+   588→            bypass = await self.run_attacker(patch, item)
+   589→            attacker_results.append(bypass)
+   590→        else:
+   591→            attacker_results.append(None)
+   592→
+   593→    # 4. Score combines harness + attacker survival
+   594→    scores = [
+   595→        self.compute_drq_score(harness, attack)
+   596→        for harness, attack in zip(harness_results, attacker_results)
+   597→    ]
+   598→
+   599→    return self.build_scored_data_group(patches, scores)
+   600→```
+   601→
+   602→### 5.4 Adversary Pool (Historical Opponents)
+   603→
+   604→DRQ's key mechanism: **new generations must beat historical opponents**.
+   605→
+   606→```python
+   607→class AdversaryPool:
+   608→    """Store successful attacks for future training."""
+   609→
+   610→    def __init__(self, max_size: int = 100):
+   611→        self.pool: Dict[str, List[Dict]] = {}  # task_id -> attacks
+   612→
+   613→    def add_successful_attack(self, task_id: str, attack: Dict):
+   614→        """When attacker bypasses a patch, store it."""
+   615→        if task_id not in self.pool:
+   616→            self.pool[task_id] = []
+   617→        self.pool[task_id].append(attack)
+   618→        # Trim to max size
+   619→        self.pool[task_id] = self.pool[task_id][-self.max_size:]
+   620→
+   621→    def get_historical_attacks(self, task_id: str) -> List[Dict]:
+   622→        """Get attacks that future patches must survive."""
+   623→        return self.pool.get(task_id, [])
+   624→```
+   625→
+   626→This prevents overfitting: patches must work against all historical attacks, not just current ones.
+   627→
+   628→---
+   629→
+   630→## 6. Two-Tier Model Architecture
+   631→
+   632→### 6.1 Tier Separation
+   633→
+   634→**Tier 1 (Teachers/Orchestrators):** Frontier models via API
+   635→- Used for: data generation, adjudication, auditing
+   636→- NOT trained, just used
+   637→- Examples: Claude Opus 4.5, GPT-5.2, Gemini 3 Pro
+   638→
+   639→**Tier 2 (Specialists):** Open-source models we train
+   640→- Trained via LoRA for efficiency
+   641→- Refreshed regularly (weekly/monthly)
+   642→- Examples: Qwen2.5-7B, Llama 3.3-8B, DeepSeek-R1-7B
+   643→
+   644→### 6.2 API Access
+   645→
+   646→| Access Method | Use Case | Cost |
+   647→|---------------|----------|------|
+   648→| **OpenRouter** | Single API, 300+ models | ~5% markup |
+   649→| **Direct APIs** | High volume, lower cost | Provider rates |
+   650→| **Claude Code API** | Max plan included | Subscription |
+   651→
+   652→---
+   653→
+   654→## 7. Judge Reliability & Bias Mitigation
+   655→
+   656→### 7.1 Known LLM-as-Judge Biases
+   657→
+   658→| Bias Type | Description | Mitigation |
+   659→|-----------|-------------|------------|
+   660→| **Position Bias** | Prefers A or B based on order | Always evaluate both orders |
+   661→| **Verbosity Bias** | Prefers longer answers | Length normalization |
+   662→| **Self-Enhancement** | Prefers its own style | Use different judge than generator |
+   663→
+   664→### 7.2 Required Mitigations
+   665→
+   666→```python
+   667→async def mitigated_judge(self, response_a, response_b, challenge):
+   668→    """Always evaluate in both orders."""
+   669→
+   670→    verdict_ab = await self.judge.evaluate(first=response_a, second=response_b)
+   671→    verdict_ba = await self.judge.evaluate(first=response_b, second=response_a)
+   672→
+   673→    if verdict_ab.winner == "first" and verdict_ba.winner == "second":
+   674→        return {"winner": "A", "confident": True}
+   675→    elif verdict_ab.winner == "second" and verdict_ba.winner == "first":
+   676→        return {"winner": "B", "confident": True}
+   677→    else:
+   678→        return {"winner": None, "needs_escalation": True}
+   679→```
+   680→
+   681→### 7.3 Judge Calibration (Week 0 Requirement)
+   682→
+   683→Before training, verify:
+   684→- Position bias flip rate < 10%
+   685→- Verbosity correlation < 0.3
+   686→- Self-agreement > 95%
+   687→
+   688→---
+   689→
+   690→## 8. Data Evolution Loop
+   691→
+   692→### 8.1 Key Principle
+   693→
+   694→**Treat "evolution" as DATA evolution, not weight evolution.**
+   695→
+   696→Directly mutating LoRA weights is inefficient. Instead:
+   697→1. Generate many candidate responses
+   698→2. Select winners via verifiers/judges
+   699→3. Train using preference optimization (DPO/GRPO)
+   700→
+   701→### 8.2 The Loop
+   702→
+   703→```
+   704→Generate k responses → Verify/Judge → Select winners → Train DPO → Repeat
+   705→```
+   706→
+   707→### 8.3 Training Objective Per Arena
+   708→
+   709→| Arena | Method | Why |
+   710→|-------|--------|-----|
+   711→| Code/Security | GRPO | Multiple responses ranked by test results |
+   712→| Reasoning | DPO | Binary correct/incorrect |
+   713→| Subjective | KTO/ORPO | Handles noisy preferences |
+   714→
+   715→---
+   716→
+   717→## 9. Implementation Phases
+   718→
+   719→### Phase 0: Verifier Harness (Week 0-1)
+   720→
+   721→**Goal:** Build the moat before anything else
+   722→
+   723→**Tasks:**
+   724→- [ ] Set up Docker sandbox for code execution
+   725→- [ ] Implement Sigma rule tester with log corpus
+   726→- [ ] Implement static analyzer integration (Semgrep)
+   727→- [ ] Build exploit verification sandbox
+   728→- [ ] Create test corpora (attack logs, vulnerable code)
+   729→
+   730→**Compute:** 1x A100 or consumer GPU (~$50)
+   731→
+   732→**GO/NO-GO:** Verifiers must work reliably before Phase 1
+   733→
+   734→### Phase 1: First Specialist (Weeks 1-3)
+   735→
+   736→**Goal:** Prove the loop works on ONE product
+   737→
+   738→**Tasks:**
+   739→- [ ] Choose product: Detection Engineer OR Secure Code Review
+   740→- [ ] Generate initial dataset via frontier + verification
+   741→- [ ] Train first specialist with DPO
+   742→- [ ] Set up eval pipeline
+   743→- [ ] Deploy behind router with frontier fallback
+   744→
+   745→**Compute:** 2x A100 80GB (~$300)
+   746→
+   747→**Success Criteria:**
+   748→- [ ] +5% improvement on domain benchmark
+   749→- [ ] Verifier pass rate > 90%
+   750→
+   751→### Phase 2: Router & Refresh (Weeks 3-6)
+   752→
+   753→**Goal:** Implement continuous improvement
+   754→
+   755→**Tasks:**
+   756→- [ ] Build router with confidence-based fallback
+   757→- [ ] Implement failure mining pipeline
+   758→- [ ] Run first teacher refresh cycle
+   759→- [ ] Ship v1.1 specialist
+   760→
+   761→**Compute:** 4x A100 + ~$200 API (~$1,200)
+   762→
+   763→### Phase 3: Scale & Second Product (Weeks 6+)
+   764→
+   765→**Goal:** Expand only with proven signal
+   766→
+   767→**Tasks:**
+   768→- [ ] Add second product vertical
+   769→- [ ] Scale to production workloads
+   770→- [ ] Establish weekly refresh cadence
+   771→
+   772→**Compute:** 8x A100 (~$3,000+)
+   773→
+   774→---
+   775→
+   776→## 10. Infrastructure & Costs
+   777→
+   778→### 10.1 Cost-Minimized Compute Ramp
+   779→
+   780→| Phase | GPUs | Duration | Compute | API | Total |
+   781→|-------|------|----------|---------|-----|-------|
+   782→| Phase 0 | 1x A100 | 1 week | $50 | $0 | $50 |
+   783→| Phase 1 | 2x A100 | 2 weeks | $300 | $0 | $300 |
+   784→| Phase 2 | 4x A100 | 3 weeks | $1,000 | $200 | $1,200 |
+   785→| Phase 3 | 8x A100 | 4 weeks | $3,000 | $300 | $3,300 |
+   786→| **Total** | - | 10 weeks | **$4,350** | **$500** | **$4,850** |
+   787→
+   788→### 10.2 Model Selection
+   789→
+   790→**Start with ONE base model:** Qwen2.5-7B-Instruct
+   791→
+   792→**Why:**
+   793→- Strong baseline performance
+   794→- Efficient inference
+   795→- Good LoRA compatibility
+   796→- Apache 2.0 license
+   797→
+   798→---
+   799→
+   800→## 11. Data Specification
+   801→
+   802→### 11.1 What Is Stored Per Match
+   803→
+   804→```python
+   805→@dataclass
+   806→class MatchRecord:
+   807→    match_id: str
+   808→    timestamp: datetime
+   809→    arena_type: str
+   810→
+   811→    # Challenge
+   812→    challenge_text: str
+   813→    challenge_metadata: Dict
+   814→
+   815→    # Response
+   816→    response: str
+   817→    response_tokens: int
+   818→
+   819→    # Verification
+   820→    verifier_result: Dict
+   821→    verification_passed: bool
+   822→
+   823→    # Costs
+   824→    inference_cost: float
+   825→    total_cost: float
+   826→```
+   827→
+   828→### 11.2 Caching Rule
+   829→
+   830→**Never pay twice for the same computation.**
+   831→
+   832→---
+   833→
+   834→## 12. Budget Gates & Stopping Criteria
+   835→
+   836→### 12.1 Hard Gates
+   837→
+   838→| Gate | Trigger | Action |
+   839→|------|---------|--------|
+   840→| **Week 3** | No +5% on domain metric | STOP or PIVOT |
+   841→| **Daily API** | >$50/day | Pause and review |
+   842→| **Total API** | >$500 total | Switch to verifiable only |
+   843→
+   844→### 12.2 Decision Tree
+   845→
+   846→```
+   847→Week 3:
+   848→├── +5% improvement? → Continue
+   849→├── No improvement but system works? → Debug, adjust
+   850→└── System broken? → STOP
+   851→```
+   852→
+   853→---
+   854→
+   855→## 13. Ablation Plan
+   856→
+   857→### 13.1 Required Ablations
+   858→
+   859→| Ablation | What It Tests |
+   860→|----------|---------------|
+   861→| Baseline SFT | Same data, no competition |
+   862→| No frontier | Self-play only |
+   863→| Verifiable only | No judge-based |
+   864→
+   865→### 13.2 Statistical Requirements
+   866→
+   867→- 3 seeds minimum
+   868→- Report mean ± std
+   869→- p < 0.05 for significance
+   870→
+   871→---
+   872→
+   873→## 14. Risk Analysis
+   874→
+   875→### 14.1 Top Risk: Reward Hacking
+   876→
+   877→If success depends on a judge, models will game the judge.
+   878→
+   879→**Mitigation:** Use verifiable tasks first.
+   880→
+   881→### 14.2 Technical Risks
+   882→
+   883→| Risk | Mitigation |
+   884→|------|------------|
+   885→| Training instability | Use DPO/GRPO (stable) |
+   886→| Judge gaming | Verifiable tasks first |
+   887→| Cost overrun | Hard budget gates |
+   888→
+   889→---
+   890→
+   891→## 15. Success Metrics
+   892→
+   893→### 15.1 Phase 1 Success
+   894→
+   895→- [ ] Verifier harness working
+   896→- [ ] +5% on domain benchmark
+   897→- [ ] Training loop runs 24h without crash
+   898→
+   899→### 15.2 Ultimate Success
+   900→
+   901→- [ ] Specialist beats frontier on target domain
+   902→- [ ] Weekly refresh cycle operational
+   903→- [ ] Paying customers
+   904→
+   905→---
+   906→
+   907→## Appendix: Minimal Blueprint
+   908→
+   909→**Fastest path to value:**
+   910→
+   911→1. **Pick one product:** Detection Engineer OR Secure Code Review
+   912→2. **Build verifier harness first** (this is the moat)
+   913→3. Generate initial dataset via frontier + verification
+   914→4. Train first specialist with DPO
+   915→5. Put behind router with frontier fallback
+   916→6. **Every week:** Mine failures → regenerate → retrain → ship
+   917→
+   918→---
+   919→
+   920→*Version 2.0 - Updated with Continuous Specialization Flywheel architecture*
+   921→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

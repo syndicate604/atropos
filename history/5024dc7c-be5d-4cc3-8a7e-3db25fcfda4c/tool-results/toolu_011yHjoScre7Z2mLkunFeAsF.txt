@@ -1,0 +1,6 @@
+[hydra 5d3097c] Add VM setup requirements and script for A100/L4 boxes
+ 2 files changed, 121 insertions(+)
+ create mode 100644 environments/hydra/requirements-vm.txt
+ create mode 100755 environments/hydra/setup-vm.sh
+To github.com:RelayOne/hydra.git
+   92e5240..5d3097c  hydra -> hydra

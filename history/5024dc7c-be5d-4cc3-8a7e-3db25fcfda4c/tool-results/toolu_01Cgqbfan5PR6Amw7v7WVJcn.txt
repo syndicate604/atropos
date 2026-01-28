@@ -1,0 +1,3 @@
+Exit code 128
+Cloning into 'hydra'...
+fatal: could not read Username for 'https://github.com': No such device or address

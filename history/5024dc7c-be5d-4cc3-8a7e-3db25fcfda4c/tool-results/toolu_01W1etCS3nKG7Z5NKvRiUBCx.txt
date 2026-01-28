@@ -1,0 +1,30 @@
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+  [2/5] Applying patch: external:tmpctpo75hf.diff...
+  [!] Patch failed: patching file app.py
+Hunk #1 FAILED at 31.
+1 out of 1 hunk FAILED -- saving rejects to file app.py.r...
+  [1/5] Running exploit on original code...
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0
+INFO:atroposlib.envs.base:env_manager: Status dict: {'current_step': 0, 'queue_size': 0, 'unallocated_fraction': 1.0, 'self_queue_size': 0, 'max_group_size': 1, 'env_weight': 1.0}
+max_num_workers: 3, queue size: 0, workers: 3, self_queue_size: 0

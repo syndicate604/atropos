@@ -1,0 +1,4 @@
+[hydra 659d971] Fix process mode: disable wandb by default (no rollout server)
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+To github.com:RelayOne/hydra.git
+   f93897f..659d971  hydra -> hydra

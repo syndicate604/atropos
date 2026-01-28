@@ -1,0 +1,24 @@
+   303→    # Init vllm
+   304→    vllm_command = [
+   305→        "python",
+   306→        "-m",
+   307→        "vllm.entrypoints.openai.api_server",
+   308→        "--model",
+   309→        config.model_name,
+   310→        "--port",
+   311→        str(config.vllm_port),
+   312→        "--dtype",
+   313→        "auto",
+   314→        "--gpu-memory-utilization",
+   315→        "0.45",
+   316→        "--disable-log-requests",
+   317→    ]
+   318→    print(f"  Launching vLLM server: {' '.join(vllm_command)}")
+   319→    try:
+   320→        vllm_process = subprocess.Popen(vllm_command)
+   321→        print(f"  vLLM server launched with PID: {vllm_process.pid}")
+   322→        # Check immediate errors
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

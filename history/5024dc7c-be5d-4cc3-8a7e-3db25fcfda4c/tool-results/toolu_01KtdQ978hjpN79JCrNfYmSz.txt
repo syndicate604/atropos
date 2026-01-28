@@ -1,0 +1,7 @@
+/home/bron/.config/gcloud
+/home/bron/.config/gcloud/balmy-ocean-449223-v9-df4fdbca4d9f.json
+/home/bron/.config/gcloud/hidden_gcloud_config_universe_descriptor_data_cache_configs.db
+/home/bron/.config/gcloud/legacy_credentials/todal-277@balmy-ocean-449223-v9.iam.gserviceaccount.com
+[core]
+project = voice-ai-435704
+account = syndicate604@gmail.com

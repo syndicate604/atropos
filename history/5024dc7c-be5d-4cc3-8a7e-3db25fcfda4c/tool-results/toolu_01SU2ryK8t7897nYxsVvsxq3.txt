@@ -1,0 +1,3 @@
+NAME               DIRECTION  ALLOWED                                     SOURCE_RANGES  TARGET_TAGS
+allow-rdp          INGRESS    [{'IPProtocol': 'tcp', 'ports': ['3389']}]  ['0.0.0.0/0']  ['rdp-server']
+default-allow-rdp  INGRESS    [{'IPProtocol': 'tcp', 'ports': ['3389']}]  ['0.0.0.0/0']

@@ -1,0 +1,3 @@
+/root/hydra/example_trainer/grpo.py:270: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+  config=config.dict(),  # Log config parameters
+`torch_dtype` is deprecated! Use `dtype` instead!

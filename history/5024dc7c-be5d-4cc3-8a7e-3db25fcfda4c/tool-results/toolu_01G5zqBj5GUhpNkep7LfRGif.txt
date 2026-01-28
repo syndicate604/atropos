@@ -1,0 +1,17 @@
+=== Hostname ===
+training-box-01.us-central1-f.c.balmy-ocean-449223-v9.internal
+
+=== GPU Check ===
+00:04.0 3D controller: NVIDIA Corporation GA100 [A100 SXM4 40GB] (rev a1)
+
+=== CPU/RAM ===
+12
+Mem:            83Gi       1.2Gi        80Gi       8.3Mi       2.5Gi        82Gi
+
+=== Disk ===
+/dev/root       4.8T  3.0G  4.8T   1% /
+
+=== OS ===
+PRETTY_NAME="Ubuntu 24.04.3 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"

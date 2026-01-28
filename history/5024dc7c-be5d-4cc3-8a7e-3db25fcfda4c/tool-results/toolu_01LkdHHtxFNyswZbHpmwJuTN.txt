@@ -1,0 +1,2 @@
+Exit code 1
+ERROR: (gcloud.compute.instances.describe) Underspecified resource [training-controller-1]. Specify the [--zone] flag.

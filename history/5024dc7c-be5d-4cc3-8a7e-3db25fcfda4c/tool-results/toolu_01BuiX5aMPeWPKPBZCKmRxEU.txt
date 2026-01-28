@@ -1,0 +1,8 @@
+Updating 5ad14e2..659d971
+Fast-forward
+ atroposlib/envs/base.py                            |  4 +-
+ .../Hydra_Plans/06_Week1-2_Implementation_Notes.md | 84 +++++++++++++++++++++-
+ 2 files changed, 84 insertions(+), 4 deletions(-)
+From github.com:RelayOne/hydra
+ * branch            hydra      -> FETCH_HEAD
+   5ad14e2..659d971  hydra      -> origin/hydra

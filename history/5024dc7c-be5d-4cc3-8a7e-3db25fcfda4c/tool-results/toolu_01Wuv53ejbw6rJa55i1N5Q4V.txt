@@ -1,0 +1,9 @@
+69:    vllm_restart_interval: int = Field(
+300:        f"vLLM will be restarted every {config.vllm_restart_interval} steps on port {config.vllm_port}"
+342:            config.vllm_restart_interval = (
+348:            config.vllm_restart_interval = (
+371:        ) % config.vllm_restart_interval == 0 or step == config.training_steps - 1:  # Also restart/save on last step
+467:        ) % config.vllm_restart_interval == 0 or step == config.training_steps - 1:  # Also restart/save on last step
+539:                config.vllm_restart_interval = (
+545:                config.vllm_restart_interval = (
+589:        vllm_restart_interval=3,  # Example interval

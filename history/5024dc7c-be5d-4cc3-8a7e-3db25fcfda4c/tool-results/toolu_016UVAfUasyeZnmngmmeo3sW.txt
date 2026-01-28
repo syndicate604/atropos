@@ -1,0 +1,54 @@
+   100→        Run a single task with a specific patch.
+   101→
+   102→        Args:
+   103→            task_id: Task identifier (e.g., "sqli-001")
+   104→            patch_name: Name of patch in tasks/<id>/patches/ (e.g., "known-good")
+   105→            patch_file: Path to external patch file (for model-generated patches)
+   106→
+   107→        One of patch_name or patch_file must be provided.
+   108→        """
+   109→        task_dir = self.tasks_dir / task_id
+   110→
+   111→        if not task_dir.exists():
+   112→            raise ValueError(f"Task directory not found: {task_dir}")
+   113→
+   114→        # Determine patch source
+   115→        if patch_file is not None:
+   116→            actual_patch_file = Path(patch_file)
+   117→            display_name = f"external:{actual_patch_file.name}"
+   118→        elif patch_name is not None:
+   119→            actual_patch_file = task_dir / "patches" / f"{patch_name}.diff"
+   120→            display_name = patch_name
+   121→            if not actual_patch_file.exists():
+   122→                raise ValueError(f"Patch not found: {actual_patch_file}")
+   123→        else:
+   124→            raise ValueError("Either patch_name or patch_file must be provided")
+   125→
+   126→        # Load task config (JSON, not YAML - no host deps)
+   127→        config = self._load_config(task_dir / "task.json")
+   128→
+   129→        # Create temp directory for workspace
+   130→        with tempfile.TemporaryDirectory() as tmp_dir:
+   131→            tmp_path = Path(tmp_dir)
+   132→
+   133→            # Copy workspace (will be modified by patch)
+   134→            workspace_src = task_dir / "workspace"
+   135→            workspace_dst = tmp_path / "workspace"
+   136→            shutil.copytree(workspace_src, workspace_dst)
+   137→
+   138→            # Copy exploit (read-only)
+   139→            exploit_src = task_dir / "exploit"
+   140→            exploit_dst = tmp_path / "exploit"
+   141→            shutil.copytree(exploit_src, exploit_dst)
+   142→
+   143→            # Step 1: Run exploit on ORIGINAL code
+   144→            print(f"  [1/5] Running exploit on original code...")
+   145→            exploit_original = self._run_exploit(workspace_dst, exploit_dst)
+   146→
+   147→            # Step 2: Apply patch (with graceful failure handling)
+   148→            print(f"  [2/5] Applying patch: {display_name}...")
+   149→            patch_success, patch_error_code, patch_error_msg = self._apply_patch_safe(
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

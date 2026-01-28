@@ -1,0 +1,8 @@
+=== GPUs ===
+No GPUs
+=== Docker ===
+No Docker
+=== Python ===
+Python 3.13.7
+=== Disk ===
+/dev/root       993G  3.2G  989G   1% /

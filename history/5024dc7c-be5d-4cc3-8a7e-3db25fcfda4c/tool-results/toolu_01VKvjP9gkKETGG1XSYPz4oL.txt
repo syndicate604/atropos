@@ -1,0 +1,2 @@
+total 4.0K
+drwxr-xr-x 3 root root 4.0K Jan 27 03:48 Qwen2.5-7B-Instruct

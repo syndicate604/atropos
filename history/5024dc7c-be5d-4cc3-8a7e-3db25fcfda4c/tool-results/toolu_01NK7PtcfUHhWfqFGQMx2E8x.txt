@@ -1,0 +1,96 @@
+176-                code=code,
+177-                metadata=task_meta.get("metadata", {}),
+178-                cwe=task_meta.get("cwe", "Unknown"),
+179-                description=task_meta.get("metadata", {}).get("description", "")
+180-            )
+181-            self.tasks.append(task)
+182-
+183-        if not self.tasks:
+184-            raise ValueError("No valid tasks found in tasks directory")
+185-
+186-        print(f"Loaded {len(self.tasks)} tasks: {[t['task_id'] for t in self.tasks]}")
+187-        self.task_iter = 0
+188-
+189-    async def get_next_item(self) -> SCRTask:
+190-        """Get the next task for training."""
+191-        task = self.tasks[self.task_iter % len(self.tasks)]
+192-        self.task_iter += 1
+193-        return task
+194-
+195-    def _build_user_prompt(self, task: SCRTask) -> str:
+196-        """Build the user prompt for a task."""
+197-        return f"""## Vulnerability Information
+198-- CWE: {task['cwe']}
+199-- Description: {task['description']}
+200-- Language: {task['metadata'].get('language', 'python')}
+201-- Framework: {task['metadata'].get('framework', 'unknown')}
+202-
+203-## Vulnerable Code
+204-```python
+205-{task['code']}
+206-```
+207-
+208-## Requirements
+209-1. Fix the security vulnerability described above
+210-2. Maintain all existing functionality
+211-3. The patch must pass regression tests
+212-4. The code must be clean of security scanner findings
+213-
+214-Generate a unified diff patch to fix this vulnerability:"""
+215-
+216:    def _normalize_path(self, path: str) -> str:
+217-        """Normalize a file path for diff format."""
+218-        path = path.strip()
+219-        # Remove timestamps
+220-        if '\t' in path:
+221-            path = path.split('\t')[0]
+222-        # Remove leading ./
+223-        if path.startswith('./'):
+224-            path = path[2:]
+225-        # Ensure workspace/ prefix for app.py
+226-        if path == 'app.py' or path.endswith('/app.py'):
+227-            if not path.startswith('workspace/'):
+228-                path = 'workspace/app.py'
+229-        return path
+230-
+231:    def _normalize_diff_headers(self, diff_text: str) -> str:
+232-        """
+233-        Aggressively normalize diff headers for `patch -p1` compatibility.
+234-
+235-        Handles common model mistakes:
+236-        - Missing a/b prefixes
+237-        - Missing workspace/ in path
+238-        - Leading ./ in paths
+239-        - Missing diff --git header
+240-        - Prose between headers (stripped)
+241-        """
+242-        lines = diff_text.split('\n')
+243-        normalized = []
+244-        has_git_header = False
+245-        in_diff = False
+246-        file_path = None
+247-
+248-        for line in lines:
+249-            # Track if we have a git header
+250-            if line.startswith('diff --git'):
+251-                has_git_header = True
+252-                in_diff = True
+253-                normalized.append(line)
+254-                continue
+255-
+256-            # Fix --- header
+257-            if line.startswith('--- '):
+258-                in_diff = True
+259-                path = self._normalize_path(line[4:])
+260-                # Remove any existing a/ prefix before re-adding
+261-                if path.startswith('a/'):
+262-                    path = path[2:]
+263-                file_path = path
+264-                line = f'--- a/{path}'
+265-                normalized.append(line)
+266-                continue
+267-
+268-            # Fix +++ header
+269-            if line.startswith('+++ '):
+270-                path = self._normalize_path(line[4:])
+271-                if path.startswith('b/'):

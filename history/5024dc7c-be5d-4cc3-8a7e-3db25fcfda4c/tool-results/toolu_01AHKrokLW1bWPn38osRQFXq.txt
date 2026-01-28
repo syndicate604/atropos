@@ -1,0 +1,49 @@
+import gzip
+import time
+import uuid
+from typing import Any, Dict, List, Optional
+
+from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import PlainTextResponse
+from pydantic import BaseModel, field_validator
+from starlette.datastructures import MutableHeaders
+from starlette.types import Receive, Scope, Send
+
+from atroposlib.api.utils import (
+    find_groups_summing_to_target,
+    grab_batch_with_minimum_allocations,
+    grab_exact_from_heterogeneous_queue,
+)
+
+# Constants
+MIN_ENV_WEIGHT = (
+    0.01  # Minimum weight to prevent environments from being completely starved
+)
+
+# Message import removed - using Dict[str, Any] for more flexible validation
+
+app = FastAPI(title="AtroposLib API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+
+class GZipRequestMiddleware:
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return

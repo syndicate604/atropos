@@ -1,0 +1,104 @@
+   216→    def _normalize_path(self, path: str) -> str:
+   217→        """Normalize a file path for diff format."""
+   218→        path = path.strip()
+   219→        # Remove timestamps
+   220→        if '\t' in path:
+   221→            path = path.split('\t')[0]
+   222→        # Remove leading ./
+   223→        if path.startswith('./'):
+   224→            path = path[2:]
+   225→        # Ensure workspace/ prefix for app.py
+   226→        if path == 'app.py' or path.endswith('/app.py'):
+   227→            if not path.startswith('workspace/'):
+   228→                path = 'workspace/app.py'
+   229→        return path
+   230→
+   231→    def _normalize_diff_headers(self, diff_text: str) -> str:
+   232→        """
+   233→        Aggressively normalize diff headers for `patch -p1` compatibility.
+   234→
+   235→        Handles common model mistakes:
+   236→        - Missing a/b prefixes
+   237→        - Missing workspace/ in path
+   238→        - Leading ./ in paths
+   239→        - Missing diff --git header
+   240→        - Prose between headers (stripped)
+   241→        """
+   242→        lines = diff_text.split('\n')
+   243→        normalized = []
+   244→        has_git_header = False
+   245→        in_diff = False
+   246→        file_path = None
+   247→
+   248→        for line in lines:
+   249→            # Track if we have a git header
+   250→            if line.startswith('diff --git'):
+   251→                has_git_header = True
+   252→                in_diff = True
+   253→                normalized.append(line)
+   254→                continue
+   255→
+   256→            # Fix --- header
+   257→            if line.startswith('--- '):
+   258→                in_diff = True
+   259→                path = self._normalize_path(line[4:])
+   260→                # Remove any existing a/ prefix before re-adding
+   261→                if path.startswith('a/'):
+   262→                    path = path[2:]
+   263→                file_path = path
+   264→                line = f'--- a/{path}'
+   265→                normalized.append(line)
+   266→                continue
+   267→
+   268→            # Fix +++ header
+   269→            if line.startswith('+++ '):
+   270→                path = self._normalize_path(line[4:])
+   271→                if path.startswith('b/'):
+   272→                    path = path[2:]
+   273→                line = f'+++ b/{path}'
+   274→                normalized.append(line)
+   275→                continue
+   276→
+   277→            # Keep hunk headers and diff content
+   278→            if line.startswith('@@') or line.startswith('+') or line.startswith('-') or line.startswith(' '):
+   279→                in_diff = True
+   280→                normalized.append(line)
+   281→                continue
+   282→
+   283→            # If we're in diff mode and see non-diff content, might be prose - skip it
+   284→            if in_diff and line.strip() and not line.startswith(('#', 'diff', '---', '+++', '@@', '+', '-', ' ', '\\')):
+   285→                # Skip prose lines within diff
+   286→                continue
+   287→
+   288→            # Keep empty lines and other valid content
+   289→            normalized.append(line)
+   290→
+   291→        result = '\n'.join(normalized)
+   292→
+   293→        # Add diff --git header if missing but we have file path
+   294→        if not has_git_header and file_path:
+   295→            git_header = f'diff --git a/{file_path} b/{file_path}\n'
+   296→            result = git_header + result
+   297→
+   298→        return result
+   299→
+   300→    def _extract_diff_from_response(self, response: str) -> Optional[str]:
+   301→        """Extract a unified diff from the model response and normalize headers."""
+   302→        # Try to find diff in code block first (most reliable)
+   303→        diff_pattern = r'```(?:diff)?\s*\n(.*?)```'
+   304→        matches = re.findall(diff_pattern, response, re.DOTALL)
+   305→
+   306→        if matches:
+   307→            diff_text = matches[0].strip()
+   308→            # Validate it looks like a diff
+   309→            if any(line.startswith(('---', '+++', 'diff ')) for line in diff_text.split('\n')[:5]):
+   310→                return self._normalize_diff_headers(diff_text)
+   311→
+   312→        # Try to find raw diff without code blocks
+   313→        lines = response.split('\n')
+   314→        diff_start = None
+   315→        for i, line in enumerate(lines):
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

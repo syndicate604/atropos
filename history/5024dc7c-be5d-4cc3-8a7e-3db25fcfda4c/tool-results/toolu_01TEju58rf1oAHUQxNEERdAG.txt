@@ -1,0 +1,10 @@
+75:    launch_vllm_server: bool = Field(
+254:def launch_vllm_server_process(model_path: str, port: int, gpu_util: float = 0.45):
+355:    if config.launch_vllm_server:
+366:    if config.launch_vllm_server:
+367:        if not launch_vllm_server_process(config.model_name, config.vllm_port):
+369:            config.launch_vllm_server = False
+387:        if config.launch_vllm_server:
+484:            if config.launch_vllm_server:
+519:                    config.launch_vllm_server = False
+523:        if config.launch_vllm_server and vllm_process and vllm_process.poll() is not None:

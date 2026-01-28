@@ -1,0 +1,82 @@
+133-    )
+134-    tokenizer_name: str = Field(
+135-        default="NousResearch/DeepHermes-3-Llama-3-3B-Preview",
+136-        description="Hugging Face tokenizer to use.",
+137-    )
+138:    use_wandb: bool = Field(default=True, description="Whether to use wandb")
+139-    rollout_server_url: str = Field(
+140-        default="http://localhost:8000", description="URL of the rollout server"
+141-    )
+142-    total_steps: int = Field(default=1000, description="Total number of steps to run")
+143-    wandb_name: str | None = Field(
+--
+460-    async def setup(self):
+461-        """Setup the environment"""
+462-        raise NotImplementedError("Setup method must be implemented in subclass")
+463-
+464-    async def setup_wandb(self):
+465:        if self.config.use_wandb:
+466-            # Setup wandb getting the group and project via the server
+467-            while self.wandb_project is None:
+468-                async with aiohttp.ClientSession() as session:
+469-                    async with session.get(
+470-                        f"{self.config.rollout_server_url}/wandb_info"
+--
+669-            ).mean()
+670-        wandb_metrics = await self.create_rollout_table(wandb_metrics)
+671-        wandb_metrics = self.perf_stats(wandb_metrics)
+672-        self.rollouts_for_wandb = []
+673-        self.completion_lengths = []
+674:        if self.config.use_wandb:
+675-            if self.wandb_prepend is not None:
+676-                wandb_metrics = {
+677-                    f"{self.wandb_prepend}_{k}": v for k, v in wandb_metrics.items()
+678-                }
+679-            # add server metrics to wandb without prepend to collate them all
+--
+1244-                        self.running_items.pop(item_uuid)
+1245-                        # Do we want to retry? probably not...
+1246-                        # self.backlog.append(item["item"])
+1247-            await asyncio.sleep(0.1)
+1248-
+1249:    async def process_manager(self):
+1250-        """
+1251-        Process manager for running a specific number of groups
+1252-        """
+1253-        await self.setup()
+1254-
+1255:        if self.config.use_wandb:
+1256-            random_id = "".join(random.choices(string.ascii_lowercase, k=6))
+1257-            current_date = datetime.now().strftime("%Y-%m-%d")
+1258-            wandb_run_name = f"{self.name}-{current_date}-{random_id}"
+1259-            wandb.init(
+1260-                project=self.wandb_project,
+--
+1615-                env_config_dict_base["include_messages"] = True
+1616-                if env_config_dict_base.get("data_path_to_save_groups") is None:
+1617-                    env_config_dict_base["data_path_to_save_groups"] = (
+1618-                        f"data/{cls.name or 'groups'}.jsonl"
+1619-                    )
+1620:                env_config_dict_base["use_wandb"] = True
+1621-
+1622-                env_config_dict = merge_dicts(
+1623-                    env_config_dict_base,  # `config_init` defaults with process adjustments
+1624-                    yaml_config.get(ENV_NAMESPACE, {}),  # YAML config
+1625-                    extract_namespace(cli_passed_flags, env_full_prefix),  # CLI args
+--
+1776-                    f"writing to {env_config.data_path_to_save_groups}"
+1777-                )
+1778-                # Handle the case where we might already be in an event loop
+1779-                try:
+1780-                    loop = asyncio.get_running_loop()
+1781:                    task = loop.create_task(env.process_manager())
+1782-                    loop.run_until_complete(task)
+1783-                except RuntimeError:
+1784:                    asyncio.run(env.process_manager())
+1785-
+1786-        return CliProcessConfig
+1787-
+1788-    @classmethod
+1789-    def get_cli_evaluate_config_cls(cls) -> type:
+
+[Showing results with pagination = limit: 80, offset: 0]

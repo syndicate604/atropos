@@ -1,0 +1,16 @@
+552:        # Basic check if vLLM process terminated unexpectedly (outside interval check)
+553-        if vllm_process and vllm_process.poll() is not None:
+554-            print(
+555-                f"\n *** WARNING: vLLM process terminated unexpectedly (return code: {vllm_process.returncode}). ",
+556-                "Check vLLM logs. ***\n",
+557-            )
+558-            stderr_output = (
+559-                vllm_process.stderr.read().decode()
+560-                if vllm_process.stderr
+561-                else "No stderr"
+562-            )
+563-            print(f"vLLM stderr: {stderr_output}")
+564-            vllm_process = None  # Reset so it relaunches next interval
+565-
+566-    print("Training finished.")
+567-    # --- Wandb Finish ---

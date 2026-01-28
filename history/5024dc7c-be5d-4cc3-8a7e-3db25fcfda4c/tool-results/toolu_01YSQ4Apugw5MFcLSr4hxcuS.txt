@@ -1,0 +1,49 @@
+   195→                    else {}
+   196→                ),
+   197→                timeout=aiohttp.ClientTimeout(total=self.config.timeout),
+   198→            ) as response:
+   199→                response.raise_for_status()
+   200→                results = await response.json()
+   201→        output_tokens_list = []
+   202→        output_logprobs_list = []
+   203→        finish_reasons_list = []
+   204→        for output_token_logprobs, finish_reason in zip(
+   205→            results["logprobs"], results["finish_reasons"]
+   206→        ):
+   207→            logprobs = [
+   208→                list(item[0].values())[0] for item in output_token_logprobs
+   209→            ]  # Extract logprob from [{id: logprob}]
+   210→            output_ids = [
+   211→                int(list(item[0].keys())[0]) for item in output_token_logprobs
+   212→            ]  # Extract token ID from [{id: logprob}]
+   213→
+   214→            # Get finish reason
+   215→            finish_reason = finish_reason
+   216→
+   217→            output_tokens_list.append(output_ids)
+   218→            output_logprobs_list.append(logprobs)
+   219→            finish_reasons_list.append(finish_reason)
+   220→
+   221→        return (
+   222→            prompt_tokens,
+   223→            output_tokens_list,
+   224→            output_logprobs_list,
+   225→            finish_reasons_list,
+   226→        )
+   227→
+   228→
+   229→def resolve_openai_configs(
+   230→    default_server_configs,
+   231→    openai_config_dict,
+   232→    yaml_config,
+   233→    cli_passed_flags,
+   234→    logger,
+   235→):
+   236→    """
+   237→    Helper to resolve the final server_configs, handling single, multiple servers, and overrides.
+   238→    """
+   239→    from atroposlib.envs.server_handling.server_manager import ServerBaseline
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

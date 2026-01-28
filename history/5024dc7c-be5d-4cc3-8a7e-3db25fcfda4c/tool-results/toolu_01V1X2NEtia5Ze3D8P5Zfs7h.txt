@@ -1,0 +1,4 @@
+origin	git@github.com:RelayOne/hydra.git (fetch)
+origin	git@github.com:RelayOne/hydra.git (push)
+syndicate	git@github.com:syndicate604/atropos.git (fetch)
+syndicate	git@github.com:syndicate604/atropos.git (push)

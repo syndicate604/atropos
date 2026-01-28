@@ -1,0 +1,32 @@
+21:import wandb
+138:    use_wandb: bool = Field(default=True, description="Whether to use wandb")
+143:    wandb_name: str | None = Field(
+145:        description="Name to be grouped by in wandb",
+148:        default=32, description="Number of rollouts to display on wandb"
+250:        self.rollouts_for_wandb = []
+252:        self.wandb_project = None
+253:        self.wandb_group = None
+263:        self.wandb_prepend = None
+429:            self.wandb_prepend,
+446:            self.checkpoint_dir, "env_checkpoints", self.wandb_prepend
+453:            self.wandb_prepend,
+464:    async def setup_wandb(self):
+465:        if self.config.use_wandb:
+466:            # Setup wandb getting the group and project via the server
+467:            while self.wandb_project is None:
+470:                        f"{self.config.rollout_server_url}/wandb_info"
+473:                        self.wandb_group = data["group"]
+474:                        self.wandb_project = data["project"]
+476:                if self.wandb_project is None:
+480:                wandb_run_name = None
+481:                if self.config.wandb_name:
+484:                    wandb_run_name = (
+485:                        f"{self.config.wandb_name}-{current_date}-{random_id}"
+488:                wandb.init(
+489:                    name=wandb_run_name,
+490:                    project=self.wandb_project,
+491:                    group=self.wandb_group,
+507:                        "desired_name": self.config.wandb_name,
+530:            self.wandb_prepend = data["wandb_name"]
+
+[Showing results with pagination = limit: 30, offset: 0]

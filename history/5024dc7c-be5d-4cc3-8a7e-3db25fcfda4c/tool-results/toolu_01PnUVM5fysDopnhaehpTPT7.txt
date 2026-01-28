@@ -1,0 +1,30 @@
+    num_rollouts_to_keep=32,
+    num_rollouts_per_group_for_logging=1,
+    ensure_scores_are_not_same=False,
+    data_path_to_save_groups='/tmp/scr_100step_fixed.jsonl',
+    data_dir_to_save_evals=None,
+    min_items_sent_before_logging=2,
+    include_messages=True,
+    min_batch_allocation=None,
+    worker_timeout=600.0,
+    thinking_mode=False,
+    reasoning_effort=None,
+    max_reasoning_tokens=None,
+    custom_thinking_prompt=None
+)
+[
+    APIServerConfig(
+        timeout=1200,
+        num_max_requests_at_once=512,
+        num_requests_for_eval=32,
+        model_name='/root/models/Qwen2.5-7B-Instruct',
+        rolling_buffer_length=1000,
+        server_type='vllm',
+        api_key='x',
+        base_url='http://localhost:9004/v1',
+        n_kwarg_is_ignored=False,
+        health_check=True
+    )
+]
+/root/hydra/atroposlib/envs/base.py:896: UserWarning: Trainer requested to ignore max length by setting max_token_len to -1, ensure your trainer handles this appropriately.
+  warnings.warn(

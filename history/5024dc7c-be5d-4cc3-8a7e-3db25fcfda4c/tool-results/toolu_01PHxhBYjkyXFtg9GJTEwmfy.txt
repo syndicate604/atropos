@@ -1,0 +1,5 @@
+training-controller-1
+Linux training-controller-1 6.17.0-1005-gcp #5-Ubuntu SMP Sat Nov 22 06:06:50 UTC 2025 x86_64 GNU/Linux
+16
+Mem:            62Gi       1.1Gi        60Gi       1.0Mi       1.9Gi        61Gi
+Warning: Permanently added '35.222.9.121' (ED25519) to the list of known hosts.

@@ -1,0 +1,6 @@
+Exit code 1
+ERROR: (gcloud.compute.instances.add-access-config) Could not fetch resource:
+ - At most one access config currently supported.
+
+ERROR: (gcloud.compute.instances.set-machine-type) Could not fetch resource:
+ - Instances with guest accelerators do not support live migration.

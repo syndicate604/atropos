@@ -1,0 +1,84 @@
+   102→        timeout=10,
+   103→    )
+   104→
+   105→
+   106→@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=15))
+   107→def get_batch():
+   108→    data = requests.get("http://localhost:8000/batch", timeout=10).json()
+   109→    return data
+   110→
+   111→
+   112→def pad_data_to_good_offset(data, batch_size: int):
+   113→    max_token_len = max(
+   114→        [max([len(x) for x in item["tokens"]]) for item in data["batch"]]
+   115→    )
+   116→    # usually 64 is a good choice to ensure nonweird scaling behavior on GPUS
+   117→    # so we pad to the nearest multiple of 64
+   118→    good_multiple = 64
+   119→    if (max_token_len - 1) % (good_multiple) != 0:
+   120→        max_token_len = math.ceil((max_token_len - 1) / (good_multiple)) * good_multiple
+   121→        token_setup_len = (
+   122→            max_token_len + 1
+   123→        )  # add 1 so we can make it causal at the proper length
+   124→    else:
+   125→        token_setup_len = max_token_len
+   126→        max_token_len = (
+   127→            max_token_len - 1
+   128→        )  # since it's causal we need to remove the last bit...
+   129→    # pad all tokens to max_token_len and add to lists
+   130→    input_ids = list()
+   131→    labels = list()
+   132→    advantages = list()
+   133→    lengths = list()
+   134→    temperatures = list()
+   135→    for item in data["batch"]:
+   136→        scores = item["scores"]
+   137→        scores = np.array(scores)
+   138→        # check if we have more than 1 score...
+   139→        if len(scores) > 1:
+   140→            scores = scores - scores.mean()
+   141→            scores = scores / max(scores.std(), 1e-8)
+   142→        item["scores"] = scores
+   143→        if item["overrides"] is not None:
+   144→            for i in range(len(item["overrides"])):
+   145→                if item["overrides"][i].get("set_advantage_to_zero", False):
+   146→                    item["scores"][i] = 0
+   147→        for i in range(len(item["tokens"])):
+   148→            lengths.append(
+   149→                math.ceil((len(item["tokens"][i]) - 1) / (good_multiple))
+   150→                * good_multiple
+   151→            )
+   152→            label_item = np.concatenate(
+   153→                [
+   154→                    np.array(item["masks"][i]),
+   155→                    np.full(
+   156→                        max(0, token_setup_len - len(item["tokens"][i])),
+   157→                        -100,
+   158→                        dtype=np.int32,
+   159→                    ),
+   160→                ]
+   161→            )
+   162→            item["tokens"][i] = np.concatenate(
+   163→                [
+   164→                    np.array(item["tokens"][i]),
+   165→                    np.zeros(
+   166→                        max(0, token_setup_len - len(item["tokens"][i])), dtype=np.int32
+   167→                    ),
+   168→                ]
+   169→            )
+   170→            input_ids.append(item["tokens"][i][:-1])
+   171→            labels.append(label_item[1:])
+   172→            advantages.append(item["scores"][i])
+   173→            # per-sample override -> group generation_params -> group_overrides - > 1.0
+   174→            # need to update docs since this lets you set the temperature for each sample from the override
+   175→            t = 1.0
+   176→            if (
+   177→                item.get("overrides")
+   178→                and i < len(item["overrides"])
+   179→                and isinstance(item["overrides"][i], dict)
+   180→                and ("temperature" in item["overrides"][i])
+   181→            ):
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

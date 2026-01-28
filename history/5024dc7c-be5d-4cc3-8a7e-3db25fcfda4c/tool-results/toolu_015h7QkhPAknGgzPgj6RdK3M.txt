@@ -1,0 +1,318 @@
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Hit:1 http://us-central1.gce.archive.ubuntu.com/ubuntu questing InRelease
+Hit:2 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates InRelease
+Hit:3 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports InRelease
+Get:4 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main Icons (48x48) [86.8 kB]
+Get:5 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main Icons (64x64) [123 kB]
+Get:6 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main Icons (64x64@2) [21.8 kB]
+Get:7 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/universe Icons (48x48) [3735 kB]
+Get:8 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/universe Icons (64x64) [7632 kB]
+Hit:9 http://security.ubuntu.com/ubuntu questing-security InRelease
+Get:10 http://security.ubuntu.com/ubuntu questing-security/main Icons (48x48) [29 B]
+Get:11 http://security.ubuntu.com/ubuntu questing-security/main Icons (64x64) [29 B]
+Get:12 http://security.ubuntu.com/ubuntu questing-security/main Icons (64x64@2) [29 B]
+Get:13 http://security.ubuntu.com/ubuntu questing-security/universe Icons (48x48) [7080 B]
+Get:14 http://security.ubuntu.com/ubuntu questing-security/universe Icons (64x64) [11.3 kB]
+Get:15 http://security.ubuntu.com/ubuntu questing-security/universe Icons (64x64@2) [29 B]
+Get:16 http://security.ubuntu.com/ubuntu questing-security/restricted Icons (48x48) [29 B]
+Get:17 http://security.ubuntu.com/ubuntu questing-security/restricted Icons (64x64) [29 B]
+Get:18 http://security.ubuntu.com/ubuntu questing-security/restricted Icons (64x64@2) [29 B]
+Get:19 http://security.ubuntu.com/ubuntu questing-security/multiverse Icons (48x48) [29 B]
+Get:20 http://security.ubuntu.com/ubuntu questing-security/multiverse Icons (64x64) [29 B]
+Get:21 http://security.ubuntu.com/ubuntu questing-security/multiverse Icons (64x64@2) [29 B]
+Get:22 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/universe Icons (64x64@2) [102 kB]
+Get:23 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/restricted Icons (48x48) [29 B]
+Get:24 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/restricted Icons (64x64) [29 B]
+Get:25 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/restricted Icons (64x64@2) [29 B]
+Get:26 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/multiverse Icons (48x48) [64.4 kB]
+Get:27 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/multiverse Icons (64x64) [187 kB]
+Get:28 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/multiverse Icons (64x64@2) [904 B]
+Get:29 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/main Icons (48x48) [14.1 kB]
+Get:30 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/main Icons (64x64) [17.0 kB]
+Get:31 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/main Icons (64x64@2) [29 B]
+Get:32 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/universe Icons (48x48) [22.1 kB]
+Get:33 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/universe Icons (64x64) [33.2 kB]
+Get:34 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/universe Icons (64x64@2) [29 B]
+Get:35 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted Icons (48x48) [29 B]
+Get:36 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted Icons (64x64) [29 B]
+Get:37 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted Icons (64x64@2) [29 B]
+Get:38 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/multiverse Icons (48x48) [29 B]
+Get:39 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/multiverse Icons (64x64) [29 B]
+Get:40 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/multiverse Icons (64x64@2) [29 B]
+Get:41 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/main Icons (48x48) [29 B]
+Get:42 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/main Icons (64x64) [29 B]
+Get:43 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/main Icons (64x64@2) [29 B]
+Get:44 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/universe Icons (48x48) [29 B]
+Get:45 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/universe Icons (64x64) [29 B]
+Get:46 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/universe Icons (64x64@2) [29 B]
+Get:47 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/restricted Icons (48x48) [29 B]
+Get:48 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/restricted Icons (64x64) [29 B]
+Get:49 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/restricted Icons (64x64@2) [29 B]
+Get:50 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/multiverse Icons (48x48) [29 B]
+Get:51 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/multiverse Icons (64x64) [29 B]
+Get:52 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-backports/multiverse Icons (64x64@2) [29 B]
+Fetched 12.1 MB in 1s (9358 kB/s)
+Reading package lists...
+Building dependency tree...
+Reading state information...
+All packages are up to date.
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Solving dependencies...
+Installing:
+  nvidia-driver-550  nvidia-utils-550
+
+Installing dependencies:
+  dkms                      nvidia-dkms-580
+  libnvidia-cfg1-580        nvidia-driver-580
+  libnvidia-common-580      nvidia-firmware-580-580.126.09
+  libnvidia-compute-580     nvidia-kernel-common-580
+  libnvidia-decode-580      nvidia-kernel-source-580
+  libnvidia-egl-wayland1    nvidia-settings
+  libnvidia-encode-580      nvidia-utils-580
+  libnvidia-extra-580       pkg-config
+  libnvidia-fbc1-580        pkgconf
+  libnvidia-gl-580          pkgconf-bin
+  libpkgconf3               screen-resolution-extra
+  libxnvctrl0               xserver-xorg-video-nvidia-580
+  nvidia-compute-utils-580
+
+Suggested packages:
+  menu
+
+Recommended packages:
+  libnvidia-compute-580:i386  libnvidia-fbc1-580:i386
+  libnvidia-decode-580:i386   libnvidia-gl-580:i386
+  libnvidia-encode-580:i386
+
+Summary:
+  Upgrading: 0, Installing: 27, Removing: 0, Not Upgrading: 0
+  Download size: 399 MB
+  Space needed: 1153 MB / 1056 GB available
+
+Get:1 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 dkms all 3.2.0-1ubuntu1 [62.4 kB]
+Get:2 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 nvidia-firmware-580-580.126.09 amd64 580.126.09-0ubuntu0.25.10.1 [75.9 MB]
+Get:3 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 nvidia-kernel-common-580 amd64 580.126.09-0ubuntu0.25.10.1 [779 kB]
+Get:4 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-cfg1-580 amd64 580.126.09-0ubuntu0.25.10.1 [160 kB]
+Get:5 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-common-580 all 580.126.09-0ubuntu0.25.10.1 [18.7 kB]
+Get:6 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-compute-580 amd64 580.126.09-0ubuntu0.25.10.1 [59.2 MB]
+Get:7 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-decode-580 amd64 580.126.09-0ubuntu0.25.10.1 [3161 kB]
+Get:8 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 libnvidia-egl-wayland1 amd64 1:1.1.18-1 [34.0 kB]
+Get:9 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-encode-580 amd64 580.126.09-0ubuntu0.25.10.1 [115 kB]
+Get:10 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-extra-580 amd64 580.126.09-0ubuntu0.25.10.1 [78.1 kB]
+Get:11 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-fbc1-580 amd64 580.126.09-0ubuntu0.25.10.1 [94.2 kB]
+Get:12 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 libnvidia-gl-580 amd64 580.126.09-0ubuntu0.25.10.1 [172 MB]
+Get:13 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 libpkgconf3 amd64 1.8.1-4build1 [32.8 kB]
+Get:14 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 libxnvctrl0 amd64 510.47.03-0ubuntu4 [12.6 kB]
+Get:15 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 nvidia-compute-utils-580 amd64 580.126.09-0ubuntu0.25.10.1 [130 kB]
+Get:16 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 nvidia-kernel-source-580 amd64 580.126.09-0ubuntu0.25.10.1 [83.8 MB]
+Get:17 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 nvidia-dkms-580 amd64 580.126.09-0ubuntu0.25.10.1 [38.8 kB]
+Get:18 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 nvidia-utils-580 amd64 580.126.09-0ubuntu0.25.10.1 [599 kB]
+Get:19 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 xserver-xorg-video-nvidia-580 amd64 580.126.09-0ubuntu0.25.10.1 [1781 kB]
+Get:20 http://us-central1.gce.archive.ubuntu.com/ubuntu questing-updates/restricted amd64 nvidia-driver-580 amd64 580.126.09-0ubuntu0.25.10.1 [508 kB]
+Get:21 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/multiverse amd64 nvidia-driver-550 amd64 550.107.02-0ubuntu3 [11.1 kB]
+Get:22 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 pkgconf-bin amd64 1.8.1-4build1 [21.7 kB]
+Get:23 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 pkgconf amd64 1.8.1-4build1 [16.8 kB]
+Get:24 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 pkg-config amd64 1.8.1-4build1 [7494 B]
+Get:25 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 screen-resolution-extra all 0.18.5 [4334 B]
+Get:26 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/main amd64 nvidia-settings amd64 510.47.03-0ubuntu4 [898 kB]
+Get:27 http://us-central1.gce.archive.ubuntu.com/ubuntu questing/multiverse amd64 nvidia-utils-550 amd64 550.107.02-0ubuntu3 [11.1 kB]
+debconf: unable to initialize frontend: Dialog
+debconf: (Dialog frontend will not work on a dumb terminal, an emacs shell buffer, or without a controlling terminal.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+debconf: unable to initialize frontend: Teletype
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Noninteractive
+Fetched 399 MB in 7s (56.6 MB/s)
+Selecting previously unselected package dkms.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 282058 files and directories currently installed.)
+Preparing to unpack .../00-dkms_3.2.0-1ubuntu1_all.deb ...
+Unpacking dkms (3.2.0-1ubuntu1) ...
+Selecting previously unselected package nvidia-firmware-580-580.126.09.
+Preparing to unpack .../01-nvidia-firmware-580-580.126.09_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking nvidia-firmware-580-580.126.09 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package nvidia-kernel-common-580.
+Preparing to unpack .../02-nvidia-kernel-common-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking nvidia-kernel-common-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-cfg1-580:amd64.
+Preparing to unpack .../03-libnvidia-cfg1-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking libnvidia-cfg1-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-common-580.
+Preparing to unpack .../04-libnvidia-common-580_580.126.09-0ubuntu0.25.10.1_all.deb ...
+Unpacking libnvidia-common-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-compute-580:amd64.
+Preparing to unpack .../05-libnvidia-compute-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking libnvidia-compute-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-decode-580:amd64.
+Preparing to unpack .../06-libnvidia-decode-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking libnvidia-decode-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-egl-wayland1:amd64.
+Preparing to unpack .../07-libnvidia-egl-wayland1_1%3a1.1.18-1_amd64.deb ...
+Unpacking libnvidia-egl-wayland1:amd64 (1:1.1.18-1) ...
+Selecting previously unselected package libnvidia-encode-580:amd64.
+Preparing to unpack .../08-libnvidia-encode-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking libnvidia-encode-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-extra-580:amd64.
+Preparing to unpack .../09-libnvidia-extra-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking libnvidia-extra-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-fbc1-580:amd64.
+Preparing to unpack .../10-libnvidia-fbc1-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking libnvidia-fbc1-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libnvidia-gl-580:amd64.
+Preparing to unpack .../11-libnvidia-gl-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+dpkg-query: no packages found matching libnvidia-gl-550
+Unpacking libnvidia-gl-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package libpkgconf3:amd64.
+Preparing to unpack .../12-libpkgconf3_1.8.1-4build1_amd64.deb ...
+Unpacking libpkgconf3:amd64 (1.8.1-4build1) ...
+Selecting previously unselected package libxnvctrl0:amd64.
+Preparing to unpack .../13-libxnvctrl0_510.47.03-0ubuntu4_amd64.deb ...
+Unpacking libxnvctrl0:amd64 (510.47.03-0ubuntu4) ...
+Selecting previously unselected package nvidia-compute-utils-580.
+Preparing to unpack .../14-nvidia-compute-utils-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking nvidia-compute-utils-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package nvidia-kernel-source-580.
+Preparing to unpack .../15-nvidia-kernel-source-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking nvidia-kernel-source-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package nvidia-dkms-580.
+Preparing to unpack .../16-nvidia-dkms-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking nvidia-dkms-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package nvidia-utils-580.
+Preparing to unpack .../17-nvidia-utils-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking nvidia-utils-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package xserver-xorg-video-nvidia-580.
+Preparing to unpack .../18-xserver-xorg-video-nvidia-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking xserver-xorg-video-nvidia-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package nvidia-driver-580.
+Preparing to unpack .../19-nvidia-driver-580_580.126.09-0ubuntu0.25.10.1_amd64.deb ...
+Unpacking nvidia-driver-580 (580.126.09-0ubuntu0.25.10.1) ...
+Selecting previously unselected package nvidia-driver-550.
+Preparing to unpack .../20-nvidia-driver-550_550.107.02-0ubuntu3_amd64.deb ...
+Unpacking nvidia-driver-550 (550.107.02-0ubuntu3) ...
+Selecting previously unselected package pkgconf-bin.
+Preparing to unpack .../21-pkgconf-bin_1.8.1-4build1_amd64.deb ...
+Unpacking pkgconf-bin (1.8.1-4build1) ...
+Selecting previously unselected package pkgconf:amd64.
+Preparing to unpack .../22-pkgconf_1.8.1-4build1_amd64.deb ...
+Unpacking pkgconf:amd64 (1.8.1-4build1) ...
+Selecting previously unselected package pkg-config:amd64.
+Preparing to unpack .../23-pkg-config_1.8.1-4build1_amd64.deb ...
+Unpacking pkg-config:amd64 (1.8.1-4build1) ...
+Selecting previously unselected package screen-resolution-extra.
+Preparing to unpack .../24-screen-resolution-extra_0.18.5_all.deb ...
+Unpacking screen-resolution-extra (0.18.5) ...
+Selecting previously unselected package nvidia-settings.
+Preparing to unpack .../25-nvidia-settings_510.47.03-0ubuntu4_amd64.deb ...
+Unpacking nvidia-settings (510.47.03-0ubuntu4) ...
+Selecting previously unselected package nvidia-utils-550.
+Preparing to unpack .../26-nvidia-utils-550_550.107.02-0ubuntu3_amd64.deb ...
+Unpacking nvidia-utils-550 (550.107.02-0ubuntu3) ...
+Setting up nvidia-firmware-580-580.126.09 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up nvidia-kernel-source-580 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up dkms (3.2.0-1ubuntu1) ...
+Created symlink '/etc/systemd/system/multi-user.target.wants/dkms.service' → '/usr/lib/systemd/system/dkms.service'.
+Setting up libxnvctrl0:amd64 (510.47.03-0ubuntu4) ...
+Setting up libnvidia-egl-wayland1:amd64 (1:1.1.18-1) ...
+Setting up nvidia-kernel-common-580 (580.126.09-0ubuntu0.25.10.1) ...
+update-initramfs: deferring update (trigger activated)
+Created symlink '/etc/systemd/system/systemd-hibernate.service.wants/nvidia-hibernate.service' → '/usr/lib/systemd/system/nvidia-hibernate.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/nvidia-powerd.service' → '/usr/lib/systemd/system/nvidia-powerd.service'.
+Created symlink '/etc/systemd/system/systemd-suspend.service.wants/nvidia-resume.service' → '/usr/lib/systemd/system/nvidia-resume.service'.
+Created symlink '/etc/systemd/system/systemd-hibernate.service.wants/nvidia-resume.service' → '/usr/lib/systemd/system/nvidia-resume.service'.
+Created symlink '/etc/systemd/system/systemd-suspend-then-hibernate.service.wants/nvidia-resume.service' → '/usr/lib/systemd/system/nvidia-resume.service'.
+Created symlink '/etc/systemd/system/systemd-suspend.service.wants/nvidia-suspend.service' → '/usr/lib/systemd/system/nvidia-suspend.service'.
+Setting up libnvidia-extra-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up libpkgconf3:amd64 (1.8.1-4build1) ...
+Setting up libnvidia-common-580 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up pkgconf-bin (1.8.1-4build1) ...
+Setting up nvidia-dkms-580 (580.126.09-0ubuntu0.25.10.1) ...
+update-initramfs: deferring update (trigger activated)
+INFO:Enable nvidia
+DEBUG:Parsing /usr/share/ubuntu-drivers-common/quirks/dell_latitude
+DEBUG:Parsing /usr/share/ubuntu-drivers-common/quirks/lenovo_thinkpad
+DEBUG:Parsing /usr/share/ubuntu-drivers-common/quirks/put_your_quirks_here
+Loading new nvidia/580.126.09 DKMS files...
+Building for 6.17.0-1005-gcp
+Building for architecture x86_64
+
+Building initial module nvidia/580.126.09 for 6.17.0-1005-gcp
+Sign command: /usr/bin/kmodsign
+Certificate or key are missing, generating them using update-secureboot-policy...
+debconf: unable to initialize frontend: Dialog
+debconf: (Dialog frontend will not work on a dumb terminal, an emacs shell buffer, or without a controlling terminal.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+debconf: unable to initialize frontend: Teletype
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Noninteractive
+Secure Boot not enabled on this system.
+Signing key: /var/lib/shim-signed/mok/MOK.priv
+Public certificate (MOK): /var/lib/shim-signed/mok/MOK.der
+
+Building module(s)................. done.
+Signing module /var/lib/dkms/nvidia/580.126.09/build/nvidia.ko
+Signing module /var/lib/dkms/nvidia/580.126.09/build/nvidia-modeset.ko
+Signing module /var/lib/dkms/nvidia/580.126.09/build/nvidia-drm.ko
+Signing module /var/lib/dkms/nvidia/580.126.09/build/nvidia-uvm.ko
+Signing module /var/lib/dkms/nvidia/580.126.09/build/nvidia-peermem.ko
+Installing /lib/modules/6.17.0-1005-gcp/updates/dkms/nvidia.ko.zst
+Installing /lib/modules/6.17.0-1005-gcp/updates/dkms/nvidia-modeset.ko.zst
+Installing /lib/modules/6.17.0-1005-gcp/updates/dkms/nvidia-drm.ko.zst
+Installing /lib/modules/6.17.0-1005-gcp/updates/dkms/nvidia-uvm.ko.zst
+Installing /lib/modules/6.17.0-1005-gcp/updates/dkms/nvidia-peermem.ko.zst
+Running depmod..... done.
+Setting up screen-resolution-extra (0.18.5) ...
+Setting up libnvidia-cfg1-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up xserver-xorg-video-nvidia-580 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up libnvidia-compute-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up libnvidia-fbc1-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up nvidia-compute-utils-580 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up pkgconf:amd64 (1.8.1-4build1) ...
+Setting up pkg-config:amd64 (1.8.1-4build1) ...
+Setting up libnvidia-gl-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up libnvidia-decode-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up nvidia-settings (510.47.03-0ubuntu4) ...
+Setting up nvidia-utils-580 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up libnvidia-encode-580:amd64 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up nvidia-utils-550 (550.107.02-0ubuntu3) ...
+Setting up nvidia-driver-580 (580.126.09-0ubuntu0.25.10.1) ...
+Setting up nvidia-driver-550 (550.107.02-0ubuntu3) ...
+Processing triggers for desktop-file-utils (0.28-1) ...
+Processing triggers for initramfs-tools (0.150ubuntu3.1) ...
+update-initramfs: Generating /boot/initrd.img-6.17.0-1005-gcp
+Processing triggers for gnome-menus (3.36.0-3ubuntu2) ...
+Processing triggers for mate-menus (1.26.1-1build3) ...
+Processing triggers for libc-bin (2.42-0ubuntu3) ...
+Processing triggers for man-db (2.13.1-1) ...
+Processing triggers for dbus (1.16.2-2ubuntu2) ...
+Processing triggers for bamfdaemon (0.5.6+22.04.20220217-0ubuntu5) ...
+Rebuilding /usr/share/applications/bamf-2.index...
+debconf: unable to initialize frontend: Dialog
+debconf: (Dialog frontend will not work on a dumb terminal, an emacs shell buffer, or without a controlling terminal.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+debconf: unable to initialize frontend: Teletype
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Noninteractive
+
+Running kernel seems to be up-to-date.
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.

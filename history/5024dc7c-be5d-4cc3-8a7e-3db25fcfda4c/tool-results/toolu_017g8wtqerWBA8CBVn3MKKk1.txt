@@ -1,0 +1,74 @@
+   293→    # Setup optimizer
+   294→    optimizer = AdamW(model.parameters(), lr=config.lr)
+   295→
+   296→    print(
+   297→        f"Starting training for {config.training_steps} steps on device: {config.device}"
+   298→    )
+   299→    print(
+   300→        f"vLLM will be restarted every {config.vllm_restart_interval} steps on port {config.vllm_port}"
+   301→    )
+   302→
+   303→    os.makedirs(config.save_path, exist_ok=True)  # Ensure base save directory exists
+   304→    register_trainer(config)
+   305→
+   306→    # Init vllm
+   307→    vllm_command = [
+   308→        "python",
+   309→        "-m",
+   310→        "vllm.entrypoints.openai.api_server",
+   311→        "--model",
+   312→        config.model_name,
+   313→        "--port",
+   314→        str(config.vllm_port),
+   315→        "--dtype",
+   316→        "auto",
+   317→        "--gpu-memory-utilization",
+   318→        "0.45",
+   319→        "--disable-log-requests",
+   320→    ]
+   321→    print(f"  Launching vLLM server: {' '.join(vllm_command)}")
+   322→    try:
+   323→        vllm_process = subprocess.Popen(vllm_command)
+   324→        print(f"  vLLM server launched with PID: {vllm_process.pid}")
+   325→        # Check immediate errors
+   326→        try:
+   327→            stdout, stderr = vllm_process.communicate(timeout=2)
+   328→            if vllm_process.returncode is not None and vllm_process.returncode != 0:
+   329→                print(f"  Error starting vLLM: {stderr.decode()}")
+   330→                vllm_process = None
+   331→                # Maybe raise error or just warn?
+   332→                print("  WARNING: Failed to start vLLM server after checkpoint.")
+   333→        except subprocess.TimeoutExpired:
+   334→            print("  vLLM process started (check logs for details).")
+   335→    except FileNotFoundError:
+   336→        print(
+   337→            "\n *** ERROR: 'python -m vllm...' command not found. Make sure vLLM is installed and accessible. ***\n"
+   338→        )
+   339→        # Potentially stop training or just disable further vLLM restarts
+   340→        print("  Disabling further vLLM restarts.")
+   341→        config.vllm_restart_interval = (
+   342→            config.training_steps + 1
+   343→        )  # Prevent further restarts
+   344→    except Exception as e:
+   345→        print(f"\n *** ERROR: Failed to launch vLLM: {e} ***\n")
+   346→        print("  Disabling further vLLM restarts.")
+   347→        config.vllm_restart_interval = (
+   348→            config.training_steps + 1
+   349→        )  # Prevent further restarts
+   350→
+   351→    batches = list()
+   352→    for step in range(config.training_steps):
+   353→        total_loss = 0
+   354→        print(f"Step {step+1}/{config.training_steps}")
+   355→        total_pos_logp = 0
+   356→        total_neg_logp = 0
+   357→        total_logp = 0
+   358→        total_pos = 0
+   359→        total_neg = 0
+   360→        if len(batches) == 0:
+   361→            batches = get_data(config.batch_size, config.seq_len)
+   362→        token_batches, label_batches, advantage_batches, temperature_batches = (
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

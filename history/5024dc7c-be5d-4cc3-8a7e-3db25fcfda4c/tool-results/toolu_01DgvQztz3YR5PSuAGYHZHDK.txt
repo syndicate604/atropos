@@ -1,0 +1,4 @@
+[hydra 6b6b6ba] Fix path normalization: strip workspace/ prefix, patches are applied in workspace dir
+ 1 file changed, 22 insertions(+), 12 deletions(-)
+To github.com:RelayOne/hydra.git
+   659d971..6b6b6ba  hydra -> hydra

@@ -1,0 +1,4 @@
+origin	git@github.com:syndicate604/atropos.git (fetch)
+origin	git@github.com:syndicate604/atropos.git (push)
+upstream	git@github.com:NousResearch/atropos.git (fetch)
+upstream	git@github.com:NousResearch/atropos.git (push)

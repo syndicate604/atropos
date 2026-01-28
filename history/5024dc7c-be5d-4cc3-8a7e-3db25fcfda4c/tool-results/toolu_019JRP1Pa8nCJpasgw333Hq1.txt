@@ -1,0 +1,54 @@
+The file /home/bron/projects/atropos/README.md has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→# HYDRA - Security-Focused LLM Specialists
+     2→
+     3→**Hybrid Universal Dynamic Reinforcement Adversaries**
+     4→
+     5→> Built on [Atropos](https://github.com/NousResearch/atropos) | Integrated with [RelayOne](https://github.com/RelayOne/mvp)
+     6→
+     7→---
+     8→
+     9→## What is HYDRA?
+    10→
+    11→HYDRA is a **continuous specialization flywheel** for building security-focused LLM specialists that outperform frontier models on narrow, operational tasks.
+    12→
+    13→**Core Insight:** You don't beat frontier models by training once—you build a continuous improvement loop:
+    14→1. Frontier models as **teachers** (selectively)
+    15→2. **Verifiable, domain-specific data** that general models don't have
+    16→3. **Regular refresh cycles** (weekly/monthly)
+    17→4. **Eval-driven routing** between specialist and frontier
+    18→
+    19→### Target Products
+    20→
+    21→| Product | Target Users | Key Tasks |
+    22→|---------|--------------|-----------|
+    23→| **Detection Engineer** | SOC analysts, threat hunters | Sigma/YARA rules, alert triage, IOC extraction |
+    24→| **Secure Code Review** | AppSec, DevSecOps | Vulnerability patches, security review, CI copilot |
+    25→| **CTF Operator** | Red teams, pentesters | Attack chains, exploit dev (sandboxed, audited) |
+    26→
+    27→### Architecture
+    28→
+    29→```
+    30→┌─────────────────────────────────────────────────────────────┐
+    31→│                 CONTINUOUS SPECIALIZATION FLYWHEEL           │
+    32→├─────────────────────────────────────────────────────────────┤
+    33→│  FRONTIER TEACHER    → Generate hard scenarios, adjudicate  │
+    34→│  VERIFIER LAYER      → Sandboxes, static analysis, tests    │
+    35→│  SPECIALIST MODELS   → Trained LoRA products                │
+    36→│  ROUTER (RelayOne)   → Confidence-based specialist/frontier │
+    37→│  FEEDBACK LOOP       → Mine failures → retrain → ship       │
+    38→└─────────────────────────────────────────────────────────────┘
+    39→```
+    40→
+    41→**The moat isn't smarter weights—it's better verifiers + domain-specific data + faster iteration.**
+    42→
+    43→See [HYDRA Vision & Architecture](docs/Plans/01_HYDRA_Vision_and_Architecture.md) for full details.
+    44→
+    45→---
+    46→
+    47→## Training Platform: Atropos
+    48→
+    49→![newatr-02](banner-image.jpg)
+    50→
+    51→<div align="center">
+    52→
+    53→*In Greek mythology, Atropos was the eldest of the three Fates.  While her sisters spun and measured the threads of mortal lives, Atropos alone held the shears that would cut these threads, determining the final destiny of each soul. Just as Atropos guided souls to their ultimate fate, this system guides language models toward their optimal potential through reinforcement learning.*

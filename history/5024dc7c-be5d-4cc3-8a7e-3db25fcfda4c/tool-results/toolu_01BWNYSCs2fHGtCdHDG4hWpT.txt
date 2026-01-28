@@ -1,0 +1,64 @@
+  1249→    async def process_manager(self):
+  1250→        """
+  1251→        Process manager for running a specific number of groups
+  1252→        """
+  1253→        await self.setup()
+  1254→
+  1255→        if self.config.use_wandb:
+  1256→            random_id = "".join(random.choices(string.ascii_lowercase, k=6))
+  1257→            current_date = datetime.now().strftime("%Y-%m-%d")
+  1258→            wandb_run_name = f"{self.name}-{current_date}-{random_id}"
+  1259→            wandb.init(
+  1260→                project=self.wandb_project,
+  1261→                name=wandb_run_name,
+  1262→                group=self.wandb_group,
+  1263→                config=self.config.model_dump(),
+  1264→            )
+  1265→
+  1266→        # Initialize the processing
+  1267→        self.curr_step = 0
+  1268→
+  1269→        print(f"Starting to process {self.n_groups_to_process} groups...")
+  1270→
+  1271→        # Process the required number of groups
+  1272→        while self.curr_step < self.n_groups_to_process:
+  1273→            # Get an item to process
+  1274→            item = await self.get_next_item()
+  1275→            if item is None:
+  1276→                print("No more items to process")
+  1277→                break
+  1278→
+  1279→            # Process the group
+  1280→            print(f"Processing group {self.curr_step + 1}/{self.n_groups_to_process}")
+  1281→
+  1282→            # Collect trajectories with the specified group size
+  1283→            # Override the group_size temporarily
+  1284→            self.config.group_size = self.group_size_to_process
+  1285→
+  1286→            # Collect and process the trajectories
+  1287→            to_postprocess, _ = await self.collect_trajectories(item)
+  1288→
+  1289→            if to_postprocess:
+  1290→                # Post-process the trajectories
+  1291→                processed_data = await self.postprocess_histories(to_postprocess)
+  1292→
+  1293→                # Save to output file (don't send to API)
+  1294→                await self.handle_send_to_api(
+  1295→                    processed_data,
+  1296→                    item,
+  1297→                    do_send_to_api=False,
+  1298→                    abort_on_any_max_length_exceeded=False,
+  1299→                )
+  1300→                await self.wandb_log()
+  1301→
+  1302→                self.curr_step += 1
+  1303→                print(
+  1304→                    f"Successfully processed group {self.curr_step}/{self.n_groups_to_process}"
+  1305→                )
+  1306→            else:
+  1307→                print("Failed to process group, retrying...")
+  1308→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

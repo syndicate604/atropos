@@ -1,0 +1,5 @@
+Starting instance(s) training-controller-1...
+....................................................................done.
+Updated [https://compute.googleapis.com/compute/v1/projects/balmy-ocean-449223-v9/zones/us-central1-c/instances/training-controller-1].
+Instance internal IP is 10.128.0.77
+Instance external IP is 35.222.9.121

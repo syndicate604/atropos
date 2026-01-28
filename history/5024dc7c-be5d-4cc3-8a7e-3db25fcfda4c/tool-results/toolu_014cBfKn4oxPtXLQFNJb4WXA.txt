@@ -1,0 +1,54 @@
+   260→        else:
+   261→            if not config.wandb_group:
+   262→                # Set group to random 8 character string
+   263→                config.wandb_group = "".join(
+   264→                    random.choices(string.ascii_letters + string.digits, k=8)
+   265→                )
+   266→            try:
+   267→                wandb.init(
+   268→                    project=config.wandb_project,
+   269→                    group=config.wandb_group,
+   270→                    config=config.dict(),  # Log config parameters
+   271→                )
+   272→                print(
+   273→                    f"Wandb logging enabled. Run: {wandb.run.name} (Project: {config.wandb_project}) "
+   274→                )
+   275→            except Exception as e:
+   276→                print(f"Error initializing wandb: {e}. Disabling wandb.")
+   277→                config.use_wandb = False
+   278→    # --- End Wandb Setup ---
+   279→
+   280→    # Initialize model and tokenizer
+   281→    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+   282→    model = AutoModelForCausalLM.from_pretrained(
+   283→        config.model_name, torch_dtype=torch.bfloat16
+   284→    )
+   285→
+   286→    model.to(config.device)
+   287→    model.gradient_checkpointing_enable()
+   288→    model.train()
+   289→
+   290→    # Setup optimizer
+   291→    optimizer = AdamW(model.parameters(), lr=config.lr)
+   292→
+   293→    print(
+   294→        f"Starting training for {config.training_steps} steps on device: {config.device}"
+   295→    )
+   296→    print(
+   297→        f"vLLM will be restarted every {config.vllm_restart_interval} steps on port {config.vllm_port}"
+   298→    )
+   299→
+   300→    os.makedirs(config.save_path, exist_ok=True)  # Ensure base save directory exists
+   301→    register_trainer(config)
+   302→
+   303→    # Init vllm
+   304→    vllm_command = [
+   305→        "python",
+   306→        "-m",
+   307→        "vllm.entrypoints.openai.api_server",
+   308→        "--model",
+   309→        config.model_name,
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

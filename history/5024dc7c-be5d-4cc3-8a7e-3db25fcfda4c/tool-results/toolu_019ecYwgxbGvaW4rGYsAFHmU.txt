@@ -1,0 +1,31 @@
+507684
+    exit_code = exception_handler(e)
+  File "/root/hydra/atroposlib/envs/base.py", line 1347, in custom_error_handler
+    raise ex
+  File "/usr/local/lib/python3.10/dist-packages/pydantic_cli/__init__.py", line 364, in _runner
+    out = cmd.run()
+  File "/root/hydra/atroposlib/envs/base.py", line 1514, in run
+    asyncio.run(env.env_manager())
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/root/hydra/atroposlib/envs/base.py", line 1169, in env_manager
+    await self.setup_wandb()
+  File "/root/hydra/atroposlib/envs/base.py", line 488, in setup_wandb
+    wandb.init(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_init.py", line 1597, in init
+    get_sentry().reraise(e)
+  File "/usr/local/lib/python3.10/dist-packages/wandb/analytics/sentry.py", line 190, in reraise
+    raise exc.with_traceback(tb)
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_init.py", line 1518, in init
+    wi.maybe_login(init_settings)
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_init.py", line 196, in maybe_login
+    wandb_login._login(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_login.py", line 190, in _login
+    auth = _find_or_prompt_for_key(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/wandb_login.py", line 266, in _find_or_prompt_for_key
+    auth = wbauth.authenticate_session(
+  File "/usr/local/lib/python3.10/dist-packages/wandb/sdk/lib/wbauth/authenticate.py", line 138, in authenticate_session
+    raise UsageError(
+wandb.errors.errors.UsageError: No API key configured. Use `wandb login` to log in.

@@ -1,0 +1,10 @@
+total 1448
+drwxrwxr-x  21 bron bron     4096 Jan 15 09:54 .
+drwxrwxr-x 115 bron docker   4096 Jan 15 09:53 ..
+drwxrwxr-x  18 bron bron     4096 Jan 15 09:54 apps
+-rw-rw-r--   1 bron bron    29746 Jan 15 09:54 ARCHITECTURE.md
+drwxrwxr-x  37 bron bron     4096 Jan 15 09:54 .backups
+drwxrwxr-x   5 bron bron     4096 Jan 15 09:54 backups
+-rw-rw-r--   1 bron bron    11584 Jan 15 09:54 BILLING_LEDGER_TESTS_SUMMARY.md
+-rw-rw-r--   1 bron bron     6252 Jan 15 09:54 BLOG_IMPLEMENTATION_SUMMARY.md
+-rw-rw-r--   1 bron bron     8888 Jan 15 09:54 CASE_STUDIES_IMPLEMENTATION_LOG.md

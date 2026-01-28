@@ -1,0 +1,5 @@
+Exit code 1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+Error: Failed to get process executable name. Check that the process is running.
+Reason: No such file or directory (os error 2)
+Reason: No such file or directory (os error 2)

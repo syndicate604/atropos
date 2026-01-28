@@ -1,0 +1,19 @@
+CODE_OF_CONDUCT.md
+CONFIG.md
+CONTRIBUTING.md
+Initial_Ideas.md
+LICENSE
+README.md
+SLURM.md
+atroposlib
+banner-image.jpg
+docs
+environments
+example_trainer
+helpers
+llms.txt
+pyproject.toml
+pytest.ini
+requirements.txt
+test_run.sh
+Cloning into 'hydra'...

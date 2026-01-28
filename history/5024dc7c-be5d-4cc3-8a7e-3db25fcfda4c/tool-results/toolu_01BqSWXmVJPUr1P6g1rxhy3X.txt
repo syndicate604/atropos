@@ -1,0 +1,6 @@
+remote: 
+remote: Create a pull request for 'main' on GitHub by visiting:        
+remote:      https://github.com/RelayOne/hydra/pull/new/main        
+remote: 
+To github.com:RelayOne/hydra.git
+ * [new branch]      main -> main
