@@ -786,7 +786,7 @@ if __name__ == "__main__":
     # Replace "gpt2" with your desired model
     training_config = TrainingConfig(
         model_name="/root/models/Qwen2.5-7B-Instruct",
-        training_steps=25,  # Debug run - start small to detect issues early
+        training_steps=200,  # Full training run
         batch_size=1,  # Reduced from 2 to avoid OOM
         seq_len=1024,  # Increased to 1024 for better patch generation - hard-capped in pad_data_to_good_offset
         optimizer="paged_adamw8bit",  # Avoid OOM at optimizer.step() for 7B full-parameter training
