@@ -4,7 +4,7 @@ set -euo pipefail
 # One-button training script: starts API, serve, and GRPO training
 # Usage: ./run_train.sh [max_token_length] [total_steps]
 
-MAX_TOKEN_LENGTH="${1:-512}"
+MAX_TOKEN_LENGTH="${1:-4096}"
 TOTAL_STEPS="${2:-1000}"
 
 echo "========================================"

@@ -4,7 +4,7 @@
 # Example: ./run_serve.sh 512 1000
 
 # Default values
-MAX_TOKEN_LENGTH=${1:-512}
+MAX_TOKEN_LENGTH=${1:-4096}
 TOTAL_STEPS=${2:-1000}
 
 # Validate inputs
