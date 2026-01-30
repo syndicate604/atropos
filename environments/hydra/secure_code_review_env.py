@@ -419,36 +419,6 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         "unknown": -0.8,
     }
 
-    def _collapse_noop_edits(self, lines: List[str]) -> List[str]:
-        """
-        Collapse no-op edits where a line is removed and added with identical content.
-
-        Converts:
-            -@app.route("/foo")
-            +@app.route("/foo")
-        Into:
-             @app.route("/foo")  (context line)
-
-        This handles models emitting unchanged lines as both - and + in diffs.
-        """
-        out = []
-        i = 0
-        while i < len(lines):
-            # Check if this is a -/+ pair with identical content
-            if (
-                i + 1 < len(lines)
-                and lines[i].startswith("-")
-                and lines[i + 1].startswith("+")
-                and lines[i][1:] == lines[i + 1][1:]  # Content after -/+ is identical
-            ):
-                # Convert to context line (space prefix)
-                out.append(" " + lines[i][1:])
-                i += 2  # Skip both lines
-                continue
-            out.append(lines[i])
-            i += 1
-        return out
-
     def _sanitize_diff_text(self, diff_text: str) -> Tuple[str, Optional[str]]:
         """
         Sanitize diff text before applying patch.
@@ -472,9 +442,9 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         # Remove any line that starts with ``` (after stripping whitespace)
         lines = [line for line in lines if not line.strip().startswith("```")]
 
-        # Collapse no-op edits: -LINE followed by +LINE (identical) → context line
-        # This handles model emitting unchanged lines as both removed and added
-        lines = self._collapse_noop_edits(lines)
+        # NOTE: We do NOT collapse no-op -/+ pairs here because it breaks hunk headers
+        # (line counts become incorrect). Instead, we rely on prompt constraints to
+        # prevent the model from emitting them in the first place.
 
         # Drop trailing blank lines
         while lines and not lines[-1].strip():
