@@ -56,17 +56,13 @@ RULES:
 - Each line MUST start with: space, +, -, or @@
 - NO explanations, NO prose, NO comments outside the diff
 
-CRITICAL CONSTRAINTS - DO NOT:
-- Change @app.route() paths or add new routes
-- Change function names or signatures
-- Change response JSON schema keys
-- Add endpoints, refactor, or reorder unrelated code
-- Add "FIXED:" comments or marker docstrings
-- Redesign the API when a simple fix will work
-
-REQUIREMENTS:
+CRITICAL CONSTRAINTS:
 - Make the SMALLEST change that fixes the vulnerability
+- Do not modify route decorators, function signatures, or response schemas unless the vulnerability fix requires it
+- If a line is unchanged, include it ONLY as context ( ), NEVER as both - and +
+- Never output the same unchanged line as both a removed line and an added line
 - Hunk context lines (space prefix) must be copied EXACTLY from the provided code
+- Do NOT add "FIXED:" comments or marker docstrings
 - Do NOT invent or paraphrase lines - only modify lines that exist verbatim in the file
 
 EXAMPLE - Fixing SQL injection (CWE-89) in {target_file}:
@@ -225,8 +221,8 @@ class SecureCodeReviewEnv(BaseEnv):
         # Task-specific hints (minimal, non-spoiler)
         hints = {
             'cmd-001': 'For command injection: remove shell=True and pass arguments as a list.',
-            'xss-001': 'In Flask/Jinja: use `from markupsafe import escape` and escape on render.',
-            'xss-002': 'In Flask/Jinja: use `from markupsafe import escape` and escape on render.',
+            'xss-001': 'For XSS: Add `from markupsafe import escape` import at top, then use escape(...) when inserting user input into HTML.',
+            'xss-002': 'For XSS: Add `from markupsafe import escape` import at top, then use escape(...) when inserting user input into HTML.',
             'path-001': 'For path traversal: use os.path.basename() to reject directory separators.',
             'idor-001': 'For broken access control: add authorization check comparing user IDs.',
         }
@@ -423,6 +419,36 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         "unknown": -0.8,
     }
 
+    def _collapse_noop_edits(self, lines: List[str]) -> List[str]:
+        """
+        Collapse no-op edits where a line is removed and added with identical content.
+
+        Converts:
+            -@app.route("/foo")
+            +@app.route("/foo")
+        Into:
+             @app.route("/foo")  (context line)
+
+        This handles models emitting unchanged lines as both - and + in diffs.
+        """
+        out = []
+        i = 0
+        while i < len(lines):
+            # Check if this is a -/+ pair with identical content
+            if (
+                i + 1 < len(lines)
+                and lines[i].startswith("-")
+                and lines[i + 1].startswith("+")
+                and lines[i][1:] == lines[i + 1][1:]  # Content after -/+ is identical
+            ):
+                # Convert to context line (space prefix)
+                out.append(" " + lines[i][1:])
+                i += 2  # Skip both lines
+                continue
+            out.append(lines[i])
+            i += 1
+        return out
+
     def _sanitize_diff_text(self, diff_text: str) -> Tuple[str, Optional[str]]:
         """
         Sanitize diff text before applying patch.
@@ -445,6 +471,10 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
         lines = diff_text.split("\n")
         # Remove any line that starts with ``` (after stripping whitespace)
         lines = [line for line in lines if not line.strip().startswith("```")]
+
+        # Collapse no-op edits: -LINE followed by +LINE (identical) → context line
+        # This handles model emitting unchanged lines as both removed and added
+        lines = self._collapse_noop_edits(lines)
 
         # Drop trailing blank lines
         while lines and not lines[-1].strip():
