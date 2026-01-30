@@ -1,0 +1,11 @@
+{
+  "id": "trivial-001",
+  "version": 1,
+  "category": "hardcoded-credentials",
+  "metadata": {
+    "language": "python",
+    "framework": "none",
+    "difficulty": "trivial",
+    "cwe": "CWE-798"
+  }
+}

@@ -23,7 +23,6 @@ def get_profile():
     user_id = request.args.get("id", "1")
     conn = get_db()
     init_db(conn)
-    # VULNERABLE: No check if current user can access this profile
     cursor = conn.execute(f"SELECT * FROM users WHERE id = ?", (user_id,))
     user = cursor.fetchone()
     return jsonify(dict(user) if user else {})

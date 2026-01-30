@@ -41,7 +41,6 @@ def search_users():
     conn = get_db()
     init_db(conn)
 
-    # VULNERABLE: String concatenation
     sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"
     cursor = conn.execute(sql)
 

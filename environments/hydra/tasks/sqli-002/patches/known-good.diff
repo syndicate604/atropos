@@ -1,15 +1,12 @@
 --- a/app.py
 +++ b/app.py
-@@ -38,8 +38,8 @@ def search_users():
+@@ -42,7 +42,7 @@ def get_user():
      conn = get_db()
      init_db(conn)
-
--    # VULNERABLE: String concatenation
--    sql = f"SELECT * FROM users WHERE username LIKE '%{query}%'"
+ 
+-    sql = f"SELECT * FROM users WHERE id = {user_id}"
 -    cursor = conn.execute(sql)
-+    # FIXED: Parameterized query
-+    sql = "SELECT * FROM users WHERE username LIKE ?"
-+    cursor = conn.execute(sql, (f"%{query}%",))
-
++    sql = "SELECT * FROM users WHERE id = ?"
++    cursor = conn.execute(sql, (user_id,))
+ 
      results = [dict(row) for row in cursor.fetchall()]
-     return jsonify({"results": results, "count": len(results)})

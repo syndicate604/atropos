@@ -1,0 +1,13 @@
+--- a/app.py
++++ b/app.py
+@@ -22,7 +22,10 @@ def get_profile():
+     """VULNERABLE: IDOR - no authorization check."""
+     user_id = request.args.get("id", "1")
+ 
++    current_user_id = "1"
++    if user_id != current_user_id:
++        return jsonify({"error": "Unauthorized"}), 403
++
+     conn = get_db()
+     init_db(conn)
+     cursor = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,))

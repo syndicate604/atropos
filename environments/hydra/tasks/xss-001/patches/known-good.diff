@@ -1,0 +1,18 @@
+--- a/app.py
++++ b/app.py
+@@ -1,5 +1,6 @@
+ """Vulnerable Flask app with reflected XSS."""
+ from flask import Flask, request
++from markupsafe import escape
+
+ app = Flask(__name__)
+
+@@ -12,7 +13,7 @@ def search():
+     <html>
+     <head><title>Search Results</title></head>
+     <body>
+-        <h1>Search results for: {query}</h1>
++        <h1>Search results for: {escape(query)}</h1>
+         <p>No results found.</p>
+     </body>
+     </html>

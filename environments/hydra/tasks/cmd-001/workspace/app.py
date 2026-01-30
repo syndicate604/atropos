@@ -4,13 +4,12 @@ import subprocess
 
 app = Flask(__name__)
 
-@app.route("/ping")
-def ping():
-    """VULNERABLE: Command injection in host parameter."""
-    host = request.args.get("host", "localhost")
-    # VULNERABLE: Shell=True with user input
+@app.route("/echo")
+def echo():
+    """VULNERABLE: Command injection in message parameter."""
+    message = request.args.get("message", "hello")
     result = subprocess.run(
-        f"ping -c 1 {host}",
+        f"echo {message}",
         shell=True,
         capture_output=True,
         text=True

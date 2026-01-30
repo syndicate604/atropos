@@ -1,68 +1,73 @@
-# tasks/sqli-001/workspace/tests/test_app.py
-"""Regression tests for search functionality."""
+#!/usr/bin/env python3
+"""
+Regression tests for sqli-002 - /user endpoint.
 
+Tests that the app still functions correctly after the fix.
+"""
 import pytest
 
 # Import works because PYTHONPATH=/workspace is set in container
-from app import app
+from app import app, init_db, get_db
 
 
 @pytest.fixture
 def client():
-    app.config["TESTING"] = True
+    """Create test client with initialized database."""
+    app.config['TESTING'] = True
     with app.test_client() as client:
+        with app.app_context():
+            conn = get_db()
+            init_db(conn)
         yield client
 
 
-def test_health(client):
-    """Health endpoint works."""
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json["status"] == "ok"
-
-
-def test_search_normal(client):
-    """Normal search returns results."""
-    response = client.get("/search?q=alice")
+def test_get_user_valid_id(client):
+    """Test that /user returns correct user for valid id."""
+    response = client.get('/user?id=1')
     assert response.status_code == 200
     data = response.json
-    assert "results" in data
-    assert "count" in data
-    assert data["count"] >= 0
+    assert "users" in data
+    assert len(data["users"]) == 1
+    assert data["users"][0]["username"] == "alice"
 
 
-def test_search_empty(client):
-    """Empty search returns all users."""
-    response = client.get("/search?q=")
+def test_get_user_another_valid_id(client):
+    """Test that /user returns correct user for another valid id."""
+    response = client.get('/user?id=2')
     assert response.status_code == 200
     data = response.json
-    assert data["count"] == 3  # alice, bob, admin
+    assert "users" in data
+    assert len(data["users"]) == 1
+    assert data["users"][0]["username"] == "bob"
 
 
-def test_search_no_match(client):
-    """Non-matching search returns empty."""
-    response = client.get("/search?q=nonexistent")
+def test_get_user_invalid_id(client):
+    """Test that /user returns empty for non-existent id."""
+    response = client.get('/user?id=999')
     assert response.status_code == 200
-    assert response.json["count"] == 0
+    data = response.json
+    assert "users" in data
+    assert len(data["users"]) == 0
 
 
-def test_search_special_chars(client):
-    """Search handles special characters."""
-    # This should not crash the app
-    response = client.get("/search?q=O'Brien")
+def test_get_user_no_id(client):
+    """Test that /user handles missing id parameter."""
+    response = client.get('/user')
     assert response.status_code == 200
-    assert "results" in response.json
+    data = response.json
+    assert "users" in data
+    # Empty id should return no users
+    assert isinstance(data["users"], list)
 
 
 def test_response_format(client):
     """Response has expected format."""
-    response = client.get("/search?q=bob")
+    response = client.get('/user?id=1')
     data = response.json
-    assert "results" in data
-    assert "count" in data
-    assert isinstance(data["results"], list)
-    if data["count"] > 0:
-        user = data["results"][0]
+    assert "users" in data
+    assert isinstance(data["users"], list)
+    if len(data["users"]) > 0:
+        user = data["users"][0]
         assert "id" in user
         assert "username" in user
         assert "email" in user

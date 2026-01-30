@@ -1,0 +1,12 @@
+--- a/app.py
++++ b/app.py
+@@ -9,8 +9,7 @@ def echo():
+     """VULNERABLE: Command injection in message parameter."""
+     message = request.args.get("message", "hello")
+     result = subprocess.run(
+-        f"echo {message}",
+-        shell=True,
++        ["echo", message],
+         capture_output=True,
+         text=True
+     )

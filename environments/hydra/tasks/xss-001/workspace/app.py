@@ -7,7 +7,6 @@ app = Flask(__name__)
 def search():
     """VULNERABLE: Reflected XSS in search query."""
     query = request.args.get("q", "")
-    # VULNERABLE: User input directly in HTML without escaping
     html = f"""
     <html>
     <head><title>Search Results</title></head>

@@ -56,6 +56,13 @@ RULES:
 - Each line MUST start with: space, +, -, or @@
 - NO explanations, NO prose, NO comments outside the diff
 
+CRITICAL CONSTRAINTS:
+- Make the SMALLEST change that fixes the vulnerability
+- Do NOT add "FIXED:" comments or docstrings
+- Do NOT change routes, HTTP methods, or function signatures unless required by the fix
+- Hunk context lines (space prefix) must be copied EXACTLY from the provided code
+- Do NOT invent or paraphrase lines - only modify lines that exist verbatim in the file
+
 EXAMPLE - Fixing SQL injection (CWE-89) in {target_file}:
 ```diff
 diff --git a/{target_file} b/{target_file}
@@ -672,6 +679,9 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
             print(f"[SCR] Group dropped: all scores identical ({scores['scores'][0]})")
             return None
 
+        # Populate ref_logprobs from inference_logprobs (rollout policy serves as reference)
+        scores["ref_logprobs"] = scores["inference_logprobs"]
+
         print(f"[SCR] Group accepted! Returning {len(scores['tokens'])} scored items")
         return scores
 
@@ -744,7 +754,9 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                 "task_id": task["task_id"],
                 "passed": score > 0,
                 "failure_reason": failure_reason,
-                "response": response[:500],  # Truncate for logging
+                "response": response,
+                "diff_text": diff_text,
+                "patch_error": patch_error,
             })
 
         # Calculate metrics

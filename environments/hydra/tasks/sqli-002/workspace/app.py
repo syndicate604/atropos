@@ -41,7 +41,6 @@ def get_user():
     conn = get_db()
     init_db(conn)
 
-    # VULNERABLE: String concatenation in WHERE clause
     sql = f"SELECT * FROM users WHERE id = {user_id}"
     cursor = conn.execute(sql)
 
