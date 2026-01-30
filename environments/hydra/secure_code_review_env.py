@@ -56,10 +56,16 @@ RULES:
 - Each line MUST start with: space, +, -, or @@
 - NO explanations, NO prose, NO comments outside the diff
 
-CRITICAL CONSTRAINTS:
+CRITICAL CONSTRAINTS - DO NOT:
+- Change @app.route() paths or add new routes
+- Change function names or signatures
+- Change response JSON schema keys
+- Add endpoints, refactor, or reorder unrelated code
+- Add "FIXED:" comments or marker docstrings
+- Redesign the API when a simple fix will work
+
+REQUIREMENTS:
 - Make the SMALLEST change that fixes the vulnerability
-- Do NOT add "FIXED:" comments or docstrings
-- Do NOT change routes, HTTP methods, or function signatures unless required by the fix
 - Hunk context lines (space prefix) must be copied EXACTLY from the provided code
 - Do NOT invent or paraphrase lines - only modify lines that exist verbatim in the file
 
@@ -214,6 +220,21 @@ class SecureCodeReviewEnv(BaseEnv):
     def _build_user_prompt(self, task: SCRTask) -> str:
         """Build the user prompt for a task."""
         target_file = task.get('target_file', 'app.py')
+        task_id = task.get('task_id', '')
+
+        # Task-specific hints (minimal, non-spoiler)
+        hints = {
+            'cmd-001': 'For command injection: remove shell=True and pass arguments as a list.',
+            'xss-001': 'In Flask/Jinja: use `from markupsafe import escape` and escape on render.',
+            'xss-002': 'In Flask/Jinja: use `from markupsafe import escape` and escape on render.',
+            'path-001': 'For path traversal: use os.path.basename() to reject directory separators.',
+            'idor-001': 'For broken access control: add authorization check comparing user IDs.',
+        }
+
+        hint_text = ""
+        if task_id in hints:
+            hint_text = f"\n## Hint\n{hints[task_id]}\n"
+
         return f"""## Vulnerability Information
 - CWE: {task['cwe']}
 - Description: {task['description']}
@@ -225,7 +246,7 @@ class SecureCodeReviewEnv(BaseEnv):
 ```python
 {task['code']}
 ```
-
+{hint_text}
 ## Requirements
 1. Fix the security vulnerability described above
 2. Maintain all existing functionality
@@ -410,24 +431,25 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
 
         Fixes:
         1. Normalize CRLF to LF
-        2. Strip trailing markdown fences
+        2. Strip ALL markdown fence lines (not just trailing)
         3. Ensure final newline
         4. Detect truncation (incomplete diff structure)
         """
         # 1. Normalize line endings
         diff_text = diff_text.replace("\r\n", "\n").replace("\r", "\n")
 
-        # 2. Strip trailing fences defensively
+        # 2. Strip ALL fence lines anywhere in the diff
+        # Models often emit ``` or ```diff in unexpected places
         had_final_newline = diff_text.endswith("\n")
 
-        # Drop trailing blank lines, then a trailing fence line if present.
         lines = diff_text.split("\n")
+        # Remove any line that starts with ``` (after stripping whitespace)
+        lines = [line for line in lines if not line.strip().startswith("```")]
+
+        # Drop trailing blank lines
         while lines and not lines[-1].strip():
             lines.pop()
-        if lines and lines[-1].strip() in ("```", "```diff"):
-            lines.pop()
-        while lines and not lines[-1].strip():
-            lines.pop()
+
         diff_text = "\n".join(lines)
 
         # 3. Detect truncation BEFORE ensuring final newline
