@@ -37,7 +37,10 @@ def init_db(conn):
 def get_user():
     """VULNERABLE: SQL injection via user_id parameter."""
     user_id = request.args.get("id", "")
-    
+
+    if not user_id or not user_id.isdigit():
+        return jsonify({"users": []})
+
     conn = get_db()
     init_db(conn)
 
