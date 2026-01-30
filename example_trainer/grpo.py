@@ -49,20 +49,23 @@ class TrainingConfig(BaseModel):
     """
 
     model_name: str = Field(..., description="Name of the base model to train")
-    lr: float = Field(1e-5, description="Learning rate for the optimizer")
+    lr: float = Field(1e-6, description="Learning rate for the optimizer")
     optimizer: str = Field(
         "paged_adamw8bit",
         description="Optimizer to use: adamw | adamw8bit | paged_adamw8bit",
     )
     training_steps: int = Field(
-        10, description="Number of training steps"
+        25, description="Number of training steps"
     )  # Renamed from epochs
+    kl_coef: float = Field(
+        0.1, description="KL divergence coefficient for reference model anchoring"
+    )
     batch_size: int = Field(
         2, description="Batch size for training (will be handled by get_data)"
     )
     seq_len: int = Field(2048, description="Sequence length for training")
     gradient_accumulation_steps: int = Field(
-        32, description="Number of gradient accumulation steps"
+        16, description="Number of gradient accumulation steps"
     )
     device: str = Field(
         "cuda" if torch.cuda.is_available() else "cpu", description="Device to train on"
@@ -91,32 +94,40 @@ def register_trainer(config: TrainingConfig):
     """
     Register the trainer with the Atropos API
     """
-    requests.post(
+    payload = {
+        "wandb_group": config.wandb_group,
+        "wandb_project": config.wandb_project,
+        "batch_size": config.batch_size * config.gradient_accumulation_steps,
+        "max_token_len": config.seq_len,
+        "starting_step": 0,
+        "checkpoint_dir": config.save_path,
+        "save_checkpoint_interval": config.training_steps,
+        "num_steps": config.training_steps,
+    }
+    print(f"Registering trainer with payload: {payload}")
+    response = requests.post(
         "http://localhost:8000/register",
-        json={
-            "wandb_group": config.wandb_group,
-            "wandb_project": config.wandb_project,
-            "batch_size": config.batch_size * config.gradient_accumulation_steps,
-            "max_token_len": config.seq_len,
-            "starting_step": 0,
-            "checkpoint_dir": config.save_path,
-            "save_checkpoint_interval": config.training_steps,
-            "num_steps": config.training_steps,
-        },
+        json=payload,
         timeout=10,
     )
+    if response.status_code != 200:
+        print(f"Registration failed with status {response.status_code}: {response.text}")
+    response.raise_for_status()  # Raise exception if registration failed
+    print(f"✓ Trainer registered with API: {response.json()}")
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=15))
+@retry(stop=stop_after_attempt(60), wait=wait_exponential(multiplier=1, min=4, max=10))
 def get_batch():
     data = requests.get("http://localhost:8000/batch", timeout=10).json()
     return data
 
 
-def pad_data_to_good_offset(data, batch_size: int):
+def pad_data_to_good_offset(data, batch_size: int, seq_len: int):
     max_token_len = max(
         [max([len(x) for x in item["tokens"]]) for item in data["batch"]]
     )
+    # Hard cap at seq_len to prevent OOM from long sequences
+    max_token_len = min(max_token_len, seq_len)
     # usually 64 is a good choice to ensure nonweird scaling behavior on GPUS
     # so we pad to the nearest multiple of 64
     good_multiple = 64
@@ -136,6 +147,7 @@ def pad_data_to_good_offset(data, batch_size: int):
     advantages = list()
     lengths = list()
     temperatures = list()
+    ref_logprobs_list = list()  # For KL penalty
     for item in data["batch"]:
         scores = item["scores"]
         scores = np.array(scores)
@@ -148,7 +160,22 @@ def pad_data_to_good_offset(data, batch_size: int):
             for i in range(len(item["overrides"])):
                 if item["overrides"][i].get("set_advantage_to_zero", False):
                     item["scores"][i] = 0
+        # Check if ref_logprobs is available for KL penalty
+        has_ref_logprobs = item.get("ref_logprobs") is not None
+
         for i in range(len(item["tokens"])):
+            # Truncate tokens and masks to token_setup_len before padding (prevents OOM)
+            # Keep the tail (completion) instead of the head (prompt) to ensure trainable tokens
+            if len(item["tokens"][i]) > token_setup_len:
+                item["tokens"][i] = item["tokens"][i][-token_setup_len:]
+                item["masks"][i] = item["masks"][i][-token_setup_len:]
+                if has_ref_logprobs:
+                    item["ref_logprobs"][i] = item["ref_logprobs"][i][-token_setup_len:]
+            else:
+                item["tokens"][i] = item["tokens"][i]
+                item["masks"][i] = item["masks"][i]
+                # ref_logprobs doesn't need explicit assignment here
+
             lengths.append(
                 math.ceil((len(item["tokens"][i]) - 1) / (good_multiple))
                 * good_multiple
@@ -174,6 +201,22 @@ def pad_data_to_good_offset(data, batch_size: int):
             input_ids.append(item["tokens"][i][:-1])
             labels.append(label_item[1:])
             advantages.append(item["scores"][i])
+
+            # Process ref_logprobs if available (for KL penalty)
+            if has_ref_logprobs:
+                # Pad ref_logprobs to token_setup_len (zeros for padding, will be masked out)
+                ref_lp_item = np.concatenate([
+                    np.array(item["ref_logprobs"][i], dtype=np.float32),
+                    np.zeros(
+                        max(0, token_setup_len - len(item["ref_logprobs"][i])),
+                        dtype=np.float32
+                    ),
+                ])
+                # Shift by 1 to align with labels (labels = masks[1:])
+                ref_logprobs_list.append(ref_lp_item[1:])
+            else:
+                # No ref logprobs available - append zeros (will skip KL if all zeros)
+                ref_logprobs_list.append(np.zeros(len(label_item[1:]), dtype=np.float32))
             # per-sample override -> group generation_params -> group_overrides - > 1.0
             # need to update docs since this lets you set the temperature for each sample from the override
             t = 1.0
@@ -198,6 +241,7 @@ def pad_data_to_good_offset(data, batch_size: int):
     label_batches = []
     advantage_batches = []
     temperature_batches = []
+    ref_logprob_batches = []
     for i in range(len(input_ids) // batch_size):
         token_batches.append(
             torch.tensor(
@@ -223,19 +267,26 @@ def pad_data_to_good_offset(data, batch_size: int):
                 )
             ).view(-1, 1, 1)
         )
+        # Ref logprobs: same shape as labels for KL penalty
+        ref_logprob_batches.append(
+            torch.tensor(
+                np.stack(ref_logprobs_list[i * batch_size : (i + 1) * batch_size], axis=0),
+                dtype=torch.float32
+            )
+        )
 
-    return token_batches, label_batches, advantage_batches, temperature_batches
+    return token_batches, label_batches, advantage_batches, temperature_batches, ref_logprob_batches
 
 
 def get_data(
     batch_size: int, seq_len: int
 ) -> List[
     Tuple[
-        List[torch.Tensor], List[torch.Tensor], List[torch.Tensor], List[torch.Tensor]
+        List[torch.Tensor], List[torch.Tensor], List[torch.Tensor], List[torch.Tensor], List[torch.Tensor]
     ]
 ]:
     """
-    getting data from the api
+    getting data from the api (returns token, label, advantage, temperature, ref_logprob batches)
     """
     batches = []
     while True:
@@ -245,7 +296,7 @@ def get_data(
             with open("temp.json", "w", encoding="utf-8") as f:
                 json.dump(data, f)
             # In case the inference runs ahead of the training, we loop until we don't have any more data
-            batches.append(pad_data_to_good_offset(data, batch_size))
+            batches.append(pad_data_to_good_offset(data, batch_size, seq_len))
         elif len(batches) > 0:
             # Return the batches
             return batches
@@ -387,17 +438,34 @@ def train(config: TrainingConfig):
         print("  Using external vLLM server (launch_vllm=False)")
 
     batches = list()
+    step_start_times = []
+
     for step in range(config.training_steps):
+        step_start = time.time()
         total_loss = 0
-        print(f"Step {step+1}/{config.training_steps}")
+
+        # Enhanced logging header
+        print(f"\n{'='*80}")
+        print(f"Step {step+1}/{config.training_steps} ({(step+1)/config.training_steps*100:.1f}%)")
+        print(f"Time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"{'='*80}")
         total_pos_logp = 0
         total_neg_logp = 0
         total_logp = 0
         total_pos = 0
         total_neg = 0
+
+        # Accumulate advantage stats across microbatches (GPU tensors for efficiency)
+        adv_sum = torch.tensor(0.0, device=config.device)
+        adv_sumsq = torch.tensor(0.0, device=config.device)
+        adv_count = 0
+        num_microbatches = 0
+
+        # Track valid tokens on GPU (no per-microbatch sync)
+        valid_tokens = torch.tensor(0.0, device=config.device)
         if len(batches) == 0:
             batches = get_data(config.batch_size, config.seq_len)
-        token_batches, label_batches, advantage_batches, temperature_batches = (
+        token_batches, label_batches, advantage_batches, temperature_batches, ref_logprob_batches = (
             batches.pop(0)
         )
         # Terminate existing vLLM process if running
@@ -418,14 +486,15 @@ def train(config: TrainingConfig):
                         vllm_process.kill()
                         vllm_process.wait()
                     vllm_process = None
-        for tokens, labels, advantages, temperatures in zip(
-            token_batches, label_batches, advantage_batches, temperature_batches
+        for tokens, labels, advantages, temperatures, ref_logprobs in zip(
+            token_batches, label_batches, advantage_batches, temperature_batches, ref_logprob_batches
         ):
 
-            tokens, labels, advantages = (
+            tokens, labels, advantages, ref_logprobs = (
                 tokens.to(config.device),
                 labels.to(config.device),
                 advantages.to(config.device),
+                ref_logprobs.to(config.device),
             )
 
             # Forward pass
@@ -449,6 +518,10 @@ def train(config: TrainingConfig):
                 labels.shape
             )  # Reshape back to (batch, seq_len)
 
+            # Use reference logprobs from batch for KL penalty (memory-safe approach)
+            # ref_logprobs comes from rollout generation (inference_logprobs)
+            ref_logp_per_token = ref_logprobs  # Already aligned with labels
+
             # Masking based on labels != -100
             mask = (labels != -100).float()
             with torch.no_grad():
@@ -465,14 +538,42 @@ def train(config: TrainingConfig):
                 total_pos += pos.sum().item()
                 total_neg += neg.sum().item()
 
+            # GRPO loss with KL penalty
             grpo_loss_term = torch.exp(logp_per_token - logp_per_token.detach())
+            # Clamp denominator to prevent NaNs when all labels are -100
+            mask_denom = mask.sum(-1).clamp_min(1e-8)
             grpo_loss = (
-                ((-grpo_loss_term * mask).sum(-1) / mask.sum(-1))
+                ((-grpo_loss_term * mask).sum(-1) / mask_denom)
                 * advantages.to(logp_per_token.device)
             ).mean() / config.gradient_accumulation_steps
-            grpo_loss.backward()
-            total_loss += grpo_loss.item()
-        grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
+            # KL divergence penalty (keeps policy close to reference)
+            # Only apply if ref_logprobs is present (non-zero)
+            # Check if ref_logprobs is valid in completion positions (mask out prompt sentinels)
+            ref_is_valid = ((ref_logp_per_token * mask).abs() > 1e-6).any()
+
+            if ref_is_valid:
+                # KL(policy || ref) = logp_policy - logp_ref
+                kl_div = (logp_per_token - ref_logp_per_token) * mask
+                kl_penalty = (kl_div.sum(-1) / mask_denom).mean() / config.gradient_accumulation_steps
+            else:
+                # No valid ref logprobs - skip KL penalty for this batch
+                kl_penalty = torch.tensor(0.0, device=config.device)
+
+            # Combined loss: GRPO + KL penalty
+            total_batch_loss = grpo_loss + config.kl_coef * kl_penalty
+            total_batch_loss.backward()
+            total_loss += total_batch_loss.item()
+
+            # Accumulate advantage stats for step summary (stay on GPU, no sync)
+            adv_sum += advantages.sum()
+            adv_sumsq += (advantages ** 2).sum()
+            adv_count += advantages.numel()
+            num_microbatches += 1
+
+            # Track valid tokens on GPU (no sync)
+            valid_tokens += mask.sum()
+        grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=0.5)
         optimizer.step()
         optimizer.zero_grad()
         if total_pos > 0:
@@ -494,7 +595,61 @@ def train(config: TrainingConfig):
             )
         # --- End Wandb Logging ---
 
-        print(f"  Step Loss: {grpo_loss.item():.4f}")
+        # Enhanced step summary
+        step_time = time.time() - step_start
+        step_start_times.append(step_time)
+
+        # Calculate memory usage
+        if torch.cuda.is_available():
+            mem_allocated = torch.cuda.memory_allocated() / 1024**3  # GB
+            mem_reserved = torch.cuda.memory_reserved() / 1024**3  # GB
+            mem_str = f"GPU: {mem_allocated:.2f}GB allocated, {mem_reserved:.2f}GB reserved"
+        else:
+            mem_str = "CPU mode"
+
+        # Calculate ETA
+        avg_step_time = sum(step_start_times[-10:]) / len(step_start_times[-10:])  # Average of last 10 steps
+        remaining_steps = config.training_steps - (step + 1)
+        eta_seconds = avg_step_time * remaining_steps
+        eta_str = time.strftime('%H:%M:%S', time.gmtime(eta_seconds))
+
+        # Calculate step-level loss
+        # Simple average across microbatches (what we optimize)
+        avg_loss = total_loss / max(num_microbatches, 1)
+
+        # Note: total_loss already incorporates mask weighting within each microbatch
+        # via the (loss * mask).sum() / mask.sum() pattern in grpo_loss_term
+        # So avg_loss is already approximately token-weighted
+
+        # Calculate step-level advantage stats (single GPU→CPU sync for all metrics)
+        if adv_count > 0:
+            # Compute mean and variance on GPU first
+            adv_mean_t = adv_sum / adv_count
+            adv_var_t = torch.clamp(adv_sumsq / adv_count - adv_mean_t ** 2, min=0.0)
+            adv_std_t = torch.sqrt(adv_var_t)
+
+            # Pack all stats into single tensor and sync once
+            stats = torch.stack([adv_mean_t, adv_std_t, valid_tokens]).cpu()
+            adv_mean, adv_std, total_valid_tokens = stats[0].item(), stats[1].item(), int(stats[2].item())
+
+            adv_str = f"mean={adv_mean:.4f}, std={adv_std:.4f}, n={adv_count}"
+        else:
+            adv_str = "no data"
+            total_valid_tokens = 0
+
+        print(f"\n📊 Step Summary:")
+        print(f"  Loss: {avg_loss:.4f} (over {num_microbatches} microbatches, {total_valid_tokens} tokens)")
+        print(f"  Learning Rate: {optimizer.param_groups[0]['lr']:.2e}")
+        print(f"  Gradient Norm: {grad_norm.item():.4f}")
+        print(f"  Advantages: {adv_str}")
+        print(f"  Pos LogP: {total_pos_logp:.4f} | Neg LogP: {total_neg_logp:.4f}")
+        print(f"\n⏱️  Timing:")
+        print(f"  Step Time: {step_time:.2f}s")
+        print(f"  Avg Step Time (last 10): {avg_step_time:.2f}s")
+        print(f"  ETA: {eta_str} ({remaining_steps} steps remaining)")
+        print(f"\n💾 Memory:")
+        print(f"  {mem_str}")
+        print(f"  Batches in Queue: {len(batches)}")
 
         # --- vLLM Restart Logic (Moved AFTER optimizer step) ---
         # Note: There are much better ways of updating the policy, this is just a very simple example
@@ -505,14 +660,22 @@ def train(config: TrainingConfig):
                 checkpoint_path = os.path.join(
                     config.save_path, f"step_{step+1}"
                 )  # Save as step+1 since it's after step completion
-                print(f"  Saving checkpoint to {checkpoint_path}...")
+                print(f"\n💾 Saving checkpoint to {checkpoint_path}...")
+                save_start = time.time()
                 # Ensure fresh directory for saving
                 if os.path.exists(checkpoint_path):
                     shutil.rmtree(checkpoint_path)  # Remove old checkpoint if it exists
                 os.makedirs(checkpoint_path, exist_ok=True)
                 model.save_pretrained(checkpoint_path)
                 tokenizer.save_pretrained(checkpoint_path)
-                print("  Checkpoint saved.")
+                save_time = time.time() - save_start
+                # Get checkpoint size
+                checkpoint_size = sum(
+                    os.path.getsize(os.path.join(dirpath, filename))
+                    for dirpath, _, filenames in os.walk(checkpoint_path)
+                    for filename in filenames
+                ) / (1024**3)  # GB
+                print(f"✅ Checkpoint saved ({checkpoint_size:.2f}GB in {save_time:.1f}s)")
 
                 # Terminate existing vLLM process if running
                 if vllm_process:
@@ -623,10 +786,12 @@ if __name__ == "__main__":
     # Replace "gpt2" with your desired model
     training_config = TrainingConfig(
         model_name="/root/models/Qwen2.5-7B-Instruct",
-        training_steps=11,  # Use steps (smoke test)
+        training_steps=25,  # Debug run - start small to detect issues early
         batch_size=1,  # Reduced from 2 to avoid OOM
-        seq_len=1024,  # Reduced from 2048 to avoid OOM
+        seq_len=1024,  # Increased to 1024 for better patch generation - hard-capped in pad_data_to_good_offset
         optimizer="paged_adamw8bit",  # Avoid OOM at optimizer.step() for 7B full-parameter training
+        lr=1e-6,  # Lowered from 1e-5 to prevent instability
+        kl_coef=0.1,  # KL penalty to anchor policy to reference model
         vllm_restart_interval=3,  # Example interval
         vllm_port=9004,  # External vLLM server port
         launch_vllm=False,  # Use external vLLM server

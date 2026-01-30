@@ -3,7 +3,7 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import PlainTextResponse
@@ -106,8 +106,8 @@ async def root():
 
 
 class Registration(BaseModel):
-    wandb_group: str
-    wandb_project: str
+    wandb_group: Optional[str] = None
+    wandb_project: Optional[str] = None
     batch_size: int
     max_token_len: int
     checkpoint_dir: str
@@ -344,6 +344,10 @@ async def info():
 
 @app.get("/batch")
 async def get_batch():
+    # Check if trainer has registered
+    if not hasattr(app.state, "started"):
+        raise HTTPException(status_code=503, detail="Trainer not registered. Call /register first.")
+
     if not app.state.started:
         app.state.started = True
 

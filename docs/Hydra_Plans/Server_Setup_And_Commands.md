@@ -27,9 +27,32 @@ root       13817  0.2  1.0 7955640 943108 ?      Sl   03:03   0:38 python3 examp
  command":"ssh -i ~/.ssh/gcp/ngcp_root_key root@34.45.239.100 \"killall -9 python3 2>/dev/null; nvidia-smi --query-compute-apps=pid --format=csv,noheader | xargs -r kill -9; sleep 5 && cd ~/hydra && nohup python3 example_trainer/vllm_api_server.py --model /root/models/trained_model --port 9004 --host 0.0.0.0 --dtype bfloat16 --gpu-memory-utilization 0.88 --max-model-len 8192 --max-num-seqs 16 --max-num-batched-tokens 16384 --enable-prefix-caching --trust-remote-code > /tmp/vllm_trained.log 2>&1 &\nsleep 35 && tail -20 /tmp/vllm_trained.log | grep -E '(Uvicorn|KV cache)'\"","description":"Start vLLM with trained model","timeout":50000}}]
 
 
- MAIN Example of run TRAINERS 
+ MAIN Example of run TRAINERS root@training-box-01 - 35.202.149.44
 
- {"command":"ssh -i ~/.ssh/gcp/ngcp_root_key root@35.202.149.44 \"cd /root/hydra && rm -rf evals/trained_final && mkdir -p evals/trained_final && nohup python3 environments/hydra/secure_code_review_env.py evaluate \\\n  --openai.base_url http://10.128.0.78:9004/v1 \\\n  --openai.model_name Qwen/Qwen2.5-7B-Instruct \\\n  --openai.server_type vllm \\\n  --env.tokenizer_name /root/hydra/trained_model_checkpoints/final_model \\\n  --env.max_token_length 3072 \\\n --env.data_dir_to_save_evals evals/trained_final \\\n  --env.use_wandb false \\\n  > /tmp/eval_trained_final.log 2>&1 &\necho 'Started trained eval (2 tasks)' && sleep 10\"","description":"Run trained eval with 2 tasks","timeout":20000}}]
+We now have scripts vs manual pasting - they are on the Trainer server
+
+SERVE Script:
+/root/hydra/run_serve.sh
+
+Usage:
+./run_serve.sh [max_token_length] [total_steps]
+
+Examples:
+./run_serve.sh 512 1000    # For GRPO training with seq_len=512
+./run_serve.sh 4096 1000   # For evaluation with longer sequences
+
+EVAL Scripts:
+/root/hydra/run_evals.sh
+
+Usage:
+./run_evals.sh base 3072
+./run_evals.sh trained 4096
+
+Old example code to run locally 
+
+cd /root/hydra && rm -rf evals/trained_final && mkdir -p evals/trained_final && nohup python3 environments/hydra/secure_code_review_env.py evaluate   --openai.base_url http://10.128.0.78:9004/v1   --openai.model_name Qwen/Qwen2.5-7B-Instruct   --openai.server_type vllm   --env.tokenizer_name Qwen/Qwen2.5-7B-Instruct  --env.max_token_length 4096  --env.data_dir_to_save_evals evals/trained_final   --env.use_wandb false   > /tmp/eval_trained_final2.log 2>&1 &
+
+Old SSH command to run evals:
 
 {"command":"ssh -i ~/.ssh/gcp/ngcp_root_key root@35.202.149.44 \"cd /root/hydra && rm -rf evals/base_final && mkdir -p evals/base_final && nohup python3 environments/hydra/secure_code_review_env.py evaluate \\\n  --openai.base_url http://10.128.0.78:9004/v1 \\\n  --openai.model_name Qwen/Qwen2.5-7B-Instruct \\\n  --openai.server_type vllm \\\n  --env.tokenizer_name Qwen/Qwen2.5-7B-Instruct \\\n --env.max_token_length 3072 \\\n --env.data_dir_to_save_evals evals/base_final \\\n  --env.use_wandb false \\\n  > /tmp/eval_base_final.log 2>&1 &\necho 'Started baseline eval (2 tasks)' && sleep 10\"","description":"Run baseline eval with 2 tasks","timeout":20000}}]
  

@@ -1,0 +1,12 @@
+--- a/app.py
++++ b/app.py
+@@ -22,8 +22,8 @@ def logout():
+     conn = get_db()
+     init_db(conn)
+     # VULNERABLE: String concatenation in DELETE
+-    sql = f"DELETE FROM sessions WHERE token = '{token}'"
+-    conn.execute(sql)
++    sql = "DELETE FROM sessions WHERE token = ?"
++    conn.execute(sql, (token,))
+     conn.commit()
+     return jsonify({"status": "logged out"})

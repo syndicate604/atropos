@@ -46,9 +46,9 @@ engine = None
 
 
 @app.get("/health")
-async def health() -> Response:
+async def health() -> JSONResponse:
     """Health check."""
-    return Response(status_code=200)
+    return JSONResponse({"status": "ok"})
 
 
 @app.get("/health_generate")
@@ -67,7 +67,30 @@ async def health_generate() -> Response:
             final_output = request_output  # type: RequestOutput  # noqa: F841
     except asyncio.CancelledError:
         return Response(status_code=499)
-    return Response(status_code=200)
+    return JSONResponse({"status": "ok", "model_loaded": True})
+
+
+@app.get("/v1/models")
+async def list_models() -> JSONResponse:
+    """OpenAI-compatible models endpoint."""
+    assert engine is not None
+    # Get model name from engine
+    model_name = getattr(engine, 'model_config', None)
+    if model_name and hasattr(model_name, 'model'):
+        model_id = model_name.model
+    else:
+        # Fallback: try to get from tokenizer or use placeholder
+        model_id = getattr(engine.tokenizer, 'name_or_path', 'unknown')
+
+    return JSONResponse({
+        "object": "list",
+        "data": [{
+            "id": model_id,
+            "object": "model",
+            "created": 0,
+            "owned_by": "vllm"
+        }]
+    })
 
 
 @app.post("/generate")
