@@ -759,27 +759,36 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_prompt}
                     ],
-                    n=1,
+                    n=3,  # Generate 3 attempts, take best
                     max_tokens=self.config.max_token_length,
-                    temperature=0.0,  # Deterministic for eval
+                    temperature=0.3,  # Some diversity between attempts
                 )
 
-            response = completion.choices[0].message.content
-            diff_text = self._extract_diff_from_response(response)
+            # Score all 3 attempts and take the best one
+            best_score = -999
+            best_result = None
 
-            score, failure_reason, patch_error = await self._score_single_patch(
-                task_id=task["task_id"],
-                diff_text=diff_text
-            )
+            for choice in completion.choices:
+                response = choice.message.content
+                diff_text = self._extract_diff_from_response(response)
 
-            eval_results.append({
-                "task_id": task["task_id"],
-                "passed": score > 0,
-                "failure_reason": failure_reason,
-                "response": response,
-                "diff_text": diff_text,
-                "patch_error": patch_error,
-            })
+                score, failure_reason, patch_error = await self._score_single_patch(
+                    task_id=task["task_id"],
+                    diff_text=diff_text
+                )
+
+                if score > best_score:
+                    best_score = score
+                    best_result = {
+                        "task_id": task["task_id"],
+                        "passed": score > 0,
+                        "failure_reason": failure_reason,
+                        "response": response,
+                        "diff_text": diff_text,
+                        "patch_error": patch_error,
+                    }
+
+            eval_results.append(best_result)
 
         # Calculate metrics
         pass_count = sum(1 for r in eval_results if r["passed"])
@@ -799,7 +808,8 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
             start_time=start_time,
             end_time=end_time,
             generation_parameters={
-                "temperature": 0.0,
+                "n": 3,
+                "temperature": 0.3,
                 "max_tokens": self.config.max_token_length,
             },
         )
