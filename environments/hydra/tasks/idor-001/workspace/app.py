@@ -23,7 +23,7 @@ def get_profile():
     user_id = request.args.get("id", "1")
     conn = get_db()
     init_db(conn)
-    cursor = conn.execute(f"SELECT * FROM users WHERE id = ?", (user_id,))
+    cursor = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     user = cursor.fetchone()
     return jsonify(dict(user) if user else {})
 
