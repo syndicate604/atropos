@@ -71,3 +71,18 @@ def test_response_format(client):
         assert "id" in user
         assert "username" in user
         assert "email" in user
+
+
+def test_malicious_input_no_crash(client):
+    """Test that malicious input doesn't crash the server."""
+    # SQL injection attempt should be rejected gracefully, not crash
+    response = client.get('/user?id=0 OR 1=1')
+
+    # Must not crash (500 error)
+    assert response.status_code != 500, "Server crashed on malicious input"
+
+    # If it returns 200, should have empty or minimal results (not all users)
+    if response.status_code == 200:
+        data = response.json
+        assert "users" in data
+        assert len(data["users"]) < 3, "SQL injection succeeded - all users returned"
