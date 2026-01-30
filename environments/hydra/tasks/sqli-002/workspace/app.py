@@ -38,7 +38,7 @@ def get_user():
     """Get user by ID."""
     user_id = request.args.get("id", "")
 
-    if not user_id or not user_id.isdigit():
+    if not user_id:
         return jsonify({"users": []})
 
     conn = get_db()
