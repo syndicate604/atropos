@@ -35,7 +35,6 @@ def list_products():
     conn = get_db()
     init_db(conn)
 
-    # VULNERABLE: User input directly in ORDER BY clause
     sql = f"SELECT * FROM products ORDER BY {sort}"
     cursor = conn.execute(sql)
 

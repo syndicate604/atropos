@@ -19,7 +19,7 @@ def init_db(conn):
 
 @app.route("/profile")
 def get_profile():
-    """VULNERABLE: IDOR - no authorization check."""
+    """Get user profile by ID."""
     user_id = request.args.get("id", "1")
     conn = get_db()
     init_db(conn)

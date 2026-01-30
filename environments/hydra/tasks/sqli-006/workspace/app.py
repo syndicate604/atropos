@@ -21,7 +21,6 @@ def update_profile():
     email = request.json.get("email", "")
     conn = get_db()
     init_db(conn)
-    # VULNERABLE: String interpolation in UPDATE
     sql = f"UPDATE profiles SET email = '{email}' WHERE username = '{username}'"
     conn.execute(sql)
     conn.commit()

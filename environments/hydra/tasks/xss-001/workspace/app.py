@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/search")
 def search():
-    """VULNERABLE: Reflected XSS in search query."""
+    """Search and display results."""
     query = request.args.get("q", "")
     html = f"""
     <html>

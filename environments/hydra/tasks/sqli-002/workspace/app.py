@@ -35,7 +35,7 @@ def init_db(conn):
 
 @app.route("/user")
 def get_user():
-    """VULNERABLE: SQL injection via user_id parameter."""
+    """Get user by ID."""
     user_id = request.args.get("id", "")
 
     if not user_id or not user_id.isdigit():

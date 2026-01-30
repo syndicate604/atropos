@@ -21,7 +21,6 @@ def logout():
     token = request.json.get("token", "")
     conn = get_db()
     init_db(conn)
-    # VULNERABLE: String concatenation in DELETE
     sql = f"DELETE FROM sessions WHERE token = '{token}'"
     conn.execute(sql)
     conn.commit()

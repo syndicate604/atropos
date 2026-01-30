@@ -35,7 +35,7 @@ def init_db(conn):
 
 @app.route("/search")
 def search_users():
-    """VULNERABLE: SQL injection via string concatenation."""
+    """Search users by username."""
     query = request.args.get("q", "")
 
     conn = get_db()

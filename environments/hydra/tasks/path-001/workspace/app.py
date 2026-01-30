@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/download")
 def download_file():
-    """VULNERABLE: Path traversal in filename parameter."""
+    """Download file by filename."""
     filename = request.args.get("file", "")
     filepath = os.path.join("/workspace/files", filename)
     try:

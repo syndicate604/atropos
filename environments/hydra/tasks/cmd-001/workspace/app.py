@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/echo")
 def echo():
-    """VULNERABLE: Command injection in message parameter."""
+    """Echo user message back to the client."""
     message = request.args.get("message", "hello")
     result = subprocess.run(
         f"echo {message}",

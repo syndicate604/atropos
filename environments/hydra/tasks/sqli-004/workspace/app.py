@@ -21,7 +21,6 @@ def get_posts():
     limit = request.args.get("limit", "5")
     conn = get_db()
     init_db(conn)
-    # VULNERABLE: Direct interpolation in LIMIT
     sql = f"SELECT * FROM posts LIMIT {limit}"
     cursor = conn.execute(sql)
     return jsonify({"posts": [dict(row) for row in cursor.fetchall()]})

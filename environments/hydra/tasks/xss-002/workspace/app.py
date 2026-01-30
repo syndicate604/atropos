@@ -7,7 +7,7 @@ comments = []
 
 @app.route("/comment", methods=["POST"])
 def add_comment():
-    """VULNERABLE: Stored XSS - no sanitization."""
+    """Add a new comment."""
     comment = request.json.get("comment", "")
     comments.append(comment)
     return jsonify({"status": "added"})
