@@ -761,7 +761,7 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                     ],
                     n=3,  # Generate 3 attempts, take best
                     max_tokens=self.config.max_token_length,
-                    temperature=0.3,  # Some diversity between attempts
+                    temperature=0.0,  # Deterministic (all 3 will be identical)
                 )
 
             # Score all 3 attempts and take the best one
@@ -809,7 +809,7 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
             end_time=end_time,
             generation_parameters={
                 "n": 3,
-                "temperature": 0.3,
+                "temperature": 0.0,
                 "max_tokens": self.config.max_token_length,
             },
         )
