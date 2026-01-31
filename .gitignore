@@ -231,3 +231,6 @@ trained_model_checkpoints/
 
 # Test outputs
 tasks_broken/
+
+# Incomplete tasks (not ready for training)
+environments/hydra/tasks_incomplete/
