@@ -220,7 +220,7 @@ class SecureCodeReviewEnv(BaseEnv):
 
         # Task-specific hints (minimal, non-spoiler)
         hints = {
-            'cmd-001': 'For command injection: remove shell=True and pass arguments as a list.',
+            'cmd-001': 'For command injection: change to list format [\"command\", arg1, arg2] AND remove the shell=True parameter entirely.',
             'xss-001': 'For XSS: Add `from markupsafe import escape` import at top, then use escape(...) when inserting user input into HTML.',
             'xss-002': 'For XSS: Add `from markupsafe import escape` import at top, then use escape(...) when inserting user input into HTML.',
             'path-001': 'For path traversal: use os.path.basename() to reject directory separators.',
@@ -490,7 +490,25 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                     if not content_lines:
                         truncation_error = "Incomplete hunk (no content after @@ marker)"
 
-        # 4. Ensure final newline (after truncation check)
+        # 4. Validate diff structure BEFORE applying
+        # Reject diffs with missing/malformed hunks to fail fast
+        if diff_text:
+            # Must have valid hunk headers (format: @@ -line,count +line,count @@)
+            hunk_pattern = r'^@@\s+-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s+@@'
+            has_valid_hunk = bool(re.search(hunk_pattern, diff_text, re.MULTILINE))
+
+            # Must have file headers if we have hunks
+            has_file_headers = '---' in diff_text and '+++' in diff_text
+
+            if has_hunk_marker and not has_valid_hunk:
+                # Has @@ but format is wrong
+                return "", "patch_apply_malformed: invalid hunk header format"
+
+            if has_valid_hunk and not has_file_headers:
+                # Has hunks but missing file headers
+                return "", "patch_apply_malformed: missing file headers (--- or +++)"
+
+        # 5. Ensure final newline (after all validation)
         if diff_text and not diff_text.endswith("\n"):
             diff_text += "\n"
 
