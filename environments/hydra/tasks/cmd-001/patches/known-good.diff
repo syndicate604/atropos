@@ -1,10 +1,7 @@
 diff --git a/app.py b/app.py
 --- a/app.py
 +++ b/app.py
-@@ -7,10 +7,9 @@ app = Flask(__name__)
-
- @app.route("/echo")
- def echo():
+@@ -9,8 +9,7 @@
      """Echo user message back to the client."""
      message = request.args.get("message", "hello")
      result = subprocess.run(
