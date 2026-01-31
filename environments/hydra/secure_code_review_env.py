@@ -469,10 +469,15 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                     "Diff truncated mid-line (suspicious last line, no final newline)"
                 )
 
-        # Check for incomplete diff structure
-        has_git_header = 'diff --git' in diff_text
-        has_file_headers = '---' in diff_text and '+++' in diff_text
-        has_hunk_marker = '@@' in diff_text
+        diff_lines = diff_text.split("\n") if diff_text else []
+
+        # Check for incomplete diff structure (line-based to avoid false positives)
+        has_git_header = any(line.startswith("diff --git ") for line in diff_lines)
+        has_file_headers = (
+            any(line.startswith("--- ") for line in diff_lines)
+            and any(line.startswith("+++ ") for line in diff_lines)
+        )
+        has_hunk_marker = any(line.startswith("@@") for line in diff_lines)
 
         if has_git_header or has_hunk_marker:
             # If we have diff structure, check completeness
@@ -480,15 +485,15 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
                 truncation_error = "Incomplete diff structure (missing --- or +++)"
             elif has_hunk_marker:
                 # Check if last hunk looks complete (should have at least one diff line after @@)
-                hunk_lines = [i for i, line in enumerate(diff_text.split('\n')) if line.startswith('@@')]
-                if hunk_lines:
-                    last_hunk_idx = hunk_lines[-1]
-                    lines_after_hunk = diff_text.split('\n')[last_hunk_idx + 1:]
-                    # Filter to lines that are actual diff content (not empty)
-                    content_lines = [l for l in lines_after_hunk if l and not l.isspace()]
-                    # Need at least one line of context/changes after hunk header
-                    if not content_lines:
-                        truncation_error = "Incomplete hunk (no content after @@ marker)"
+                    hunk_lines = [i for i, line in enumerate(diff_lines) if line.startswith("@@")]
+                    if hunk_lines:
+                        last_hunk_idx = hunk_lines[-1]
+                        lines_after_hunk = diff_lines[last_hunk_idx + 1:]
+                        # Filter to lines that are actual diff content (not empty)
+                        content_lines = [l for l in lines_after_hunk if l and not l.isspace()]
+                        # Need at least one line of context/changes after hunk header
+                        if not content_lines:
+                            truncation_error = "Incomplete hunk (no content after @@ marker)"
 
         # 4. Validate diff structure BEFORE applying
         # Reject diffs with missing/malformed hunks to fail fast
@@ -496,9 +501,6 @@ Generate a unified diff patch for {target_file} to fix this vulnerability:"""
             # Must have valid hunk headers (format: @@ -line,count +line,count @@)
             hunk_pattern = r'^@@\s+-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s+@@'
             has_valid_hunk = bool(re.search(hunk_pattern, diff_text, re.MULTILINE))
-
-            # Must have file headers if we have hunks
-            has_file_headers = '---' in diff_text and '+++' in diff_text
 
             if has_hunk_marker and not has_valid_hunk:
                 # Has @@ but format is wrong
