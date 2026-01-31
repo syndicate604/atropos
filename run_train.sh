@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage: ./run_train.sh [max_token_length] [total_steps]
 
 MAX_TOKEN_LENGTH="${1:-4096}"
-TOTAL_STEPS="${2:-1000}"
+TOTAL_STEPS="${2:-4000}"
 
 echo "========================================"
 echo "GRPO Training Pipeline"
