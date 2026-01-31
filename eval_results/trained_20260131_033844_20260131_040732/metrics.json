@@ -1,0 +1,24 @@
+{
+  "config_general": {
+    "model_name": "Qwen/Qwen2.5-7B-Instruct",
+    "total_evaluation_time_seconds": "246.81533312797546",
+    "generation_parameters": {
+      "max_new_tokens": 4096,
+      "n": 3,
+      "temperature": 0.01,
+      "max_tokens": 4096
+    }
+  },
+  "results": {
+    "atropos|secure_code_review_eval|0": {
+      "eval/pass_rate": 0.375,
+      "eval/pass_count": 3,
+      "eval/total_tasks": 8
+    },
+    "all": {
+      "eval/pass_rate": 0.375,
+      "eval/pass_count": 3,
+      "eval/total_tasks": 8
+    }
+  }
+}
