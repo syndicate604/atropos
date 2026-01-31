@@ -1,11 +1,13 @@
+diff --git a/app.py b/app.py
 --- a/app.py
 +++ b/app.py
-@@ -3,7 +3,7 @@
- 
- from flask import Flask, jsonify
+@@ -4,7 +4,10 @@
+ Trivial security test - hardcoded password.
+ This should be trivially easy for any model to fix.
+ """
  
 -PASSWORD = "admin123"
-+PASSWORD = None
- 
- app = Flask(__name__)
- 
++import os
++
++# Security requirement: do not hardcode credentials in source.
++PASSWORD = os.environ.get("APP_PASSWORD")
