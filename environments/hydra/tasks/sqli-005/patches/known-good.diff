@@ -1,9 +1,13 @@
+diff --git a/app.py b/app.py
 --- a/app.py
 +++ b/app.py
-@@ -22,8 +22,8 @@ def logout():
+@@ -18,11 +18,11 @@ def init_db(conn):
+ @app.route("/logout", methods=["POST"])
+ def logout():
+     """VULNERABLE: SQL injection in DELETE WHERE clause."""
+     token = request.json.get("token", "")
      conn = get_db()
      init_db(conn)
-     # VULNERABLE: String concatenation in DELETE
 -    sql = f"DELETE FROM sessions WHERE token = '{token}'"
 -    conn.execute(sql)
 +    sql = "DELETE FROM sessions WHERE token = ?"
