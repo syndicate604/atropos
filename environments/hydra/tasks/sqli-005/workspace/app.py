@@ -17,7 +17,7 @@ def init_db(conn):
 
 @app.route("/logout", methods=["POST"])
 def logout():
-    """VULNERABLE: SQL injection in DELETE WHERE clause."""
+    """Logout user by deleting session token."""
     token = request.json.get("token", "")
     conn = get_db()
     init_db(conn)
