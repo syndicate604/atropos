@@ -1,0 +1,22 @@
+{
+  "id": "sqli-002",
+  "version": 1,
+  "category": "sql_injection",
+  "cwe": "CWE-89",
+  "metadata": {
+    "language": "python",
+    "framework": "flask",
+    "difficulty": "easy",
+    "description": "SQL injection in WHERE clause with integer parameter"
+  },
+  "files": {
+    "vulnerable": "workspace/app.py",
+    "exploit": "exploit/exploit.py",
+    "tests": "workspace/tests/"
+  },
+  "patches": {
+    "known-good": "Correct parameterized query fix",
+    "known-bad": "Strip/length limit but still vulnerable to injection",
+    "breaks-tests": "Uses parameterized query but changes return format"
+  }
+}

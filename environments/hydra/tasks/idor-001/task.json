@@ -1,0 +1,17 @@
+{
+  "id": "idor-001",
+  "version": 1,
+  "category": "broken_access_control",
+  "cwe": "CWE-639",
+  "metadata": {
+    "language": "python",
+    "framework": "flask",
+    "difficulty": "medium",
+    "description": "IDOR in user profile access"
+  },
+  "files": {
+    "vulnerable": "workspace/app.py",
+    "exploit": "exploit/exploit.py",
+    "tests": "workspace/tests/"
+  }
+}

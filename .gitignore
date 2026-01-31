@@ -182,6 +182,9 @@ wandb
 # Allow MCP configuration
 !configs/mcp.json
 
+# Allow task configuration files
+!environments/hydra/tasks/*/task.json
+
 # gradio
 .gradio/
 

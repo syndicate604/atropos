@@ -1,0 +1,17 @@
+{
+  "id": "path-001",
+  "version": 1,
+  "category": "path_traversal",
+  "cwe": "CWE-22",
+  "metadata": {
+    "language": "python",
+    "framework": "flask",
+    "difficulty": "medium",
+    "description": "Path traversal in file download"
+  },
+  "files": {
+    "vulnerable": "workspace/app.py",
+    "exploit": "exploit/exploit.py",
+    "tests": "workspace/tests/"
+  }
+}

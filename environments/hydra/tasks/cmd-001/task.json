@@ -1,0 +1,17 @@
+{
+  "id": "cmd-001",
+  "version": 1,
+  "category": "command_injection",
+  "cwe": "CWE-78",
+  "metadata": {
+    "language": "python",
+    "framework": "flask",
+    "difficulty": "hard",
+    "description": "Command injection in ping utility"
+  },
+  "files": {
+    "vulnerable": "workspace/app.py",
+    "exploit": "exploit/exploit.py",
+    "tests": "workspace/tests/"
+  }
+}

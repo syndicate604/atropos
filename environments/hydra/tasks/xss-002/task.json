@@ -1,0 +1,17 @@
+{
+  "id": "xss-002",
+  "version": 1,
+  "category": "xss",
+  "cwe": "CWE-79",
+  "metadata": {
+    "language": "python",
+    "framework": "flask",
+    "difficulty": "medium",
+    "description": "Stored XSS in comment system"
+  },
+  "files": {
+    "vulnerable": "workspace/app.py",
+    "exploit": "exploit/exploit.py",
+    "tests": "workspace/tests/"
+  }
+}

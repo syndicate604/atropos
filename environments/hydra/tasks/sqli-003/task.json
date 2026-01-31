@@ -1,0 +1,22 @@
+{
+  "id": "sqli-003",
+  "version": 1,
+  "category": "sql_injection",
+  "cwe": "CWE-89",
+  "metadata": {
+    "language": "python",
+    "framework": "flask",
+    "difficulty": "medium",
+    "description": "SQL injection in ORDER BY clause"
+  },
+  "files": {
+    "vulnerable": "workspace/app.py",
+    "exploit": "exploit/exploit.py",
+    "tests": "workspace/tests/"
+  },
+  "patches": {
+    "known-good": "Whitelist valid sort columns",
+    "known-bad": "Strip semicolons but still vulnerable",
+    "breaks-tests": "Hardcode sort order"
+  }
+}

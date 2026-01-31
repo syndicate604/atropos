@@ -1,0 +1,17 @@
+{
+  "id": "xss-001",
+  "version": 1,
+  "category": "xss",
+  "cwe": "CWE-79",
+  "metadata": {
+    "language": "python",
+    "framework": "flask",
+    "difficulty": "easy",
+    "description": "Reflected XSS in search results"
+  },
+  "files": {
+    "vulnerable": "workspace/app.py",
+    "exploit": "exploit/exploit.py",
+    "tests": "workspace/tests/"
+  }
+}
