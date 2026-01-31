@@ -17,7 +17,7 @@ def init_db(conn):
 
 @app.route("/posts")
 def get_posts():
-    """VULNERABLE: SQL injection in LIMIT clause."""
+    """Get posts with limit parameter."""
     limit = request.args.get("limit", "5")
     conn = get_db()
     init_db(conn)

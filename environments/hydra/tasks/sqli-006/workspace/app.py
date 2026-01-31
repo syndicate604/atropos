@@ -16,7 +16,7 @@ def init_db(conn):
 
 @app.route("/profile", methods=["POST"])
 def update_profile():
-    """VULNERABLE: SQL injection in UPDATE SET clause."""
+    """Update user profile with new information."""
     username = request.json.get("username", "")
     email = request.json.get("email", "")
     conn = get_db()

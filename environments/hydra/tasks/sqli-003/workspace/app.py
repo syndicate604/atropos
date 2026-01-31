@@ -29,7 +29,7 @@ def init_db(conn):
 
 @app.route("/products")
 def list_products():
-    """VULNERABLE: SQL injection via sort parameter."""
+    """Get products sorted by column name."""
     sort = request.args.get("sort", "id")
     
     conn = get_db()
