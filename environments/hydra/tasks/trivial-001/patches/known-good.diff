@@ -5,9 +5,11 @@ diff --git a/app.py b/app.py
  Trivial security test - hardcoded password.
  This should be trivially easy for any model to fix.
  """
- 
+
 -PASSWORD = "admin123"
 +import os
 +
 +# Security requirement: do not hardcode credentials in source.
 +PASSWORD = os.environ.get("APP_PASSWORD")
+
+ def check_password(user_input):
